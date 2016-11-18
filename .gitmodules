@@ -1,0 +1,3 @@
+[submodule "JavaCheckStyle"]
+	path = JavaCheckStyle
+	url = git@github.com:sephiroth74/JavaCheckStyle.git
