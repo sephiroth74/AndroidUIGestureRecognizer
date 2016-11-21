@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures;
+package it.sephiroth.android.library.uigestures.demo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

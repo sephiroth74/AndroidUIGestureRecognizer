@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures;
+package it.sephiroth.android.library.uigestures.demo;
 
 import org.junit.Test;
 
