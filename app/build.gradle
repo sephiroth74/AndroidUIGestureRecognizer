@@ -10,6 +10,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+        applicationId "it.sephiroth.android.library.uigestures.demo"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -30,6 +31,7 @@ dependencies {
     })
 
     compile rootProject.ext.dependencies.androidSupportAppCompat
+    compile project(':uigesturerecognizer')
 
     testCompile 'junit:junit:4.12'
 }
