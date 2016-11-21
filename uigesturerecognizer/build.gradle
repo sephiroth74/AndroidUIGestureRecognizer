@@ -26,6 +26,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile rootProject.ext.dependencies.androidSupportAnnotations
+    compile 'it.sephiroth.android.library.simplelogger:simple-logger:1.0.0'
 }
 
 
