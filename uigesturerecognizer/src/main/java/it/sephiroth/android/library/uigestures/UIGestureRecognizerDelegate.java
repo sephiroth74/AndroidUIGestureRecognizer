@@ -10,8 +10,9 @@ import java.util.List;
 
 /**
  * Created by alessandro crugnola on 11/20/16.
+ * UIGestureRecognizer
  */
-
+@SuppressWarnings ("unused")
 public class UIGestureRecognizerDelegate implements View.OnTouchListener {
     private final HashSet<UIGestureRecognizer> mSet = new HashSet<>();
     private View mView;

@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
@@ -44,10 +45,11 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
 
     public static final String VERSION = BuildConfig.VERSION_NAME;
     private static int sId = 0;
+    private static boolean sDebug = false;
 
-    static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
-    static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout();
-    static final int DOUBLE_TAP_TIMEOUT = ViewConfiguration.getDoubleTapTimeout();
+    static final long LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+    static final long TAP_TIMEOUT = ViewConfiguration.getTapTimeout();
+    static final long DOUBLE_TAP_TIMEOUT = ViewConfiguration.getDoubleTapTimeout();
     static final int TOUCH_SLOP = 8;
     static final int DOUBLE_TAP_SLOP = 100;
     static final int DOUBLE_TAP_TOUCH_SLOP = TOUCH_SLOP;
@@ -61,8 +63,8 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     private Object mTag;
     private long mId;
     private UIGestureRecognizer mOtherRecognizer;
+    private final LoggerFactory.Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
-    protected final LoggerFactory.Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
     protected final GestureHandler mHandler;
 
     public UIGestureRecognizer(@Nullable Context context) {
@@ -134,7 +136,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     public void setTag(final Object mTag) {
         this.mTag = mTag;
 
-        if (BuildConfig.DEBUG) {
+        if (sDebug) {
             logger.setTag(String.valueOf(mTag));
         }
     }
@@ -193,7 +195,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     }
 
     protected final void setState(State state) {
-        logger.info("setState: %s", state);
+        logMessage(Log.INFO, "setState: %s", state);
 
         final boolean changed = mState != state || state == State.Changed;
         mState = state;
@@ -286,9 +288,37 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
 
     @Override
     public String toString() {
-        if (BuildConfig.DEBUG) {
-            return getClass().getSimpleName() + "[" + getTag() + "]";
+        return getClass().getSimpleName() + "[state: " + getState() + ", tag:" + getTag() + "]";
+    }
+
+    public static void setLogEnabled(boolean enabled) {
+        sDebug = enabled;
+    }
+
+    void logMessage(int level, String fmt, Object... args) {
+        if (!sDebug) {
+            return;
         }
-        return super.toString();
+
+        switch (level) {
+            case Log.INFO:
+                logger.info(fmt, args);
+                break;
+            case Log.DEBUG:
+                logger.debug(fmt, args);
+                break;
+            case Log.ASSERT:
+            case Log.ERROR:
+                logger.error(fmt, args);
+                break;
+            case Log.WARN:
+                logger.warn(fmt, args);
+                break;
+            case Log.VERBOSE:
+                logger.verbose(fmt, args);
+                break;
+            default:
+                break;
+        }
     }
 }
