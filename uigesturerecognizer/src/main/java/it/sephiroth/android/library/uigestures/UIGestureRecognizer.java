@@ -1,8 +1,18 @@
 package it.sephiroth.android.library.uigestures;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
+import android.view.ViewConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import it.sephiroth.android.library.simplelogger.LoggerFactory;
 
 /**
  * Created by <b>Alessandro Crugnola</b>
@@ -17,7 +27,7 @@ import android.view.MotionEvent;
  */
 
 @SuppressWarnings ("unused")
-public abstract class UIGestureRecognizer {
+public abstract class UIGestureRecognizer implements OnGestureRecognizerStateChangeListener {
 
     public enum State {
         Possible,
@@ -28,24 +38,151 @@ public abstract class UIGestureRecognizer {
         Ended
     }
 
-    public static final String VERSION = BuildConfig.VERSION_NAME;
+    public interface OnActionListener {
+        void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer);
+    }
 
+    public static final String VERSION = BuildConfig.VERSION_NAME;
+    private static int sId = 0;
+
+    static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+    static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout();
+    static final int DOUBLE_TAP_TIMEOUT = ViewConfiguration.getDoubleTapTimeout();
+    static final int TOUCH_SLOP = 8;
+    static final int DOUBLE_TAP_SLOP = 100;
+    static final int DOUBLE_TAP_TOUCH_SLOP = TOUCH_SLOP;
+
+    private final List<OnGestureRecognizerStateChangeListener> mStateListeners = new ArrayList<>();
+    private OnActionListener mListener;
     private State mState;
     private boolean mEnabled;
     private boolean mCancelsTouchesInView;
+    private UIGestureRecognizerDelegate mDelegate;
+    private Object mTag;
+    private long mId;
+    private UIGestureRecognizer mOtherRecognizer;
+
+    protected final LoggerFactory.Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
+    protected final GestureHandler mHandler;
 
     public UIGestureRecognizer(@Nullable Context context) {
+        mHandler = new GestureHandler();
         mCancelsTouchesInView = true;
         mEnabled = true;
+        mId = generateId();
+    }
+
+    private long generateId() {
+        return sId++;
+    }
+
+    @SuppressLint ("HandlerLeak")
+    protected final class GestureHandler extends Handler {
+        @Override
+        public void handleMessage(final Message msg) {
+            UIGestureRecognizer.this.handleMessage(msg);
+        }
+    }
+
+    protected final void removeMessages(int... messages) {
+        for (int message : messages) {
+            mHandler.removeMessages(message);
+        }
+    }
+
+    protected final boolean hasMessages(int... messages) {
+        for (int message : messages) {
+            if (mHandler.hasMessages(message)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected final void setDelegate(final UIGestureRecognizerDelegate delegate) {
+        mDelegate = delegate;
+    }
+
+    protected final UIGestureRecognizerDelegate getDelegate() {
+        return mDelegate;
+    }
+
+    protected final void fireActionEvent() {
+        if (null != mListener) {
+            mListener.onGestureRecognized(this);
+        }
+    }
+
+    protected void addOnStateChangeListenerListener(final OnGestureRecognizerStateChangeListener listener) {
+        if (!mStateListeners.contains(listener)) {
+            mStateListeners.add(listener);
+        }
+    }
+
+    protected boolean removeOnStateChangeListenerListener(final OnGestureRecognizerStateChangeListener listener) {
+        return mStateListeners.remove(listener);
     }
 
     protected abstract boolean onTouchEvent(MotionEvent event);
+
+    protected abstract void handleMessage(final Message msg);
+
+    /**
+     * @param mTag custom object the instance should keep
+     * @since 1.0.0
+     */
+    public void setTag(final Object mTag) {
+        this.mTag = mTag;
+
+        if (BuildConfig.DEBUG) {
+            logger.setTag(String.valueOf(mTag));
+        }
+    }
+
+    /**
+     * @return current tag assigned to this instance
+     * @since 1.0.0
+     */
+    public Object getTag() {
+        return mTag;
+    }
+
+    /**
+     * @param mId change the instance id
+     */
+    public void setId(final long mId) {
+        this.mId = mId;
+    }
+
+    /**
+     * @return the instance id
+     * @since 1.0.0
+     */
+    public static int getId() {
+        return sId;
+    }
+
+    public void setActionListener(final OnActionListener listener) {
+        this.mListener = listener;
+    }
 
     /**
      * @return Returns the number of touches involved in the gesture represented by the receiver.
      * @since 1.0.0
      */
     public abstract int getNumberOfTouches();
+
+    /**
+     * @return Returns the X computed as the location in a given view of the gesture represented by the receiver.
+     * @since 1.0.0
+     */
+    public abstract float getCurrentLocationX();
+
+    /**
+     * @return Returns the Y computed as the location in a given view of the gesture represented by the receiver.
+     * @since 1.0.0
+     */
+    public abstract float getCurrentLocationY();
 
     /**
      * @return The current recognizer internal state
@@ -56,7 +193,28 @@ public abstract class UIGestureRecognizer {
     }
 
     protected final void setState(State state) {
+        logger.info("setState: %s", state);
+
+        final boolean changed = mState != state || state == State.Changed;
         mState = state;
+
+        if (changed) {
+            for (OnGestureRecognizerStateChangeListener listener : mStateListeners) {
+                listener.onStateChanged(this);
+            }
+        }
+    }
+
+    protected boolean inState(State... states) {
+        if (null == states || states.length < 1) {
+            return false;
+        }
+        for (State state : states) {
+            if (mState == state) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -79,14 +237,33 @@ public abstract class UIGestureRecognizer {
     }
 
     /**
-     * @param recognizer Creates a dependency relationship between the receiver and another gesture recognizer when the objects
-     *                   are created
+     * @param other Creates a dependency relationship between the receiver and another gesture recognizer when the objects
+     *              are created
      * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require'>
      * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require</a>
      * @since 1.0.0
      */
-    public void requireFailureOf(@Nullable final UIGestureRecognizer recognizer) {
-        throw new RuntimeException("Not Implemented");
+    public final void requireFailureOf(@Nullable final UIGestureRecognizer other) {
+        if (null != mOtherRecognizer) {
+            mOtherRecognizer.removeOnStateChangeListenerListener(this);
+        }
+        this.mOtherRecognizer = other;
+    }
+
+    protected final UIGestureRecognizer getRequireFailureOf() {
+        return mOtherRecognizer;
+    }
+
+    protected final void stopListenForOtherStateChanges() {
+        if (null != getRequireFailureOf()) {
+            getRequireFailureOf().removeOnStateChangeListenerListener(this);
+        }
+    }
+
+    protected final void listenForOtherStateChanges() {
+        if (null != getRequireFailureOf()) {
+            getRequireFailureOf().addOnStateChangeListenerListener(this);
+        }
     }
 
     /**
@@ -105,5 +282,13 @@ public abstract class UIGestureRecognizer {
      */
     public boolean getCancelsTouchesInView() {
         return mCancelsTouchesInView;
+    }
+
+    @Override
+    public String toString() {
+        if (BuildConfig.DEBUG) {
+            return getClass().getSimpleName() + "[" + getTag() + "]";
+        }
+        return super.toString();
     }
 }
