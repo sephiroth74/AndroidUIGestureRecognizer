@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate;
 import it.sephiroth.android.library.uigestures.UILongPressGestureRecognizer;
+import it.sephiroth.android.library.uigestures.UIPanGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer;
 
 public class MainActivity extends AppCompatActivity implements UIGestureRecognizer.OnActionListener {
@@ -25,11 +26,11 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
 
         mDelegate = new UIGestureRecognizerDelegate();
 
-        UITapGestureRecognizer recognizer = new UITapGestureRecognizer(this);
-        recognizer.setNumberOfTapsRequired(1);
-        recognizer.setNumberOfTouchesRequired(1);
-        recognizer.setTag("single-tap");
-        recognizer.setActionListener(this);
+        UITapGestureRecognizer recognizer1 = new UITapGestureRecognizer(this);
+        recognizer1.setNumberOfTapsRequired(1);
+        recognizer1.setNumberOfTouchesRequired(1);
+        recognizer1.setTag("single-tap");
+        recognizer1.setActionListener(this);
 
         UITapGestureRecognizer recognizer2 = new UITapGestureRecognizer(this);
         recognizer2.setTag("double-tap");
@@ -44,16 +45,26 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
 
         UILongPressGestureRecognizer recognizer4 = new UILongPressGestureRecognizer(this);
         recognizer4.setTag("long-press-2");
-        recognizer4.setNumberOfTapsRequired(1);
+        recognizer4.setNumberOfTapsRequired(0);
+        recognizer4.setMinimumPressDuration(4000);
+        recognizer4.setAllowableMovement(500);
         recognizer4.setActionListener(this);
 
-        recognizer.requireFailureOf(recognizer2);
-        recognizer3.requireFailureOf(recognizer4);
+        UIPanGestureRecognizer recognizer5 = new UIPanGestureRecognizer(this);
+        recognizer5.setTag("pan");
+        recognizer5.setActionListener(this);
+        recognizer5.setMinimumNumberOfTouches(1);
+        recognizer5.setMaximumNumberOfTouches(5);
 
-        mDelegate.addGestureRecognizer(recognizer);
-        mDelegate.addGestureRecognizer(recognizer2);
-        //        mDelegate.addGestureRecognizer(recognizer4);
-        //        mDelegate.addGestureRecognizer(recognizer3);
+        recognizer1.requireFailureOf(recognizer2);
+        //recognizer3.requireFailureOf(recognizer4);
+        recognizer5.requireFailureOf(recognizer4);
+
+        // mDelegate.addGestureRecognizer(recognizer);
+        // mDelegate.addGestureRecognizer(recognizer2);
+        // mDelegate.addGestureRecognizer(recognizer3);
+        mDelegate.addGestureRecognizer(recognizer4);
+        mDelegate.addGestureRecognizer(recognizer5);
 
         mDelegate.start(mRoot);
     }
