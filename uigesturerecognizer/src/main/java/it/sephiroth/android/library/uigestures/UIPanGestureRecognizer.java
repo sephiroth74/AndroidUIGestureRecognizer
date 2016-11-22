@@ -110,29 +110,6 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
         }
     }
 
-    //    @Override
-    //    public void onStateChanged(@NonNull final UIGestureRecognizer recognizer, @NonNull final State state) {
-    //
-    //        logMessage(Log.VERBOSE, "onStateChanged(" + recognizer + ", " + state + ")");
-    //        Log.v(mLogTag, "mWaitingForFailure: " + mWaitingForFailure + ", state: " + getState() + ", started: " + mStarted);
-    //
-    //        if (hasMessages(MESSAGE_RESET)) {
-    //            Log.v(mLogTag, "hasMessage(MESSAGE_RESET): " + hasMessages(MESSAGE_RESET));
-    //            return;
-    //        }
-    //
-    //        if (mStarted && mWaitingForFailure && getState() == State.Possible) {
-    //            if (state == State.Failed) {
-    //                setState(State.Began);
-    //                mWaitingForFailure = false;
-    //            } else if (state == State.Began) {
-    //                setState(State.Failed);
-    //                mStarted = false;
-    //                mWaitingForFailure = false;
-    //            }
-    //        }
-    //    }
-
     /**
      * The minimum number of fingers that can be touching the view for this gesture to be recognized.
      * The default value is 1
