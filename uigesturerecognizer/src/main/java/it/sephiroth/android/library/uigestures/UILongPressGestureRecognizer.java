@@ -44,6 +44,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     private int mNumTouches = 0;
     private final PointF mCurrentLocation;
     private boolean mFireEvents;
+    private boolean mBegan;
 
     /**
      * UILongPressGestureRecognizer looks for long-press gestures.
@@ -56,6 +57,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
         super(context);
 
         mStarted = false;
+        mBegan = false;
         mCurrentLocation = new PointF();
 
         int touchSlop;
@@ -113,6 +115,11 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
             mFireEvents = true;
             stopListenForOtherStateChanges();
             fireActionEvent();
+
+            if (mBegan) {
+                setState(State.Changed);
+            }
+
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && getState() == State.Possible) {
             stopListenForOtherStateChanges();
             removeMessages();
@@ -173,6 +180,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
 
                 mAlwaysInTapRegion = true;
                 mNumTouches = count;
+                mBegan = false;
 
                 if (!mStarted) {
                     mFireEvents = false;
@@ -253,14 +261,18 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                         }
                     }
                 } else if (getState() == State.Began) {
-                    final float deltaX = (focusX - mDownFocusX);
-                    final float deltaY = (focusY - mDownFocusY);
-                    final float distance = (deltaX * deltaX) + (deltaY * deltaY);
+                    if (!mBegan) {
+                        final float deltaX = (focusX - mDownFocusX);
+                        final float deltaY = (focusY - mDownFocusY);
+                        final float distance = (deltaX * deltaX) + (deltaY * deltaY);
 
-                    if (distance > mTouchSlopSquare) {
-                        setState(State.Changed);
-                        if (mFireEvents) {
-                            fireActionEvent();
+                        if (distance > mTouchSlopSquare) {
+                            mBegan = true;
+
+                            if (mFireEvents) {
+                                setState(State.Changed);
+                                fireActionEvent();
+                            }
                         }
                     }
                 } else if (getState() == State.Changed) {
