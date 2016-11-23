@@ -110,4 +110,4 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
 ```
 
 # JavaDocs
-**JavaDocs** are available here: [javadoc/index.html](javadoc/index.html)
+**JavaDocs** are available here: [javadoc.zip](javadoc.zip)
