@@ -13,7 +13,6 @@ android {
         applicationId "it.sephiroth.android.library.uigestures.demo"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -32,7 +31,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+
     compile rootProject.ext.dependencies.androidSupportAppCompat
     compile project(':uigesturerecognizer')
 
+    testCompile 'junit:junit:4.12'
 }

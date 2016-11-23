@@ -3,6 +3,7 @@ package it.sephiroth.android.library.uigestures;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -68,7 +69,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     protected final GestureHandler mHandler;
 
     public UIGestureRecognizer(@Nullable Context context) {
-        mHandler = new GestureHandler();
+        mHandler = new GestureHandler(Looper.getMainLooper());
         mCancelsTouchesInView = true;
         mEnabled = true;
         mId = generateId();
@@ -80,6 +81,10 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
 
     @SuppressLint ("HandlerLeak")
     protected final class GestureHandler extends Handler {
+        public GestureHandler(final Looper mainLooper) {
+            super(mainLooper);
+        }
+
         @Override
         public void handleMessage(final Message msg) {
             UIGestureRecognizer.this.handleMessage(msg);
