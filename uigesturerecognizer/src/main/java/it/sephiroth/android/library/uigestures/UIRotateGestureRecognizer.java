@@ -111,8 +111,6 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
         final int action = ev.getAction();
         int count = ev.getPointerCount();
 
-        boolean handled = false;
-
         final boolean pointerUp = action == MotionEvent.ACTION_POINTER_UP;
         final int skipIndex = pointerUp ? ev.getActionIndex() : -1;
 
@@ -304,7 +302,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                 break;
         }
 
-        return true;
+        return getCancelsTouchesInView();
     }
 
     /**
