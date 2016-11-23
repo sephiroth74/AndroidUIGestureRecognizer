@@ -16,6 +16,7 @@
 
 package it.sephiroth.android.library.uigestures;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
@@ -232,6 +233,7 @@ public class ScaleGestureDetector {
      * rest of the MotionEvents in this event stream.
      */
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
+    @SuppressLint ("NewApi")
     public boolean onTouchEvent(MotionEvent event) {
         mCurrTime = event.getEventTime();
 
@@ -245,6 +247,7 @@ public class ScaleGestureDetector {
         final int count = event.getPointerCount();
         boolean isStylusButtonDown = false;
 
+        //noinspection NewApi
         if (Build.VERSION.SDK_INT >= 23) {
             isStylusButtonDown = (event.getButtonState() & MotionEvent.BUTTON_STYLUS_PRIMARY) != 0;
         }
