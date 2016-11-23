@@ -28,7 +28,7 @@ import android.view.ViewConfiguration;
 /**
  * This is a slightly modified version of the Android's ScaleGestureDetector which
  * doesn't trigger onScaleEnd when the scale ratio is back to 0.
- *
+ * <p>
  * <p>
  * <p>
  * Detects scaling transformation gestures using the supplied {@link MotionEvent}s.
@@ -243,8 +243,11 @@ public class ScaleGestureDetector {
         }
 
         final int count = event.getPointerCount();
-        final boolean isStylusButtonDown =
-            (event.getButtonState() & MotionEvent.BUTTON_STYLUS_PRIMARY) != 0;
+        boolean isStylusButtonDown = false;
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            isStylusButtonDown = (event.getButtonState() & MotionEvent.BUTTON_STYLUS_PRIMARY) != 0;
+        }
 
         final boolean anchoredScaleCancelled =
             mAnchoredScaleMode == ANCHORED_SCALE_MODE_STYLUS && !isStylusButtonDown;
