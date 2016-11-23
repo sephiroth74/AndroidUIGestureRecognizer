@@ -350,7 +350,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return The x velocity of the pan gesture
      * @since 1.0.0
      */
     public float getXVelocity() {
@@ -358,7 +358,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return The y velocity of the pan gesture
      * @since 1.0.0
      */
     public float getYVelocity() {
@@ -366,7 +366,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @param mTranslationX
+     * @param mTranslationX Change the current translation x
      * @since 1.0.0
      */
     public void setTranslationX(final float mTranslationX) {
@@ -374,7 +374,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @param mTranslationY
+     * @param mTranslationY Change the current translation y
      * @since 1.0.0
      */
     public void setTranslationY(final float mTranslationY) {
@@ -382,7 +382,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return The translation X of the pan gesture
      * @since 1.0.0
      */
     public float getTranslationX() {
@@ -390,7 +390,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return The translation Y of the pan gesture
      * @since 1.0.0
      */
     public float getTranslationY() {
@@ -398,7 +398,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return the relative scroll x between gestures
      * @since 1.0.0
      */
     public float getScrollX() {
@@ -406,7 +406,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     /**
-     * @return
+     * @return the relative scroll y between gestures
      * @since 1.0.0
      */
     public float getScrollY() {
