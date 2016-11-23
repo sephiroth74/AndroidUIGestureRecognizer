@@ -133,7 +133,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
             stopListenForOtherStateChanges();
             fireActionEvent();
             postReset();
-        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && getState() == State.Possible) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             stopListenForOtherStateChanges();
             removeMessages();
             setState(State.Failed);
@@ -265,6 +265,9 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                                 } else {
                                     if (getRequireFailureOf().getState() == State.Failed) {
                                         fireActionEvent();
+                                        postReset();
+                                    } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
+                                        setState(State.Failed);
                                         postReset();
                                     } else {
                                         listenForOtherStateChanges();

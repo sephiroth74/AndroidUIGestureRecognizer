@@ -94,7 +94,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
             stopListenForOtherStateChanges();
             fireActionEvent();
 
-        } else if (recognizer.inState(State.Began, State.Ended) && getState() == State.Possible && mStarted) {
+        } else if (recognizer.inState(State.Began, State.Ended) && inState(State.Began, State.Possible) && mStarted) {
             stopListenForOtherStateChanges();
             removeMessages();
             setState(State.Failed);
@@ -235,6 +235,8 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                                     if (getRequireFailureOf().getState() == State.Failed) {
                                         mFireEvents = true;
                                         fireActionEvent();
+                                    } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
+                                        setState(State.Failed);
                                     } else {
                                         listenForOtherStateChanges();
                                         mFireEvents = false;

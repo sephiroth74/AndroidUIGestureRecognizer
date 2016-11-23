@@ -110,7 +110,7 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
             stopListenForOtherStateChanges();
             fireActionEvent();
 
-        } else if (recognizer.inState(State.Began, State.Ended) && getState() == State.Possible) {
+        } else if (recognizer.inState(State.Began, State.Ended) && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges();
             removeMessages();
             setState(State.Failed);
@@ -152,6 +152,8 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
                     if (getRequireFailureOf().getState() == State.Failed) {
                         mFireEvents = true;
                         fireActionEvent();
+                    } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
+                        setState(State.Failed);
                     } else {
                         listenForOtherStateChanges();
                         mFireEvents = false;

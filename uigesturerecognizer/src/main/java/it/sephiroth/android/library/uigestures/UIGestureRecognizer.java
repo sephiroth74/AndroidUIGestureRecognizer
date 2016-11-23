@@ -127,6 +127,10 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         return mStateListeners.remove(listener);
     }
 
+    protected boolean hasOnStateChangeListenerListener(final OnGestureRecognizerStateChangeListener listener) {
+        return mStateListeners.contains(listener);
+    }
+
     protected abstract boolean onTouchEvent(MotionEvent event);
 
     protected abstract void handleMessage(final Message msg);
@@ -262,6 +266,10 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         if (null != getRequireFailureOf()) {
             getRequireFailureOf().removeOnStateChangeListenerListener(this);
         }
+    }
+
+    protected final boolean isListeningForOtherStateChanges() {
+        return null != getRequireFailureOf() && getRequireFailureOf().hasOnStateChangeListenerListener(this);
     }
 
     protected final void listenForOtherStateChanges() {

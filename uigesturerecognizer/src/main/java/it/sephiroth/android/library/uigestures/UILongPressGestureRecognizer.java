@@ -120,7 +120,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 setState(State.Changed);
             }
 
-        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && getState() == State.Possible) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges();
             removeMessages();
             mStarted = false;
@@ -372,6 +372,11 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     if (getRequireFailureOf().getState() == State.Failed) {
                         mFireEvents = true;
                         fireActionEvent();
+                    } else if (getRequireFailureOf().inState(State.Began, State.Changed, State.Ended)) {
+                        mStarted = false;
+                        mFireEvents = false;
+                        mNumTaps = 0;
+                        setState(State.Failed);
                     } else {
                         listenForOtherStateChanges();
                         mFireEvents = false;
