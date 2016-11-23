@@ -10,8 +10,13 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 /**
- * Created by alessandro crugnola on 11/20/16.
- * UIGestureRecognizer
+ * UILongPressGestureRecognizer looks for long-press gestures. The user must
+ * press one or more fingers on a view and hold them there for a minimum period of time before the action triggers. While down,
+ * the user’s fingers may not move more than a specified distance; if they move beyond the specified distance, the gesture fails.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer</a>
  */
 @SuppressWarnings ("unused")
 public class UILongPressGestureRecognizer extends UIGestureRecognizer implements UIContinuousRecognizer {
