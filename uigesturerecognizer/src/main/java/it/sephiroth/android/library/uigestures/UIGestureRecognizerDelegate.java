@@ -1,10 +1,12 @@
 package it.sephiroth.android.library.uigestures;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,15 +15,45 @@ import java.util.List;
  * UIGestureRecognizer
  */
 @SuppressWarnings ("unused")
-public class UIGestureRecognizerDelegate implements View.OnTouchListener {
-    private final HashSet<UIGestureRecognizer> mSet = new HashSet<>();
-    private View mView;
+public class UIGestureRecognizerDelegate {
 
+    public interface Callback {
+        boolean shouldBegin(UIGestureRecognizer recognizer);
+
+        boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(UIGestureRecognizer current, UIGestureRecognizer recognizer);
+
+        boolean shouldReceiveTouch(final UIGestureRecognizer recognizer);
+    }
+
+    private final HashSet<UIGestureRecognizer> mSet = new LinkedHashSet<>();
+    private Callback mCallback;
+
+    public UIGestureRecognizerDelegate(@Nullable Callback callback) {
+        mCallback = callback;
+    }
+
+    /**
+     * @param callback
+     * @since 1.0.0
+     */
+    public void setCallback(final Callback callback) {
+        this.mCallback = callback;
+    }
+
+    /**
+     * @param recognizer
+     * @since 1.0.0
+     */
     public void addGestureRecognizer(@NonNull final UIGestureRecognizer recognizer) {
         recognizer.setDelegate(this);
         mSet.add(recognizer);
     }
 
+    /**
+     * @param recognizer
+     * @return
+     * @since 1.0.0
+     */
     public boolean removeGestureRecognizer(@NonNull final UIGestureRecognizer recognizer) {
         if (mSet.remove(recognizer)) {
             recognizer.setDelegate(null);
@@ -30,20 +62,13 @@ public class UIGestureRecognizerDelegate implements View.OnTouchListener {
         return false;
     }
 
-    public void start(@NonNull final View view) {
-        mView = view;
-        mView.setOnTouchListener(this);
-    }
-
-    public void stop() {
-        if (null != mView) {
-            mView.setOnTouchListener(null);
-            mView = null;
-        }
-    }
-
-    @Override
-    public boolean onTouch(final View view, final MotionEvent event) {
+    /**
+     * @param view
+     * @param event
+     * @return
+     * @since 1.0.0
+     */
+    public boolean onTouchEvent(final View view, final MotionEvent event) {
         boolean handled = false;
         boolean h;
         List<UIGestureRecognizer> list = new LinkedList<>();
@@ -68,15 +93,15 @@ public class UIGestureRecognizerDelegate implements View.OnTouchListener {
     }
 
     protected boolean shouldBegin(UIGestureRecognizer recognizer) {
-        return true;
+        return null == mCallback || mCallback.shouldBegin(recognizer);
     }
 
     private boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(
         final UIGestureRecognizer current, final UIGestureRecognizer recognizer) {
-        return true;
+        return null == mCallback || mCallback.shouldRecognizeSimultaneouslyWithGestureRecognizer(current, recognizer);
     }
 
     private boolean shouldReceiveTouch(final UIGestureRecognizer recognizer) {
-        return true;
+        return null == mCallback || mCallback.shouldReceiveTouch(recognizer);
     }
 }

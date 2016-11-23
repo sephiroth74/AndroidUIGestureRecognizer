@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
@@ -14,7 +16,8 @@ import it.sephiroth.android.library.uigestures.UIPinchGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIRotateGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer;
 
-public class MainActivity extends AppCompatActivity implements UIGestureRecognizer.OnActionListener {
+public class MainActivity extends AppCompatActivity
+    implements UIGestureRecognizer.OnActionListener, UIGestureRecognizerDelegate.Callback {
 
     private ViewGroup mRoot;
     private UIGestureRecognizerDelegate mDelegate;
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
 
         UIGestureRecognizer.setLogEnabled(BuildConfig.DEBUG);
 
-        mDelegate = new UIGestureRecognizerDelegate();
+        mDelegate = new UIGestureRecognizerDelegate(this);
 
         UITapGestureRecognizer recognizer1 = new UITapGestureRecognizer(this);
         recognizer1.setNumberOfTapsRequired(1);
@@ -78,7 +81,13 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
         mDelegate.addGestureRecognizer(recognizer6);
         mDelegate.addGestureRecognizer(recognizer7);
 
-        mDelegate.start(mRoot);
+        // start listening for MotionEvent
+        mRoot.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(final View view, final MotionEvent motionEvent) {
+                return mDelegate.onTouchEvent(view, motionEvent);
+            }
+        });
     }
 
     @Override
@@ -91,5 +100,21 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
         Log.d(getClass().getSimpleName(), "onGestureRecognized(" + recognizer + "). state: " + recognizer.getState());
+    }
+
+    @Override
+    public boolean shouldBegin(final UIGestureRecognizer recognizer) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(
+        final UIGestureRecognizer current, final UIGestureRecognizer recognizer) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldReceiveTouch(final UIGestureRecognizer recognizer) {
+        return true;
     }
 }
