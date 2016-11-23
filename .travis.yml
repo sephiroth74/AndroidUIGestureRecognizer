@@ -6,10 +6,11 @@ jdk:
 android:
   components:
     - tools
+    - tools
+    - platform-tools
     - build-tools-25.0.1
     - android-25
     - extra-android-m2repository
-    - extra-android-support
 
 notifications:
     email:
@@ -23,9 +24,9 @@ before_install:
   - android update sdk -u -a --filter platform-tools-25.0.1
 
 install:
-    # Ensure Gradle wrapper is executable, download wrapper and show version
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
 script:
-  - ./gradlew clean build checkstyleDebug -PdisablePreDex
+  - ./gradlew build connectedCheck -PdisablePreDex
+
 
