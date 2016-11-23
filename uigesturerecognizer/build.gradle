@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -43,3 +42,8 @@ tasks.all {
             task.dependsOn('check')
         }
 }
+
+apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
+apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'
+
+uploadArchives.dependsOn 'check'
