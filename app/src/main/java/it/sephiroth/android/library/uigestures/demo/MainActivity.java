@@ -10,6 +10,8 @@ import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate;
 import it.sephiroth.android.library.uigestures.UILongPressGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIPanGestureRecognizer;
+import it.sephiroth.android.library.uigestures.UIPinchGestureRecognizer;
+import it.sephiroth.android.library.uigestures.UIRotateGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer;
 
 public class MainActivity extends AppCompatActivity implements UIGestureRecognizer.OnActionListener {
@@ -56,6 +58,14 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
         recognizer5.setMinimumNumberOfTouches(1);
         recognizer5.setMaximumNumberOfTouches(5);
 
+        UIPinchGestureRecognizer recognizer6 = new UIPinchGestureRecognizer(this);
+        recognizer6.setTag("pinch");
+        recognizer6.setActionListener(this);
+
+        UIRotateGestureRecognizer recognizer7 = new UIRotateGestureRecognizer(this);
+        recognizer7.setTag("rotation");
+        recognizer7.setActionListener(this);
+
         recognizer1.requireFailureOf(recognizer2);
         //recognizer3.requireFailureOf(recognizer4);
         recognizer5.requireFailureOf(recognizer4);
@@ -63,8 +73,10 @@ public class MainActivity extends AppCompatActivity implements UIGestureRecogniz
         // mDelegate.addGestureRecognizer(recognizer);
         // mDelegate.addGestureRecognizer(recognizer2);
         // mDelegate.addGestureRecognizer(recognizer3);
-        mDelegate.addGestureRecognizer(recognizer4);
-        mDelegate.addGestureRecognizer(recognizer5);
+        // mDelegate.addGestureRecognizer(recognizer4);
+        // mDelegate.addGestureRecognizer(recognizer5);
+        mDelegate.addGestureRecognizer(recognizer6);
+        mDelegate.addGestureRecognizer(recognizer7);
 
         mDelegate.start(mRoot);
     }
