@@ -331,7 +331,8 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
         return getCancelsTouchesInView();
     }
 
-    private void removeMessages() {
+    @Override
+    protected void removeMessages() {
         removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS);
     }
 

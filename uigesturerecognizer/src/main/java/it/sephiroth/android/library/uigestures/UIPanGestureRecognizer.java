@@ -419,4 +419,9 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     public float getCurrentLocationY() {
         return mCurrentLocation.y;
     }
+
+    @Override
+    protected void removeMessages() {
+        removeMessages(MESSAGE_RESET);
+    }
 }

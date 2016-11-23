@@ -241,4 +241,9 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
     public long getTimeDelta() {
         return mScaleGestureDetector.getTimeDelta();
     }
+
+    @Override
+    protected void removeMessages() {
+        removeMessages(MESSAGE_RESET);
+    }
 }

@@ -86,6 +86,8 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         }
     }
 
+    protected abstract void removeMessages();
+
     protected final void removeMessages(int... messages) {
         for (int message : messages) {
             mHandler.removeMessages(message);
