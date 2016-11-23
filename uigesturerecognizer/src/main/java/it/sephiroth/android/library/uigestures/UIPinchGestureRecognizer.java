@@ -10,12 +10,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 /**
- * Created by alessandro crugnola on 11/22/16.
- * UIGestureRecognizer
- * <p>
  * UIPinchGestureRecognizer is a subclass of UIGestureRecognizer that looks for pinching gestures involving two touches.
  * When the user moves the two fingers toward each other, the conventional meaning is zoom-out; when the user moves the two
  * fingers away from each other, the conventional meaning is zoom-in.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uipinchgesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uipinchgesturerecognizer</a>
  */
 
 @SuppressWarnings ("unused")

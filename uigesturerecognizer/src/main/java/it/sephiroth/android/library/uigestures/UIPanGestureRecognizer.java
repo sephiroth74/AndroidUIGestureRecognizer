@@ -10,12 +10,13 @@ import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 
 /**
- * Created by alessandro crugnola on 11/21/16.
- * UIGestureRecognizer
- * <p>
  * UIPanGestureRecognizer is a subclass of UIGestureRecognizer that looks for panning (dragging) gestures. The user must
  * be pressing one or more fingers on a view while they pan it. Clients implementing the action method for this gesture
  * recognizer can ask it for the current translation and velocity of the gesture.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uipangesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uipangesturerecognizer</a>
  */
 @SuppressWarnings ("unused")
 public class UIPanGestureRecognizer extends UIGestureRecognizer implements UIContinuousRecognizer {

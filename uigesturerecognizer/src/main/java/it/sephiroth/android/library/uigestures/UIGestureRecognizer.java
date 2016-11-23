@@ -16,12 +16,12 @@ import java.util.List;
 import it.sephiroth.android.library.simplelogger.LoggerFactory;
 
 /**
- * Created by <b>Alessandro Crugnola</b>
- * <p>AndroidGestureRecognizer is an Android implementation
+ * AndroidGestureRecognizer is an Android implementation
  * of the Apple's UIGestureRecognizer framework. There's not guarantee, however, that
- * this library works 100% in the same way as the Apple version.</p>
+ * this library works 100% in the same way as the Apple version.<br />
+ * This is the base class for all the UI gesture implementations.
  *
- * @author sephiroth
+ * @author alessandro crugnola
  * @version 1.0.0
  * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer'>
  * https://developer.apple.com/reference/uikit/uigesturerecognizer</a>

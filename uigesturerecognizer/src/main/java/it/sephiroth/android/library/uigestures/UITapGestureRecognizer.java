@@ -10,8 +10,12 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 /**
- * Created by crugnola on 11/4/16.
- * UIGestureRecognizer
+ * UITapGestureRecognizer looks for single or multiple taps.
+ * For the gesture to be recognized, the specified number of fingers must tap the view a specified number of times.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uitapgesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uitapgesturerecognizer</a>
  */
 @SuppressWarnings ("unused")
 public final class UITapGestureRecognizer extends UIGestureRecognizer implements UIDiscreteGestureRecognizer {

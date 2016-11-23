@@ -10,11 +10,12 @@ import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 
 /**
- * Created by alessandro crugnola on 11/21/16.<br />
- * UIGestureRecognizer
- * <p>
  * UISwipeGestureRecognizer is a subclass of UIGestureRecognizer that looks for swiping gestures in one or more
  * directions. A swipe is a discrete gesture, and thus the associated action message is sent only once per gesture.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uiswipegesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uiswipegesturerecognizer</a>
  */
 
 @SuppressWarnings ("unused")

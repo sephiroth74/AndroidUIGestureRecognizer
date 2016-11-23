@@ -11,17 +11,42 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by alessandro crugnola on 11/20/16.
- * UIGestureRecognizer
+ * @author alessandro crugnola
  */
 @SuppressWarnings ("unused")
 public class UIGestureRecognizerDelegate {
 
     public interface Callback {
+        /**
+         * Asks the delegate if a gesture recognizer should begin interpreting touches.
+         *
+         * @param recognizer the current recognizer
+         * @return true if the recognizer should begin interpreting touches.
+         * @see
+         * <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin'>
+         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin</a>
+         */
         boolean shouldBegin(UIGestureRecognizer recognizer);
 
+        /**
+         * Asks the delegate if two gesture recognizers should be allowed to recognize gestures simultaneously.
+         *
+         * @param current    the first recognizer
+         * @param recognizer the second recognizer
+         * @return true if both recognizers shouls be recognized simultaneously
+         * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer'>
+         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer</a>
+         */
         boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(UIGestureRecognizer current, UIGestureRecognizer recognizer);
 
+        /**
+         * Ask the delegate if a gesture recognizer should receive an object representing a touch.
+         *
+         * @param recognizer the recognizer that should receive the touch
+         * @return true if the recognizer should receive the motion event
+         * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer'>
+         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer</a>
+         */
         boolean shouldReceiveTouch(final UIGestureRecognizer recognizer);
     }
 
@@ -33,7 +58,7 @@ public class UIGestureRecognizerDelegate {
     }
 
     /**
-     * @param callback
+     * @param callback set the optional callback
      * @since 1.0.0
      */
     public void setCallback(final Callback callback) {
@@ -41,7 +66,7 @@ public class UIGestureRecognizerDelegate {
     }
 
     /**
-     * @param recognizer
+     * @param recognizer add a new gesture recognizer to the chain
      * @since 1.0.0
      */
     public void addGestureRecognizer(@NonNull final UIGestureRecognizer recognizer) {
@@ -50,7 +75,7 @@ public class UIGestureRecognizerDelegate {
     }
 
     /**
-     * @param recognizer
+     * @param recognizer remove a previously added gesture recognizer
      * @return
      * @since 1.0.0
      */
@@ -63,9 +88,11 @@ public class UIGestureRecognizerDelegate {
     }
 
     /**
-     * @param view
-     * @param event
-     * @return
+     * Forward the view's touchEvent
+     *
+     * @param view  the view that generated the event
+     * @param event the motion event
+     * @return true if handled
      * @since 1.0.0
      */
     public boolean onTouchEvent(final View view, final MotionEvent event) {

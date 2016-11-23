@@ -9,12 +9,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 /**
- * Created by alessandro crugnola on 11/20/16.
- * UIGestureRecognizer
- * <p>
  * UIRotationGestureRecognizer is a subclass of UIGestureRecognizer that looks for rotation gestures involving two
  * touches. When the user moves the fingers opposite each other in a circular motion, the underlying view should rotate in a
  * corresponding direction and speed.
+ *
+ * @author alessandro crugnola
+ * @see <a href='https://developer.apple.com/reference/uikit/uirotationgesturerecognizer'>
+ * https://developer.apple.com/reference/uikit/uirotationgesturerecognizer</a>
  */
 
 @SuppressWarnings ("unused")
