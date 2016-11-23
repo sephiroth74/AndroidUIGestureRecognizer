@@ -28,9 +28,22 @@ android {
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    destinationDir = file("../javadoc/")
+    title = "Android UIGestureRecognizer $VERSION_NAME"
+    description = "AndroidGestureRecognizer is an Android implementation of the Apple's UIGestureRecognizer framework."
+    failOnError false
 
+    options {
+        author true
+        docTitle "Android UIGestureRecognizer $VERSION_NAME"
+    }
+
+}
+
+dependencies {
     compile('it.sephiroth.android.library.simplelogger:simple-logger:1.0.0') {
         exclude group: 'com.android.support'
     }
