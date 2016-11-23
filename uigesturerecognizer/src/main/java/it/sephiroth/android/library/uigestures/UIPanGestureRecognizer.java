@@ -239,6 +239,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
 
                 mStarted = false;
                 mFireEvents = false;
+                stopListenForOtherStateChanges();
                 removeMessages(MESSAGE_RESET);
                 setState(State.Possible);
                 break;
