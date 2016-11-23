@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: "../JavacheckStyle/checkstyle.gradle"
+apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
