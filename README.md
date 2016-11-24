@@ -1,6 +1,6 @@
 # Android UIGestureRecognizer
 
-[![Build Status](https://travis-ci.com/sephiroth74/AndroidUIGestureRecognizer.svg?token=wyuXsgX393aH5yfys8FE&branch=master)](https://travis-ci.com/sephiroth74/AndroidUIGestureRecognizer)
+
 <br />
 
 AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.
