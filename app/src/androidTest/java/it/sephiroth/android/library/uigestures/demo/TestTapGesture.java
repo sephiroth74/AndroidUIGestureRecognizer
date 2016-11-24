@@ -6,6 +6,8 @@ import android.graphics.Point;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -15,7 +17,6 @@ import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
-import android.view.MotionEvent;
 
 import junit.framework.Assert;
 
@@ -33,6 +34,7 @@ import static android.content.Context.POWER_SERVICE;
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
 import static android.os.PowerManager.FULL_WAKE_LOCK;
 import static android.os.PowerManager.ON_AFTER_RELEASE;
+import static android.support.test.espresso.Espresso.onView;
 import static org.junit.Assert.assertEquals;
 
 @RunWith (AndroidJUnit4.class)
@@ -67,9 +69,22 @@ public class TestTapGesture {
     @Rule
     public ActivityTestRule<BaseTest> mActivityRule = new ActivityTestRule<>(BaseTest.class);
 
+    private UiObject getMainView() {
+        return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/activity_main"));
+    }
+
+    private UiObject getTextView() {
+        return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/text"));
+    }
+
+    private UiObject getTitleView() {
+        return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/title"));
+    }
+
     @Test
     public void test_singleTap() throws UiObjectNotFoundException, InterruptedException {
         BaseTest activity = mActivityRule.getActivity();
+
         final UIGestureRecognizerDelegate delegate = activity.delegate;
         Assert.assertNotNull(delegate);
         delegate.clear();
@@ -81,24 +96,16 @@ public class TestTapGesture {
         recognizer.setActionListener(mActivityRule.getActivity());
         delegate.addGestureRecognizer(recognizer);
 
-        final UiObject mainView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/activity_main"));
-        final UiObject textView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/text"));
+        final UiObject mainView = getMainView();
+        final UiObject textView = getTextView();
+        final UiObject title = getTitleView();
+        title.setText("1 Tap");
 
         textView.setText("None");
 
         mainView.click();
         SystemClock.sleep(200);
 
-        assertEquals(recognizer.getTag() + ": " + State.Ended, textView.getText());
-        assertEquals(mActivityRule.getActivity().getCurrentState(), State.Ended);
-        assertEquals(State.Ended, recognizer.getState());
-
-        // test second click
-        SystemClock.sleep(200);
-        textView.setText("None");
-
-        mainView.click();
-        SystemClock.sleep(200);
         assertEquals(recognizer.getTag() + ": " + State.Ended, textView.getText());
     }
 
@@ -108,8 +115,6 @@ public class TestTapGesture {
         Assert.assertNotNull(delegate);
         delegate.clear();
 
-        BaseTest activity = mActivityRule.getActivity();
-
         UITapGestureRecognizer recognizer = new UITapGestureRecognizer(context);
         recognizer.setTag("single-tap");
         recognizer.setNumberOfTouchesRequired(2);
@@ -117,8 +122,11 @@ public class TestTapGesture {
         recognizer.setActionListener(mActivityRule.getActivity());
         delegate.addGestureRecognizer(recognizer);
 
-        final UiObject mainView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/activity_main"));
-        final UiObject textView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/text"));
+        final UiObject mainView = getMainView();
+        final UiObject textView = getTextView();
+        final UiObject title = getTitleView();
+
+        title.setText("1 Tap 2 Fingers");
 
         mainView.performTwoPointerGesture(
             new Point(200, 300),
@@ -128,65 +136,38 @@ public class TestTapGesture {
             1
         );
         SystemClock.sleep(200);
-
         assertEquals(recognizer.getTag() + ": " + State.Ended, textView.getText());
-        assertEquals(mActivityRule.getActivity().getCurrentState(), State.Ended);
-        assertEquals(State.Ended, recognizer.getState());
-
-        // test second click
-        textView.setText("None");
-        mainView.click();
-
-        SystemClock.sleep(800);
-        assertEquals("None", textView.getText());
     }
 
     @Test
-    public void test_singleTap5Fingers() throws UiObjectNotFoundException, InterruptedException {
-        final UIGestureRecognizerDelegate delegate = mActivityRule.getActivity().delegate;
-        Assert.assertNotNull(delegate);
+    public void test_singleTap2Taps() throws UiObjectNotFoundException, InterruptedException {
+        BaseTest activity = mActivityRule.getActivity();
+
+        final UIGestureRecognizerDelegate delegate = activity.delegate;
         delegate.clear();
 
         UITapGestureRecognizer recognizer = new UITapGestureRecognizer(context);
         recognizer.setTag("single-tap");
-        recognizer.setNumberOfTouchesRequired(5);
-        recognizer.setNumberOfTapsRequired(1);
+        recognizer.setNumberOfTouchesRequired(1);
+        recognizer.setNumberOfTapsRequired(2);
         recognizer.setActionListener(mActivityRule.getActivity());
         delegate.addGestureRecognizer(recognizer);
 
-        final UiObject mainView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/activity_main"));
-        final UiObject textView = device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/text"));
+        final UiObject mainView = getMainView();
+        final UiObject textView = getTextView();
+        final UiObject title = getTitleView();
 
-        final MotionEvent.PointerCoords[] pointers1 = new MotionEvent.PointerCoords[1];
-        pointers1[0] = new MotionEvent.PointerCoords();
-        pointers1[0].x = 200;
-        pointers1[0].y = 300;
+        title.setText("2 Taps");
+        textView.setText("None");
 
-        final MotionEvent.PointerCoords[] pointers2 = new MotionEvent.PointerCoords[1];
-        pointers2[0] = new MotionEvent.PointerCoords();
-        pointers2[0].x = 300;
-        pointers2[0].y = 400;
-
-        final MotionEvent.PointerCoords[] pointers3 = new MotionEvent.PointerCoords[1];
-        pointers3[0] = new MotionEvent.PointerCoords();
-        pointers3[0].x = 400;
-        pointers3[0].y = 500;
-
-        final MotionEvent.PointerCoords[] pointers4 = new MotionEvent.PointerCoords[1];
-        pointers4[0] = new MotionEvent.PointerCoords();
-        pointers4[0].x = 500;
-        pointers4[0].y = 600;
-
-        final MotionEvent.PointerCoords[] pointers5 = new MotionEvent.PointerCoords[1];
-        pointers5[0] = new MotionEvent.PointerCoords();
-        pointers5[0].x = 700;
-        pointers5[0].y = 700;
-
-        mainView.performMultiPointerGesture(pointers1, pointers2, pointers3, pointers4, pointers5);
-
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick());
         SystemClock.sleep(200);
 
         assertEquals(recognizer.getTag() + ": " + State.Ended, textView.getText());
     }
 
+    @Test
+    public void test_singleTap2Taps2Fingers() throws UiObjectNotFoundException, InterruptedException {
+
+    }
 }

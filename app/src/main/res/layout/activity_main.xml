@@ -11,16 +11,30 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/text"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@null"
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:text="None"
         android:inputType="none"
-        android:background="@null"
+        android:text="None"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+    <EditText
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
         android:layout_marginBottom="8dp"
+        android:background="@null"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="none"
+        android:text="None"
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
