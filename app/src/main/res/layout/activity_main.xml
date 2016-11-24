@@ -10,18 +10,27 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <TextView
+    <EditText
         android:id="@+id/text"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="None" />
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="None"
+        android:inputType="none"
+        android:background="@null"
+        android:layout_marginBottom="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:id="@+id/text2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/text"
-        android:text="None" />
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 </RelativeLayout>

@@ -16,17 +16,33 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
     private TextView mTextView;
     private TextView mTextView2;
     private UIGestureRecognizer.State mCurrentState;
+    private long timeSpan = 0;
+
+    public TextView getTextView() {
+        return mTextView;
+    }
+
+    public TextView getTextView2() {
+        return mTextView2;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        timeSpan = System.currentTimeMillis();
+
         delegate = new UIGestureRecognizerDelegate(null);
         findViewById(R.id.activity_main).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View view, final MotionEvent motionEvent) {
-                mTextView2.setText(actionToString(motionEvent.getActionMasked()));
+                long time = System.currentTimeMillis() - timeSpan;
+                CharSequence currentText = mTextView2.getText();
+                mTextView2.setText(time + "ms, action:" + actionToString(motionEvent.getActionMasked()));
+                mTextView2.append("\n");
+                mTextView2.append(currentText);
+
                 return delegate.onTouchEvent(view, motionEvent);
             }
         });
