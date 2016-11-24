@@ -82,9 +82,23 @@ public class UIGestureRecognizerDelegate {
     public boolean removeGestureRecognizer(@NonNull final UIGestureRecognizer recognizer) {
         if (mSet.remove(recognizer)) {
             recognizer.setDelegate(null);
+            recognizer.clearStateListeners();
             return true;
         }
         return false;
+    }
+
+    /**
+     * Remove all the gesture recognizers currently associated with the delegate
+     *
+     * @since 1.0.0
+     */
+    public void clear() {
+        for (UIGestureRecognizer uiGestureRecognizer : mSet) {
+            uiGestureRecognizer.setDelegate(null);
+            uiGestureRecognizer.clearStateListeners();
+        }
+        mSet.clear();
     }
 
     /**

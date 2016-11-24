@@ -112,6 +112,10 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         mDelegate = delegate;
     }
 
+    protected void clearStateListeners() {
+        mStateListeners.clear();
+    }
+
     protected final UIGestureRecognizerDelegate getDelegate() {
         return mDelegate;
     }
