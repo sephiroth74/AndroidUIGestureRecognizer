@@ -67,7 +67,7 @@ public class TestTapGesture {
 
         assertEquals(recognizer.getTag() + ": " + State.Ended, textView.getText());
         assertEquals(mActivityRule.getActivity().getCurrentState(), State.Ended);
-        assertEquals(recognizer.getState(), State.Ended);
+        assertEquals(State.Ended, recognizer.getState());
 
         // test second click
         textView.setText("None");
