@@ -136,7 +136,6 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
         if (recognizer.getState() == State.Failed && getState() == State.Ended) {
             stopListenForOtherStateChanges();
             fireActionEvent();
-            postReset();
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             stopListenForOtherStateChanges();
             removeMessages();
@@ -180,13 +179,14 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP);
+                removeMessages();
                 mAlwaysInTapRegion = true;
                 mNumTouches = count;
 
+                setState(State.Possible);
+
                 if (!mStarted) {
                     stopListenForOtherStateChanges();
-                    setState(State.Possible);
                     mNumTaps = 0;
                     mStarted = true;
                 }
@@ -265,14 +265,11 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
                                 if (null == getRequireFailureOf()) {
                                     fireActionEvent();
-                                    postReset();
                                 } else {
                                     if (getRequireFailureOf().getState() == State.Failed) {
                                         fireActionEvent();
-                                        postReset();
                                     } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
                                         setState(State.Failed);
-                                        postReset();
                                     } else {
                                         listenForOtherStateChanges();
                                         logMessage(Log.DEBUG, "waiting...");
@@ -280,7 +277,6 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                                 }
                             } else {
                                 setState(State.Failed);
-                                postReset();
                             }
                             mStarted = false;
                         }
@@ -320,7 +316,6 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
     private void handleFailed() {
         setState(State.Failed);
         removeMessages();
-        postReset();
         mStarted = false;
     }
 
