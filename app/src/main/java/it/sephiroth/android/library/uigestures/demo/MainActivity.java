@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate;
@@ -76,19 +77,19 @@ public class MainActivity extends AppCompatActivity
         recognizer8.setNumberOfTouchesRequired(1);
         recognizer8.setDirection(UISwipeGestureRecognizer.UP | UISwipeGestureRecognizer.RIGHT);
 
-        recognizer1.requireFailureOf(recognizer2);
+        //recognizer1.requireFailureOf(recognizer2);
         //recognizer3.requireFailureOf(recognizer4);
         recognizer5.requireFailureOf(recognizer4);
         recognizer8.requireFailureOf(recognizer4);
 
-        // mDelegate.addGestureRecognizer(recognizer);
-        // mDelegate.addGestureRecognizer(recognizer2);
+        //mDelegate.addGestureRecognizer(recognizer1);
+        mDelegate.addGestureRecognizer(recognizer2);
         // mDelegate.addGestureRecognizer(recognizer3);
-        mDelegate.addGestureRecognizer(recognizer4);
+        // mDelegate.addGestureRecognizer(recognizer4);
         // mDelegate.addGestureRecognizer(recognizer5);
         // mDelegate.addGestureRecognizer(recognizer6);
         // mDelegate.addGestureRecognizer(recognizer7);
-        mDelegate.addGestureRecognizer(recognizer8);
+        // mDelegate.addGestureRecognizer(recognizer8);
 
         // start listening for MotionEvent
         mRoot.setOnTouchListener(new View.OnTouchListener() {
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
         Log.d(getClass().getSimpleName(), "onGestureRecognized(" + recognizer + "). state: " + recognizer.getState());
+        ((TextView) findViewById(R.id.text)).setText(recognizer.getState().name());
+        ((TextView) findViewById(R.id.text2)).setText(recognizer.toString());
     }
 
     @Override

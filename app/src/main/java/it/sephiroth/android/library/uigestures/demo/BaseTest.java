@@ -26,9 +26,29 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
         findViewById(R.id.activity_main).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View view, final MotionEvent motionEvent) {
+                mTextView2.setText(actionToString(motionEvent.getActionMasked()));
                 return delegate.onTouchEvent(view, motionEvent);
             }
         });
+    }
+
+    private static String actionToString(final int action) {
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                return "ACTION_DOWN";
+            case MotionEvent.ACTION_UP:
+                return "ACTION_UP";
+            case MotionEvent.ACTION_CANCEL:
+                return "ACTION_CANCEL";
+            case MotionEvent.ACTION_MOVE:
+                return "ACTION_MOVE";
+            case MotionEvent.ACTION_POINTER_DOWN:
+                return "ACTION_POINTER_DOWN";
+            case MotionEvent.ACTION_POINTER_UP:
+                return "ACTION_POINTER_UP";
+            default:
+                return "ACTION_OTHER";
+        }
     }
 
     public UIGestureRecognizer.State getCurrentState() {
@@ -45,7 +65,6 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
         mCurrentState = recognizer.getState();
-        mTextView.setText(recognizer.getState().name());
-        mTextView2.setText(recognizer.toString());
+        mTextView.setText(recognizer.getTag() + ": " + recognizer.getState().name());
     }
 }
