@@ -13,8 +13,8 @@ android:
     - addon-google_apis-google-25
     - extra-android-m2repository
     - extra-android-support
-    - sys-img-x86_64-google_apis-google-24
-    - sys-img-x86_64-android-24
+    - sys-img-x86_64-google_apis-google-25
+    - sys-img-x86_64-android-25
 
   licenses:
     - 'android-sdk-license-.+'
