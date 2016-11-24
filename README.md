@@ -15,12 +15,23 @@ For more info about the ui gesture recognizers look this WWDC video [https://dev
 # Available Recognizers
 
 * [UITapGestureRecognizer](https://developer.apple.com/reference/uikit/uitapgesturerecognizer)
+> UIGestureRecognizer that looks for single or multiple taps. For the gesture to be recognized, the specified number of fingers must tap the view a specified number of times.
+
 * [UIPinchGestureRecognizer](https://developer.apple.com/reference/uikit/uipinchgesturerecognizer)
+> Pinching is a continuous gesture. The gesture begins (began) when the two touches have moved enough to be considered a pinch gesture. The gesture changes (changed) when a finger moves (with both fingers remaining pressed). The gesture ends (ended) when both fingers lift from the view.
+
 * [UIRotationGestureRecognizer](https://developer.apple.com/reference/uikit/uirotationgesturerecognizer)
+> Rotation is a continuous gesture. It begins when two touches have moved enough to be considered a rotation. The gesture changes when a finger moves while the two fingers are down. It ends when both fingers have lifted. At each stage in the gesture, the gesture recognizer sends its action message.
+
 * [UISwipeGestureRecognizer](https://developer.apple.com/reference/uikit/uiswipegesturerecognizer)
+> UISwipeGestureRecognizer recognizes a swipe when the specified number of touches (numberOfTouchesRequired) have moved mostly in an allowable direction (direction) far enough to be considered a swipe. Swipes can be slow or fast. A slow swipe requires high directional precision but a small distance; a fast swipe requires low directional precision but a large distance.
+
 * [UIPanGestureRecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
+> A panning gesture is continuous. It begins (began) when the minimum number of fingers allowed (minimumNumberOfTouches) has moved enough to be considered a pan. It changes (changed) when a finger moves while at least the minimum number of fingers are pressed down. It ends (ended) when all fingers are lifted.
+
 * ~~UIScreenEdgePanGestureRecognizer~~
 * [UILongPressGestureRecognizer](https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer)
+> Long-press gestures are continuous. The gesture begins (began) when the number of allowable fingers (numberOfTouchesRequired) have been pressed for the specified period (minimumPressDuration) and the touches do not move beyond the allowable range of movement (allowableMovement). The gesture recognizer transitions to the Change state whenever a finger moves, and it ends (ended) when any of the fingers are lifted.
 
 # Discrete vs Continuous
 > The gesture interpreted by a gesture recognizer can be either discrete or continuous. A discrete gesture, such as a double tap, occurs but once in a multi-touch sequence and results in a single action sent. However, when a gesture recognizer interprets a continuous gesture such as a rotation gesture, it sends an action message for each incremental change until the multi-touch sequence concludes. <small>(from https://developer.apple.com/reference/uikit/uigesturerecognizer)</small>
@@ -62,8 +73,10 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
             recognizer2.setNumberOfTouchesRequired(1);
             recognizer2.setActionListener(this);
 
-            // the single tap gesture requires the double tap to fail
-            // in order to be recognized
+            // We want to recognize a single tap and a double tap separately. Normally, when the user
+            // performs a double tap, the single tap would be triggered twice.
+            // In this way, however, the single tap will wait until the double tap will fail. So a single tap
+            // and a double tap will be triggered separately.
             recognizer1.requireFailureOf(recognizer2);
 
             // add both gestures to the delegate
