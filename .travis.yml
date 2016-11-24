@@ -18,6 +18,7 @@ android:
 
   licenses:
     - 'android-sdk-license-.+'
+    - 'android-sdk-preview-license-.+'
     - 'google-gdk-license-.+'
 
 notifications:
@@ -36,6 +37,7 @@ env:
 before_script:
   - android list target
   - echo no | android update sdk --no-ui --filter sys-img-x86_64-google_apis-25 --all
+  - android list target
   - echo no | android create avd --force -n test -t "android-25" --abi x86_64 --tag google_apis --skin WXGA720
   - emulator -avd test -no-window &
   - android-wait-for-emulator
