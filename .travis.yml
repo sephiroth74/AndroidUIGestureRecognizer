@@ -55,6 +55,9 @@ install:
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
 script:
-  - ./gradlew build installDebug connectedCheck -PdisablePreDex
+  - ./gradlew connectedAndroidTest -PdisablePreDex
 
-
+after_faiure:
+  - cat /home/travis/build/sephiroth74/AndroidUIGestureRecognizer/app/build/reports/androidTests/connected/index.html
+  - mvn clean install -DskipTests=false
+  - adb logcat &
