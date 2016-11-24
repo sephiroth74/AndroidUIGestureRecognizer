@@ -1,8 +1,6 @@
 # Android UIGestureRecognizer
 
 
-<br />
-
 AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.
 https://developer.apple.com/reference/uikit/uigesturerecognizer
 
