@@ -13,7 +13,7 @@ android:
     - addon-google_apis-google-25
     - extra-android-m2repository
     - extra-android-support
-    - sys-img-x86_64-google_apis-google-25
+    - sys-img-x86_64-google_apis-25
     - sys-img-x86_64-android-25
 
   licenses:
@@ -35,6 +35,7 @@ env:
 # Emulator Management: Create, Start and Wait
 before_script:
   - android list target
+  - echo no | android update sdk --no-ui --filter sys-img-x86_64-google_apis-25 --all
   - echo no | android create avd --force -n test -t "android-21" --abi armeabi-v7a --tag default --skin WXGA720
   - emulator -avd test -no-window &
   - android-wait-for-emulator
