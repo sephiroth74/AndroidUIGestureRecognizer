@@ -29,7 +29,9 @@ public class UIGestureRecognizerDelegate {
         boolean shouldBegin(UIGestureRecognizer recognizer);
 
         /**
-         * Asks the delegate if two gesture recognizers should be allowed to recognize gestures simultaneously.
+         * Asks the delegate if two gesture recognizers should be allowed to recognize gestures simultaneously.<br />
+         * true to allow both gestureRecognizer and otherGestureRecognizer to recognize their gestures simultaneously. The
+         * default implementation returns false.
          *
          * @param current    the first recognizer
          * @param recognizer the second recognizer
@@ -76,7 +78,7 @@ public class UIGestureRecognizerDelegate {
 
     /**
      * @param recognizer remove a previously added gesture recognizer
-     * @return
+     * @return true if succesfully removed from the list
      * @since 1.0.0
      */
     public boolean removeGestureRecognizer(@NonNull final UIGestureRecognizer recognizer) {
@@ -118,6 +120,7 @@ public class UIGestureRecognizerDelegate {
             if (shouldReceiveTouch(recognizer)) {
                 boolean pass = true;
                 for (UIGestureRecognizer current : list) {
+                    // TODO: Verify this against the real iOS implementation.
                     if (!shouldRecognizeSimultaneouslyWithGestureRecognizer(current, recognizer)) {
                         pass = false;
                         break;
