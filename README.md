@@ -1,6 +1,6 @@
 # Android UIGestureRecognizer
 
-[![Build Status](https://travis-ci.com/sephiroth74/AndroidUIGestureRecognizer.svg?token=wyuXsgX393aH5yfys8FE&branch=master)](https://travis-ci.com/sephiroth74/AndroidUIGestureRecognizer)
+[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)
 <br />
 
 AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.
@@ -42,6 +42,18 @@ Gesture Recognizers that implement this interface will only fire the `Ended` sta
 Internally they will switch between `Possible`, `Ended`, `Failed` or `Cancelled` state.
 #### UIContinuousRecognizer
 A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state changed events (for instance a pinch gesture, or a rotate gesture).
+
+# Installation
+
+The library is currently under heavy development, so there are no stable artifacts so far. I'm publishing snapshots to the sonatype repository at this time. In order to use it, you need to have the sonatype url inside your `repositories` container:
+
+    repositories {
+        maven { url uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    }
+
+Then add the library dependency:
+
+    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:1.0.0-SNAPSHOT'
 
 
 # Example
