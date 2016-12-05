@@ -2,13 +2,12 @@ package it.sephiroth.android.library.uigestures;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author alessandro crugnola
@@ -33,13 +32,13 @@ public class UIGestureRecognizerDelegate {
          * true to allow both gestureRecognizer and otherGestureRecognizer to recognize their gestures simultaneously. The
          * default implementation returns false.
          *
-         * @param current    the first recognizer
-         * @param recognizer the second recognizer
+         * @param recognizer the first recognizer
+         * @param other      the second recognizer
          * @return true if both recognizers shouls be recognized simultaneously
          * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer'>
          * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer</a>
          */
-        boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(UIGestureRecognizer current, UIGestureRecognizer recognizer);
+        boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(UIGestureRecognizer recognizer, UIGestureRecognizer other);
 
         /**
          * Ask the delegate if a gesture recognizer should receive an object representing a touch.
@@ -113,27 +112,39 @@ public class UIGestureRecognizerDelegate {
      */
     public boolean onTouchEvent(final View view, final MotionEvent event) {
         boolean handled = false;
-        boolean h;
-        List<UIGestureRecognizer> list = new LinkedList<>();
 
+        // TODO: each recognizer should prepare its internal status here
+        // but don't execute any action
         for (UIGestureRecognizer recognizer : mSet) {
             if (shouldReceiveTouch(recognizer)) {
-                boolean pass = true;
-                for (UIGestureRecognizer current : list) {
-                    // TODO: Verify this against the real iOS implementation.
-                    if (!shouldRecognizeSimultaneouslyWithGestureRecognizer(current, recognizer)) {
-                        pass = false;
-                        break;
-                    }
-                }
-                h = pass && recognizer.onTouchEvent(event);
-                list.add(recognizer);
-                handled |= h;
+                handled |= recognizer.onTouchEvent(event);
             } else {
                 handled |= recognizer.onTouchEvent(event);
             }
         }
+
+        // TODO: here we need another loop to tell each recognizer to execute its action
+
         return handled;
+    }
+
+    boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(final UIGestureRecognizer recognizer) {
+        Log.i(getClass().getSimpleName(), "shouldRecognizeSimultaneouslyWithGestureRecognizer(" + recognizer + ")");
+        if (mSet.size() == 1) {
+            return true;
+        }
+
+        boolean result = true;
+        for (UIGestureRecognizer other : mSet) {
+            if (other != recognizer) {
+                Log.v(getClass().getSimpleName(), "other: " + other + ", other.began: " + other.hasBeganFiringEvents());
+                if (other.hasBeganFiringEvents()) {
+                    result &= null != mCallback && mCallback.shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer, other);
+                }
+            }
+        }
+        Log.v(getClass().getSimpleName(), "result: " + result);
+        return result;
     }
 
     protected boolean shouldBegin(UIGestureRecognizer recognizer) {

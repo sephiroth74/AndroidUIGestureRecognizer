@@ -135,7 +135,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
         if (recognizer.getState() == State.Failed && getState() == State.Ended) {
             stopListenForOtherStateChanges();
-            fireActionEvent();
+            fireActionEventIfCanRecognizeSimultaneously();
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             stopListenForOtherStateChanges();
             removeMessages();
@@ -184,6 +184,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                 mNumTouches = count;
 
                 setState(State.Possible);
+                setBeginFiringEvents(false);
 
                 if (!mStarted) {
                     stopListenForOtherStateChanges();
@@ -252,9 +253,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
                 if (getState() == State.Possible && mStarted) {
                     if (mNumTouches != mTouchesRequired) {
-                        mStarted = false;
-                        removeMessages();
-                        setState(State.Failed);
+                        handleFailed();
                     } else {
                         if (mNumTaps < mTapsRequired) {
                             delayedFail();
@@ -264,10 +263,10 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                                 setState(State.Ended);
 
                                 if (null == getRequireFailureOf()) {
-                                    fireActionEvent();
+                                    fireActionEventIfCanRecognizeSimultaneously();
                                 } else {
                                     if (getRequireFailureOf().getState() == State.Failed) {
-                                        fireActionEvent();
+                                        fireActionEventIfCanRecognizeSimultaneously();
                                     } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
                                         setState(State.Failed);
                                     } else {
@@ -282,8 +281,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                         }
                     }
                 } else {
-                    mStarted = false;
-                    setState(State.Possible);
+                    handleReset();
                 }
                 break;
 
@@ -291,6 +289,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                 removeMessages();
                 mStarted = false;
                 setState(State.Cancelled);
+                setBeginFiringEvents(false);
                 postReset();
                 break;
 
@@ -298,6 +297,13 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                 break;
         }
         return getCancelsTouchesInView();
+    }
+
+    private void fireActionEventIfCanRecognizeSimultaneously() {
+        if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+            fireActionEvent();
+            setBeginFiringEvents(true);
+        }
     }
 
     @Override
@@ -315,12 +321,14 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     private void handleFailed() {
         setState(State.Failed);
+        setBeginFiringEvents(false);
         removeMessages();
         mStarted = false;
     }
 
     private void handleReset() {
         setState(State.Possible);
+        setBeginFiringEvents(false);
         mStarted = false;
     }
 

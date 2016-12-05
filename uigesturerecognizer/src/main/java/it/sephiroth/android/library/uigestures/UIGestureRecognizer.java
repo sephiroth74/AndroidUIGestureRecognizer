@@ -59,6 +59,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     private OnActionListener mListener;
     private State mState;
     private boolean mEnabled;
+    private boolean mBeganFiringEvents;
     private boolean mCancelsTouchesInView;
     private UIGestureRecognizerDelegate mDelegate;
     private Object mTag;
@@ -89,6 +90,17 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         public void handleMessage(final Message msg) {
             UIGestureRecognizer.this.handleMessage(msg);
         }
+    }
+
+    /**
+     * @return Has began firing events
+     */
+    protected boolean hasBeganFiringEvents() {
+        return mBeganFiringEvents && inState(State.Began, State.Changed, State.Ended);
+    }
+
+    protected void setBeginFiringEvents(boolean value) {
+        mBeganFiringEvents = value;
     }
 
     protected abstract void removeMessages();
