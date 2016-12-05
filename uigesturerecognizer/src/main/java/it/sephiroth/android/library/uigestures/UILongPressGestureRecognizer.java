@@ -317,8 +317,10 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     if (hasBeganFiringEvents()) {
                         fireActionEvent();
                     }
+                    postReset();
                 } else {
                     mStarted = false;
+                    postReset();
                 }
                 setBeginFiringEvents(false);
                 break;
@@ -409,6 +411,11 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 fireActionEvent();
             }
         }
+    }
+
+    @Override
+    protected boolean hasBeganFiringEvents() {
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 
     @Override

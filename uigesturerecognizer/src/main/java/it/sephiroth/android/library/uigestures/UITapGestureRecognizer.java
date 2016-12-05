@@ -136,6 +136,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
         if (recognizer.getState() == State.Failed && getState() == State.Ended) {
             stopListenForOtherStateChanges();
             fireActionEventIfCanRecognizeSimultaneously();
+            postReset();
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             stopListenForOtherStateChanges();
             removeMessages();
@@ -264,9 +265,11 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
                                 if (null == getRequireFailureOf()) {
                                     fireActionEventIfCanRecognizeSimultaneously();
+                                    postReset();
                                 } else {
                                     if (getRequireFailureOf().getState() == State.Failed) {
                                         fireActionEventIfCanRecognizeSimultaneously();
+                                        postReset();
                                     } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
                                         setState(State.Failed);
                                     } else {
@@ -301,9 +304,14 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     private void fireActionEventIfCanRecognizeSimultaneously() {
         if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
-            fireActionEvent();
             setBeginFiringEvents(true);
+            fireActionEvent();
         }
+    }
+
+    @Override
+    protected boolean hasBeganFiringEvents() {
+        return super.hasBeganFiringEvents() && inState(State.Ended);
     }
 
     @Override

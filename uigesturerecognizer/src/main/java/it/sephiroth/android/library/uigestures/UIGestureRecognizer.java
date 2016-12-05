@@ -96,7 +96,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
      * @return Has began firing events
      */
     protected boolean hasBeganFiringEvents() {
-        return mBeganFiringEvents && inState(State.Began, State.Changed, State.Ended);
+        return mBeganFiringEvents;
     }
 
     protected void setBeginFiringEvents(boolean value) {
