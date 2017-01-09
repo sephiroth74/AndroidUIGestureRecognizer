@@ -8,7 +8,7 @@ android:
     - tools
     - tools
     - platform-tools
-    - build-tools-25.0.1
+    - build-tools-25.0.2
     - android-25
     - addon-google_apis-google-25
     - extra-android-m2repository
