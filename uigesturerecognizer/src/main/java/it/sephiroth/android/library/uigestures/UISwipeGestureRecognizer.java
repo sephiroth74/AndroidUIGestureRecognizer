@@ -51,7 +51,6 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
     private float mVelocityY, mVelocityX;
     private final PointF mCurrentLocation;
     private long mDownTime;
-    private boolean mFireEvents;
     private int mTouches;
     private boolean mDown;
 
@@ -61,7 +60,6 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
         mDirection = RIGHT;
         mStarted = false;
         mTouches = 0;
-        mFireEvents = false;
 
         int touchSlop;
         final ViewConfiguration configuration = ViewConfiguration.get(context);
@@ -76,7 +74,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
         switch (msg.what) {
             case MESSAGE_RESET:
                 mStarted = false;
-                mFireEvents = false;
+                setBeginFiringEvents(false);
                 setState(State.Possible);
                 break;
             default:
@@ -100,10 +98,9 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
         logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, getState());
 
         if (recognizer.getState() == State.Failed && getState() == State.Ended) {
-            mFireEvents = true;
             removeMessages();
             stopListenForOtherStateChanges();
-            fireActionEvent();
+            fireActionEventIfCanRecognizeSimultaneously();
 
             if (!mDown) {
                 mStarted = false;
@@ -112,10 +109,17 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
 
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             mStarted = false;
-            mFireEvents = false;
+            setBeginFiringEvents(false);
             stopListenForOtherStateChanges();
             removeMessages();
             setState(State.Failed);
+        }
+    }
+
+    private void fireActionEventIfCanRecognizeSimultaneously() {
+        if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+            setBeginFiringEvents(true);
+            fireActionEvent();
         }
     }
 
@@ -243,7 +247,6 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
             case MotionEvent.ACTION_DOWN:
                 mStarted = false;
                 mDown = true;
-                mFireEvents = false;
 
                 mDownFocusX = mLastFocusX = focusX;
                 mDownFocusY = mLastFocusY = focusY;
@@ -251,6 +254,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
 
                 mVelocityTracker.clear();
 
+                setBeginFiringEvents(false);
                 removeMessages(MESSAGE_RESET);
                 setState(State.Possible);
                 break;
@@ -281,7 +285,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
                                 if (time > MAXIMUM_TOUCH_SLOP_TIME) {
                                     logMessage(Log.WARN, "passed too much time");
                                     mStarted = false;
-                                    mFireEvents = false;
+                                    setBeginFiringEvents(false);
                                     setState(State.Failed);
                                 } else {
                                     int direction =
@@ -294,7 +298,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
 
                                     if (direction == -1 || (mDirection & direction) == 0) {
                                         mStarted = false;
-                                        mFireEvents = false;
+                                        setBeginFiringEvents(false);
                                         setState(State.Failed);
                                     } else {
                                         logMessage(Log.DEBUG, "direction accepted: " + (mDirection & direction));
@@ -303,7 +307,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
                                 }
                             } else {
                                 mStarted = false;
-                                mFireEvents = false;
+                                setBeginFiringEvents(false);
                                 setState(State.Failed);
                             }
                         }
@@ -327,30 +331,28 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
                                     if (getDelegate().shouldBegin(this)) {
                                         setState(State.Ended);
                                         if (null == getRequireFailureOf()) {
-                                            mFireEvents = true;
-                                            fireActionEvent();
+                                            fireActionEventIfCanRecognizeSimultaneously();
                                         } else {
                                             if (getRequireFailureOf().getState() == State.Failed) {
-                                                mFireEvents = true;
-                                                fireActionEvent();
+                                                fireActionEventIfCanRecognizeSimultaneously();
                                             } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
-                                                mFireEvents = false;
                                                 mStarted = false;
+                                                setBeginFiringEvents(false);
                                                 setState(State.Failed);
                                             } else {
                                                 logMessage(Log.DEBUG, "waiting...");
                                                 listenForOtherStateChanges();
-                                                mFireEvents = false;
+                                                setBeginFiringEvents(false);
                                             }
                                         }
                                     } else {
                                         setState(State.Failed);
                                         mStarted = false;
-                                        mFireEvents = false;
+                                        setBeginFiringEvents(false);
                                     }
                                 } else {
                                     mStarted = false;
-                                    mFireEvents = false;
+                                    setBeginFiringEvents(false);
                                     setState(State.Failed);
                                 }
                             }

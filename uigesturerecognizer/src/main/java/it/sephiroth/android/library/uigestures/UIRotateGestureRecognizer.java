@@ -38,15 +38,14 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
     private MotionEvent mPreviousEvent;
     private final PointF mCurrentLocation = new PointF();
     private int mTouches;
-    private boolean mFireEvents;
 
     @Override
     protected void handleMessage(final Message msg) {
         switch (msg.what) {
             case MESSAGE_RESET:
-                mFireEvents = false;
                 stopListenForOtherStateChanges();
                 setState(State.Possible);
+                setBeginFiringEvents(false);
                 break;
             default:
                 break;
@@ -91,15 +90,31 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
         logMessage(Log.VERBOSE, "state: %s", getState());
 
         if (recognizer.getState() == State.Failed && getState() == State.Began) {
-            mFireEvents = true;
             stopListenForOtherStateChanges();
-            fireActionEvent();
+            fireActionEventIfCanRecognizeSimultaneously();
 
         } else if (recognizer.inState(State.Began, State.Ended) && inState(State.Began, State.Possible) && mStarted) {
             stopListenForOtherStateChanges();
             removeMessages();
             setState(State.Failed);
         }
+    }
+
+    private void fireActionEventIfCanRecognizeSimultaneously() {
+        if (inState(State.Changed, State.Ended)) {
+            setBeginFiringEvents(true);
+            fireActionEvent();
+        } else {
+            if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+                setBeginFiringEvents(true);
+                fireActionEvent();
+            }
+        }
+    }
+
+    @Override
+    protected boolean hasBeganFiringEvents() {
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
@@ -135,9 +150,9 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
             case MotionEvent.ACTION_DOWN:
                 mValid = false;
                 mStarted = false;
-                mFireEvents = false;
                 stopListenForOtherStateChanges();
                 setState(State.Possible);
+                setBeginFiringEvents(false);
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -205,9 +220,10 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
 
                 if (inState(State.Began, State.Changed)) {
                     setState(State.Ended);
-                    if (mFireEvents) {
+                    if (hasBeganFiringEvents()) {
                         fireActionEvent();
                     }
+                    mHandler.sendEmptyMessage(MESSAGE_RESET);
                 }
                 break;
 
@@ -228,17 +244,15 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                                 setState(State.Began);
 
                                 if (null == getRequireFailureOf()) {
-                                    mFireEvents = true;
-                                    fireActionEvent();
+                                    fireActionEventIfCanRecognizeSimultaneously();
                                 } else {
                                     if (getRequireFailureOf().getState() == State.Failed) {
-                                        mFireEvents = true;
-                                        fireActionEvent();
+                                        fireActionEventIfCanRecognizeSimultaneously();
                                     } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
                                         setState(State.Failed);
                                     } else {
                                         listenForOtherStateChanges();
-                                        mFireEvents = false;
+                                        setBeginFiringEvents(false);
                                         logMessage(Log.DEBUG, "waiting...");
                                     }
                                 }
@@ -248,7 +262,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                         }
                     } else {
                         if (getState() == State.Began) {
-                            if (mFireEvents) {
+                            if (hasBeganFiringEvents()) {
                                 setState(State.Changed);
                                 fireActionEvent();
                             }
@@ -286,7 +300,6 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                 mValid = false;
                 mStarted = false;
                 mPreviousAngle = 0;
-                mFireEvents = false;
                 mVelocity = 0;
 
                 if (null != mPreviousEvent) {
@@ -295,6 +308,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                 }
 
                 setState(State.Cancelled);
+                setBeginFiringEvents(false);
                 mHandler.sendEmptyMessage(MESSAGE_RESET);
 
                 break;

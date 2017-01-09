@@ -48,7 +48,6 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     private int mNumTaps = 0;
     private int mNumTouches = 0;
     private final PointF mCurrentLocation;
-    private boolean mFireEvents;
     private boolean mBegan;
 
     /**
@@ -117,19 +116,19 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
         logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, getState());
 
         if (recognizer.getState() == State.Failed && getState() == State.Began) {
-            mFireEvents = true;
             stopListenForOtherStateChanges();
-            fireActionEvent();
+            fireActionEventIfCanRecognizeSimultaneously();
 
-            if (mBegan) {
+            if (mBegan && hasBeganFiringEvents()) {
                 setState(State.Changed);
             }
 
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges();
             removeMessages();
-            mStarted = false;
             setState(State.Failed);
+            setBeginFiringEvents(false);
+            mStarted = false;
         }
     }
 
@@ -188,9 +187,9 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 mBegan = false;
 
                 if (!mStarted) {
-                    mFireEvents = false;
                     stopListenForOtherStateChanges();
                     setState(State.Possible);
+                    setBeginFiringEvents(false);
                     mNumTaps = 0;
                     mStarted = true;
                 } else {
@@ -243,9 +242,12 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 } else if (inState(State.Began, State.Changed)) {
                     if (mNumTouches - 1 < mTouchesRequired) {
                         setState(State.Ended);
-                        if (mFireEvents) {
+
+                        if (hasBeganFiringEvents()) {
                             fireActionEvent();
                         }
+
+                        setBeginFiringEvents(false);
                     }
                 }
                 break;
@@ -274,7 +276,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                         if (distance > mTouchSlopSquare) {
                             mBegan = true;
 
-                            if (mFireEvents) {
+                            if (hasBeganFiringEvents()) {
                                 setState(State.Changed);
                                 fireActionEvent();
                             }
@@ -282,7 +284,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     }
                 } else if (getState() == State.Changed) {
                     setState(State.Changed);
-                    if (mFireEvents) {
+                    if (hasBeganFiringEvents()) {
                         fireActionEvent();
                     }
                 }
@@ -312,12 +314,15 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     mNumTaps = 0;
                     mStarted = false;
                     setState(State.Ended);
-                    if (mFireEvents) {
+                    if (hasBeganFiringEvents()) {
                         fireActionEvent();
                     }
+                    postReset();
                 } else {
                     mStarted = false;
+                    postReset();
                 }
+                setBeginFiringEvents(false);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
@@ -350,16 +355,17 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     }
 
     private void handleFailed() {
-        mStarted = false;
-        mFireEvents = false;
         removeMessages();
         setState(State.Failed);
+        setBeginFiringEvents(false);
+
+        mStarted = false;
     }
 
     private void handleReset() {
         setState(State.Possible);
+        setBeginFiringEvents(false);
         mStarted = false;
-        mFireEvents = false;
     }
 
     private void handleLongPress() {
@@ -371,29 +377,45 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
             if (mNumTouches == mTouchesRequired && getDelegate().shouldBegin(this)) {
                 setState(State.Began);
                 if (null == getRequireFailureOf()) {
-                    mFireEvents = true;
-                    fireActionEvent();
+                    fireActionEventIfCanRecognizeSimultaneously();
                 } else {
                     if (getRequireFailureOf().getState() == State.Failed) {
-                        mFireEvents = true;
-                        fireActionEvent();
+                        fireActionEventIfCanRecognizeSimultaneously();
                     } else if (getRequireFailureOf().inState(State.Began, State.Changed, State.Ended)) {
-                        mStarted = false;
-                        mFireEvents = false;
-                        mNumTaps = 0;
                         setState(State.Failed);
+                        setBeginFiringEvents(false);
+                        mStarted = false;
+                        mNumTaps = 0;
                     } else {
                         listenForOtherStateChanges();
-                        mFireEvents = false;
+                        setBeginFiringEvents(false);
                         logMessage(Log.DEBUG, "waiting...");
                     }
                 }
             } else {
                 setState(State.Failed);
+                setBeginFiringEvents(false);
                 mStarted = false;
                 mNumTaps = 0;
             }
         }
+    }
+
+    private void fireActionEventIfCanRecognizeSimultaneously() {
+        if (inState(State.Changed, State.Ended)) {
+            setBeginFiringEvents(true);
+            fireActionEvent();
+        } else {
+            if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+                setBeginFiringEvents(true);
+                fireActionEvent();
+            }
+        }
+    }
+
+    @Override
+    protected boolean hasBeganFiringEvents() {
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 
     @Override

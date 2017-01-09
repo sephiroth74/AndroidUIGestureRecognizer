@@ -54,7 +54,7 @@ The library is currently under heavy development, so there are no stable artifac
 
 Then add the library dependency:
 
-    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:1.0.0-SNAPSHOT'
+    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:1.0.0-r1-SNAPSHOT'
 
 
 # Example

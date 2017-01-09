@@ -41,13 +41,11 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     private float mVelocityY, mVelocityX;
     private final PointF mCurrentLocation;
     private int mTouches;
-    private boolean mFireEvents;
 
     public UIPanGestureRecognizer(@NonNull final Context context) {
         super(context);
         mMinimumNumberOfTouches = 1;
         mMaximumNumberOfTouches = Integer.MAX_VALUE;
-        mFireEvents = false;
 
         int touchSlop;
         final ViewConfiguration configuration = ViewConfiguration.get(context);
@@ -63,7 +61,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
         switch (msg.what) {
             case MESSAGE_RESET:
                 mStarted = false;
-                mFireEvents = false;
+                setBeginFiringEvents(false);
                 setState(State.Possible);
                 break;
             default:
@@ -99,15 +97,15 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
         logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, getState());
 
         if (recognizer.getState() == State.Failed && getState() == State.Began) {
-            mFireEvents = true;
             stopListenForOtherStateChanges();
-            fireActionEvent();
+            fireActionEventIfCanRecognizeSimultaneously();
 
         } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges();
             removeMessages();
-            mStarted = false;
             setState(State.Failed);
+            setBeginFiringEvents(false);
+            mStarted = false;
         }
     }
 
@@ -239,10 +237,11 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
                 mVelocityTracker.addMovement(ev);
 
                 mStarted = false;
-                mFireEvents = false;
+
                 stopListenForOtherStateChanges();
                 removeMessages(MESSAGE_RESET);
                 setState(State.Possible);
+                setBeginFiringEvents(false);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -273,17 +272,15 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
                             setState(State.Began);
 
                             if (null == getRequireFailureOf()) {
-                                mFireEvents = true;
-                                fireActionEvent();
+                                fireActionEventIfCanRecognizeSimultaneously();
                             } else {
                                 if (getRequireFailureOf().getState() == State.Failed) {
-                                    mFireEvents = true;
-                                    fireActionEvent();
+                                    fireActionEventIfCanRecognizeSimultaneously();
                                 } else if (getRequireFailureOf().inState(State.Began, State.Ended, State.Changed)) {
                                     setState(State.Failed);
                                 } else {
                                     listenForOtherStateChanges();
-                                    mFireEvents = false;
+                                    setBeginFiringEvents(false);
                                     logMessage(Log.DEBUG, "waiting...");
                                 }
                             }
@@ -301,7 +298,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
                     mVelocityY = mVelocityTracker.getYVelocity(pointerId);
                     mVelocityX = mVelocityTracker.getXVelocity(pointerId);
 
-                    if (mFireEvents) {
+                    if (hasBeganFiringEvents()) {
                         setState(State.Changed);
                         fireActionEvent();
                     }
@@ -315,7 +312,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
 
                 if (inState(State.Began, State.Changed)) {
                     setState(State.Ended);
-                    if (mFireEvents) {
+                    if (hasBeganFiringEvents()) {
                         fireActionEvent();
                     }
                 }
@@ -335,11 +332,14 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
                     mVelocityTracker.recycle();
                     mVelocityTracker = null;
                 }
+
+                mHandler.sendEmptyMessage(MESSAGE_RESET);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
                 removeMessages(MESSAGE_RESET);
                 setState(State.Cancelled);
+                setBeginFiringEvents(false);
                 mHandler.sendEmptyMessage(MESSAGE_RESET);
                 break;
 
@@ -348,6 +348,23 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
         }
 
         return getCancelsTouchesInView();
+    }
+
+    private void fireActionEventIfCanRecognizeSimultaneously() {
+        if (inState(State.Changed, State.Ended)) {
+            setBeginFiringEvents(true);
+            fireActionEvent();
+        } else {
+            if (getDelegate().shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+                setBeginFiringEvents(true);
+                fireActionEvent();
+            }
+        }
+    }
+
+    @Override
+    protected boolean hasBeganFiringEvents() {
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 
     /**
