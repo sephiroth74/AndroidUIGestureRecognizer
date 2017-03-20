@@ -362,11 +362,6 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
         }
     }
 
-    @Override
-    protected boolean hasBeganFiringEvents() {
-        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
-    }
-
     /**
      * @return The x velocity of the pan gesture
      * @since 1.0.0
