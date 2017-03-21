@@ -311,8 +311,9 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
             case MotionEvent.ACTION_UP:
 
                 if (inState(State.Began, State.Changed)) {
+                    final boolean began = hasBeganFiringEvents();
                     setState(State.Ended);
-                    if (hasBeganFiringEvents()) {
+                    if (began) {
                         fireActionEvent();
                     }
                 }
