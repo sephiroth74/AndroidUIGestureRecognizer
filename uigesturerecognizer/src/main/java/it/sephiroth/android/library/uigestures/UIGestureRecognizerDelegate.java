@@ -128,7 +128,7 @@ public class UIGestureRecognizerDelegate {
         return handled;
     }
 
-    boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(final UIGestureRecognizer recognizer) {
+    public boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(final UIGestureRecognizer recognizer) {
         Log.i(getClass().getSimpleName(), "shouldRecognizeSimultaneouslyWithGestureRecognizer(" + recognizer + ")");
         if (mSet.size() == 1) {
             return true;
@@ -147,7 +147,7 @@ public class UIGestureRecognizerDelegate {
         return result;
     }
 
-    protected boolean shouldBegin(UIGestureRecognizer recognizer) {
+    public boolean shouldBegin(UIGestureRecognizer recognizer) {
         return null == mCallback || mCallback.shouldBegin(recognizer);
     }
 

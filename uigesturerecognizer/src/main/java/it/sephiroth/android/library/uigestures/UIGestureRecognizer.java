@@ -234,7 +234,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         }
     }
 
-    protected boolean inState(State... states) {
+    public boolean inState(State... states) {
         if (null == states || states.length < 1) {
             return false;
         }
@@ -326,7 +326,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         sDebug = enabled;
     }
 
-    void logMessage(int level, String fmt, Object... args) {
+    protected void logMessage(int level, String fmt, Object... args) {
         if (!sDebug) {
             return;
         }
