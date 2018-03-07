@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -142,6 +143,7 @@ public class UIGestureRecognizerDelegate {
 
         mView = view;
         mView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint ("ClickableViewAccessibility")
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
                 return onTouchEvent(v, event);
