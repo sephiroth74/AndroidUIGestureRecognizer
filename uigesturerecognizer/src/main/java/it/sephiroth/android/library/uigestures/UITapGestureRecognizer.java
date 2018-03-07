@@ -31,8 +31,6 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
     // a long press will make this gesture to fail
     private static final int MESSAGE_LONG_PRESS = 4;
 
-    private static final long LONG_PRESS_TIMEOUT = 1500;
-
     private static final String TAG = UITapGestureRecognizer.class.getSimpleName();
 
     private final int mDoubleTapTouchSlopSquare;
