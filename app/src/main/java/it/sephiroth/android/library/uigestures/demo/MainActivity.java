@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
@@ -86,12 +83,15 @@ public class MainActivity extends AppCompatActivity
         recognizer8.setNumberOfTouchesRequired(1);
         recognizer8.setDirection(UISwipeGestureRecognizer.UP | UISwipeGestureRecognizer.RIGHT);
 
-        //recognizer1.requireFailureOf(recognizer2);
+        recognizer1.requireFailureOf(recognizer2);
+
         //recognizer3.requireFailureOf(recognizer4);
         //        recognizer5.requireFailureOf(recognizer4);
         //        recognizer8.requireFailureOf(recognizer4);
 
         mDelegate.addGestureRecognizer(recognizer1);
+        mDelegate.addGestureRecognizer(recognizer2);
+        mDelegate.addGestureRecognizer(recognizer3);
         //        mDelegate.addGestureRecognizer(recognizer2);
         // mDelegate.addGestureRecognizer(recognizer3);
         // mDelegate.addGestureRecognizer(recognizer4);

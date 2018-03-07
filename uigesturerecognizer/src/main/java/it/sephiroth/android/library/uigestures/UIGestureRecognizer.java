@@ -12,7 +12,9 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import it.sephiroth.android.library.simplelogger.LoggerFactory;
 
@@ -55,7 +57,9 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     static final int DOUBLE_TAP_SLOP = 100;
     static final int DOUBLE_TAP_TOUCH_SLOP = TOUCH_SLOP;
 
-    private final List<OnGestureRecognizerStateChangeListener> mStateListeners = new ArrayList<>();
+    private final List<OnGestureRecognizerStateChangeListener> mStateListeners
+        = Collections.synchronizedList(new ArrayList<OnGestureRecognizerStateChangeListener>());
+
     private OnActionListener mListener;
     private State mState;
     private boolean mEnabled;
@@ -240,8 +244,9 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         mState = state;
 
         if (changed) {
-            for (OnGestureRecognizerStateChangeListener listener : mStateListeners) {
-                listener.onStateChanged(this);
+            final ListIterator<OnGestureRecognizerStateChangeListener> iterator = mStateListeners.listIterator();
+            while (iterator.hasNext()) {
+                iterator.next().onStateChanged(this);
             }
         }
     }
