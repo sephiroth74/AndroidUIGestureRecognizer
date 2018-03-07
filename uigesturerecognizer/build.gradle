@@ -44,11 +44,11 @@ task javadoc(type: Javadoc) {
 }
 
 dependencies {
-    compile('it.sephiroth.android.library.simplelogger:simple-logger:1.0.0') {
+    implementation('it.sephiroth.android.library.simplelogger:simple-logger:1.0.0') {
         exclude group: 'com.android.support'
     }
 
-    compile rootProject.ext.dependencies.androidSupportAnnotations
+    implementation rootProject.ext.dependencies.androidSupportAnnotations
 }
 
 
