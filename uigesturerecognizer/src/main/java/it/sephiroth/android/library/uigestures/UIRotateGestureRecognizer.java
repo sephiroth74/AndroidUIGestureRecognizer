@@ -120,6 +120,8 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
     protected boolean onTouchEvent(MotionEvent ev) {
+        super.onTouchEvent(ev);
+
         if (!isEnabled()) {
             return false;
         }

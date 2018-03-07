@@ -144,6 +144,8 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
     protected boolean onTouchEvent(MotionEvent ev) {
+        super.onTouchEvent(ev);
+
         if (!isEnabled()) {
             return false;
         }

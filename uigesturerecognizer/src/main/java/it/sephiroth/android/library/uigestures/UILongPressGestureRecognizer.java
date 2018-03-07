@@ -153,6 +153,8 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     @SuppressWarnings ("checkstyle:cyclomaticcomplexity")
     @Override
     protected boolean onTouchEvent(final MotionEvent ev) {
+        super.onTouchEvent(ev);
+
         if (!isEnabled()) {
             return false;
         }

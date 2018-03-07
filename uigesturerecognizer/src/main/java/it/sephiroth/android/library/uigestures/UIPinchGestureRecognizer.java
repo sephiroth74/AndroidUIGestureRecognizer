@@ -70,6 +70,8 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
 
     @Override
     protected boolean onTouchEvent(MotionEvent ev) {
+        super.onTouchEvent(ev);
+
         if (isEnabled()) {
             mScaleGestureDetector.onTouchEvent(ev);
             return getCancelsTouchesInView();

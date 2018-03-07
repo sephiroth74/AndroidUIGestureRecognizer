@@ -15,6 +15,9 @@ import java.util.LinkedHashSet;
 @SuppressWarnings ("unused")
 public class UIGestureRecognizerDelegate {
 
+    private View mView;
+    private boolean mEnabled = true;
+
     public interface Callback {
         /**
          * Asks the delegate if a gesture recognizer should begin interpreting touches.
@@ -126,6 +129,52 @@ public class UIGestureRecognizerDelegate {
         // TODO: here we need another loop to tell each recognizer to execute its action
 
         return handled;
+    }
+
+    /**
+     * Helper method to start listening for touch events. Use this instead
+     * of {@link #onTouchEvent(View, MotionEvent)}
+     *
+     * @param view
+     */
+    public void startListeningView(@NonNull final View view) {
+        stopListeningView();
+
+        mView = view;
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(final View v, final MotionEvent event) {
+                return onTouchEvent(v, event);
+            }
+        });
+    }
+
+    /**
+     * Stop listening for touch events on the associated view
+     */
+    public void stopListeningView() {
+        if (null != mView) {
+            mView.setOnTouchListener(null);
+            mView = null;
+        }
+    }
+
+    /**
+     * Enable/Disable any registered gestures
+     *
+     * @param enabled
+     */
+    public void setEnabled(final boolean enabled) {
+        mEnabled = enabled;
+        if (!mEnabled) {
+            stopListeningView();
+        } else {
+            startListeningView(mView);
+        }
+    }
+
+    public boolean isEnabled() {
+        return mEnabled;
     }
 
     public boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(final UIGestureRecognizer recognizer) {

@@ -50,7 +50,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     private int mNumTaps = 0;
     private int mNumTouches = 0;
-    private long mTapTimeout = LONG_PRESS_TIMEOUT;
+    private long mTapTimeout;
     private final PointF mCurrentLocation;
 
     /**
@@ -160,6 +160,8 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
     protected boolean onTouchEvent(final MotionEvent ev) {
+        super.onTouchEvent(ev);
+
         if (!isEnabled()) {
             return false;
         }

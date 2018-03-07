@@ -101,12 +101,8 @@ public class MainActivity extends AppCompatActivity
         // mDelegate.addGestureRecognizer(recognizer8);
 
         // start listening for MotionEvent
-        mRoot.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(final View view, final MotionEvent motionEvent) {
-                return mDelegate.onTouchEvent(view, motionEvent);
-            }
-        });
+
+        mDelegate.startListeningView(mRoot);
     }
 
     @Override
@@ -118,7 +114,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
-        final String dateTime = dateFormat.format(new Date());
+        final String dateTime = dateFormat.format(recognizer.getLastEvent().getEventTime());
         Log.d(
             getClass().getSimpleName(),
             "[" + dateTime + "] onGestureRecognized(" + recognizer + "). state: " + recognizer.getState()

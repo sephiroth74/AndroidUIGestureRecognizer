@@ -65,6 +65,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     private Object mTag;
     private long mId;
     private UIGestureRecognizer mOtherRecognizer;
+    private MotionEvent mLastEvent;
     private final LoggerFactory.Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
     protected final GestureHandler mHandler;
@@ -120,6 +121,14 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         return false;
     }
 
+    protected void setLastEvent(final MotionEvent mLastEvent) {
+        this.mLastEvent = mLastEvent;
+    }
+
+    public MotionEvent getLastEvent() {
+        return mLastEvent;
+    }
+
     protected final void setDelegate(final UIGestureRecognizerDelegate delegate) {
         mDelegate = delegate;
     }
@@ -152,7 +161,10 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         return mStateListeners.contains(listener);
     }
 
-    protected abstract boolean onTouchEvent(MotionEvent event);
+    protected boolean onTouchEvent(MotionEvent event) {
+        mLastEvent = MotionEvent.obtain(event);
+        return false;
+    }
 
     protected abstract void handleMessage(final Message msg);
 
