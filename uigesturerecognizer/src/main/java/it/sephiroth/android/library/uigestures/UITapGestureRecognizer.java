@@ -50,6 +50,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     private int mNumTaps = 0;
     private int mNumTouches = 0;
+    private long mTapTimeout = LONG_PRESS_TIMEOUT;
     private final PointF mCurrentLocation;
 
     /**
@@ -107,6 +108,10 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
         }
     }
 
+    public void setTapTimeout(final long mTapTimeout) {
+        this.mTapTimeout = mTapTimeout;
+    }
+
     /**
      * Change the number of required taps for this recognizer to succeed.<br />
      * Default value is 1
@@ -129,9 +134,11 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     @Override
     public void onStateChanged(@NonNull final UIGestureRecognizer recognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(%s): %s", recognizer, recognizer.getState());
-        logMessage(Log.VERBOSE, "this.state: %s", getState());
-        logMessage(Log.VERBOSE, "mStarted: %s", mStarted);
+        if (sDebug) {
+            logMessage(Log.VERBOSE, "onStateChanged(%s): %s", recognizer, recognizer.getState());
+            logMessage(Log.VERBOSE, "this.state: %s", getState());
+            logMessage(Log.VERBOSE, "mStarted: %s", mStarted);
+        }
 
         if (recognizer.getState() == State.Failed && getState() == State.Ended) {
             stopListenForOtherStateChanges();
@@ -193,7 +200,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                     mStarted = true;
                 }
 
-                mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, LONG_PRESS_TIMEOUT);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, mTapTimeout);
 
                 mNumTaps++;
                 mDownFocusX = focusX;
