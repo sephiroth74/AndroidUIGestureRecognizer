@@ -75,6 +75,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
             doubleTapTouchSlop = DOUBLE_TAP_TOUCH_SLOP;
         }
 
+        mTapTimeout = ViewConfiguration.getTapTimeout();
         mTouchSlopSquare = touchSlop * touchSlop;
         mDoubleTapTouchSlopSquare = doubleTapTouchSlop * doubleTapTouchSlop;
     }
