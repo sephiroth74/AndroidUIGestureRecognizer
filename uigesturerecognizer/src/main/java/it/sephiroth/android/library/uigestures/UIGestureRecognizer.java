@@ -46,7 +46,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
 
     public static final String VERSION = BuildConfig.VERSION_NAME;
     private static int sId = 0;
-    private static boolean sDebug = false;
+    protected static boolean sDebug = false;
 
     static final long LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
     static final long TAP_TIMEOUT = ViewConfiguration.getTapTimeout();

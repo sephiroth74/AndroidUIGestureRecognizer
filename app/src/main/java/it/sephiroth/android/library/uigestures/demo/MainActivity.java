@@ -9,6 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate;
 import it.sephiroth.android.library.uigestures.UILongPressGestureRecognizer;
@@ -23,11 +28,14 @@ public class MainActivity extends AppCompatActivity
 
     private ViewGroup mRoot;
     private UIGestureRecognizerDelegate mDelegate;
+    private DateFormat dateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
 
         UIGestureRecognizer.setLogEnabled(BuildConfig.DEBUG);
 
@@ -37,6 +45,7 @@ public class MainActivity extends AppCompatActivity
         recognizer1.setNumberOfTapsRequired(1);
         recognizer1.setNumberOfTouchesRequired(1);
         recognizer1.setTag("single-tap");
+        recognizer1.setTapTimeout(200);
         recognizer1.setActionListener(this);
 
         UITapGestureRecognizer recognizer2 = new UITapGestureRecognizer(this);
@@ -79,14 +88,14 @@ public class MainActivity extends AppCompatActivity
 
         //recognizer1.requireFailureOf(recognizer2);
         //recognizer3.requireFailureOf(recognizer4);
-//        recognizer5.requireFailureOf(recognizer4);
-//        recognizer8.requireFailureOf(recognizer4);
+        //        recognizer5.requireFailureOf(recognizer4);
+        //        recognizer8.requireFailureOf(recognizer4);
 
-        //mDelegate.addGestureRecognizer(recognizer1);
-//        mDelegate.addGestureRecognizer(recognizer2);
+        mDelegate.addGestureRecognizer(recognizer1);
+        //        mDelegate.addGestureRecognizer(recognizer2);
         // mDelegate.addGestureRecognizer(recognizer3);
         // mDelegate.addGestureRecognizer(recognizer4);
-         mDelegate.addGestureRecognizer(recognizer5);
+        //         mDelegate.addGestureRecognizer(recognizer5);
         // mDelegate.addGestureRecognizer(recognizer6);
         // mDelegate.addGestureRecognizer(recognizer7);
         // mDelegate.addGestureRecognizer(recognizer8);
@@ -104,14 +113,18 @@ public class MainActivity extends AppCompatActivity
     public void onContentChanged() {
         super.onContentChanged();
 
-        mRoot = (ViewGroup) findViewById(R.id.activity_main);
+        mRoot = findViewById(R.id.activity_main);
     }
 
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
-        Log.d(getClass().getSimpleName(), "onGestureRecognized(" + recognizer + "). state: " + recognizer.getState());
+        final String dateTime = dateFormat.format(new Date());
+        Log.d(
+            getClass().getSimpleName(),
+            "[" + dateTime + "] onGestureRecognized(" + recognizer + "). state: " + recognizer.getState()
+        );
         ((TextView) findViewById(R.id.text)).setText(recognizer.getState().name());
-        ((TextView) findViewById(R.id.text2)).setText(recognizer.toString());
+        ((TextView) findViewById(R.id.text2)).setText("[" + dateTime + "] " + recognizer.toString());
     }
 
     @Override
