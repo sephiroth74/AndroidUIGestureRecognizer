@@ -243,9 +243,10 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     mHandler.sendMessageDelayed(message, TAP_TIMEOUT);
                 } else if (inState(State.Began, State.Changed)) {
                     if (mNumTouches - 1 < mTouchesRequired) {
+                        final boolean began = hasBeganFiringEvents();
                         setState(State.Ended);
 
-                        if (hasBeganFiringEvents()) {
+                        if (began) {
                             fireActionEvent();
                         }
 
@@ -315,8 +316,9 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 } else if (inState(State.Began, State.Changed)) {
                     mNumTaps = 0;
                     mStarted = false;
+                    final boolean began = hasBeganFiringEvents();
                     setState(State.Ended);
-                    if (hasBeganFiringEvents()) {
+                    if (began) {
                         fireActionEvent();
                     }
                     postReset();
