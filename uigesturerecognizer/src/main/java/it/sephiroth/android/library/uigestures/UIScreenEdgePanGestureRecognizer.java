@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -23,6 +22,7 @@ import android.view.ViewConfiguration;
 @SuppressWarnings ("unused")
 public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implements UIContinuousRecognizer {
     private static final int MESSAGE_RESET = 4;
+    private static final int SCREEN_EDGE_LIMIT_DP = 20;
     private final float mEdgeLimit;
     private int mTouchSlopSquare;
 
@@ -55,8 +55,8 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
         mTouchSlopSquare = touchSlop * touchSlop;
         mCurrentLocation = new PointF();
 
-        mEdgeLimit = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, context.getResources().getDisplayMetrics());
-        logMessage(Log.INFO, "edge limit: %g", mEdgeLimit);
+        mEdgeLimit = TypedValue
+            .applyDimension(TypedValue.COMPLEX_UNIT_DIP, SCREEN_EDGE_LIMIT_DP, context.getResources().getDisplayMetrics());
     }
 
     public void setEdge(UIRectEdge direction) {
@@ -273,7 +273,7 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
                         if ((count >= mMinimumNumberOfTouches
                             && count <= mMaximumNumberOfTouches)
                             && getDelegate().shouldBegin(this)
-                            && getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, mVelocityX, mVelocityY, 0) == mEdge) {
+                            && getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, mVelocityX, mVelocityY) == mEdge) {
 
                             setState(State.Began);
 
@@ -454,21 +454,19 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
     }
 
     private UIRectEdge getTouchDirection(
-        float x1, float y1, float x2, float y2, float velocityX, float velocityY, final float distanceThreshold) {
+        float x1, float y1, float x2, float y2, float velocityX, float velocityY) {
         float diffY = y2 - y1;
         float diffX = x2 - x1;
-        logMessage(Log.VERBOSE, "diff: %gx%g", diffX, diffY);
-        logMessage(Log.VERBOSE, "velocity: %gx%g", velocityX, velocityY);
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
-            if (Math.abs(diffX) > distanceThreshold) {
+            if (Math.abs(diffX) > (float) 0) {
                 if (diffX > 0) {
                     return UIRectEdge.LEFT;
                 } else {
                     return UIRectEdge.RIGTH;
                 }
             }
-        } else if (Math.abs(diffY) > distanceThreshold) {
+        } else if (Math.abs(diffY) > (float) 0) {
             if (diffY > 0) {
                 return UIRectEdge.TOP;
             } else {
