@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +71,7 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     private long mId;
     private UIGestureRecognizer mOtherRecognizer;
     private MotionEvent mLastEvent;
+    private WeakReference<Context> mContextRef;
     private final LoggerFactory.Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
     protected final GestureHandler mHandler;
@@ -79,6 +81,11 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
         mCancelsTouchesInView = true;
         mEnabled = true;
         mId = generateId();
+        mContextRef = new WeakReference<>(context);
+    }
+
+    public Context getContext() {
+        return mContextRef.get();
     }
 
     private long generateId() {
