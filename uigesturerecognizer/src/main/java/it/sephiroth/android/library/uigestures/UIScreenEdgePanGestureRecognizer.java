@@ -171,6 +171,9 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
         mCurrentLocation.x = focusX;
         mCurrentLocation.y = focusY;
 
+        final float rawX = ev.getRawX();
+        final float rawY = ev.getRawY();
+
         mTouches = count;
 
         switch (action & MotionEvent.ACTION_MASK) {
@@ -237,7 +240,7 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
                 stopListenForOtherStateChanges();
                 removeMessages(MESSAGE_RESET);
 
-                if (!computeState(mDownFocusX, mDownFocusY)) {
+                if (!computeState(rawX, rawY)) {
                     setState(State.Failed);
                 } else {
                     setState(State.Possible);
