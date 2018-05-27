@@ -59,7 +59,11 @@ tasks.all {
         }
 }
 
-apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
-apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'
+try {
+    apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
+    apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'
+} catch (e) {
+
+}
 
 uploadArchives.dependsOn 'check'
