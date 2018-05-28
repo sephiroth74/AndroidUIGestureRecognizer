@@ -202,7 +202,7 @@ public class ScaleGestureDetector {
         mSpanSlop = ViewConfiguration.get(context).getScaledTouchSlop() * 2;
 
         final Resources res = context.getResources();
-        mMinSpan = res.getDimensionPixelSize(R.dimen.config_minScalingSpan);
+        mMinSpan = res.getDimensionPixelSize(R.dimen.gestures_config_minScalingSpan);
         mHandler = handler;
         mTouches = 0;
         // Quick scale is enabled by default after JB_MR2

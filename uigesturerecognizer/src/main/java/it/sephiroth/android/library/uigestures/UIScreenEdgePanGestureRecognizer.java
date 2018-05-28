@@ -22,7 +22,6 @@ import android.view.ViewConfiguration;
 @SuppressWarnings ("unused")
 public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implements UIContinuousRecognizer {
     private static final int MESSAGE_RESET = 4;
-    private static final int SCREEN_EDGE_LIMIT_DP = 20;
     private final float mEdgeLimit;
     private int mTouchSlopSquare;
 
@@ -54,9 +53,8 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
         touchSlop = configuration.getScaledTouchSlop();
         mTouchSlopSquare = touchSlop * touchSlop;
         mCurrentLocation = new PointF();
-
-        mEdgeLimit = TypedValue
-            .applyDimension(TypedValue.COMPLEX_UNIT_DIP, SCREEN_EDGE_LIMIT_DP, context.getResources().getDisplayMetrics());
+        mEdgeLimit = context.getResources().getDimension(R.dimen.gestures_screen_edge_limit);
+        logMessage(Log.VERBOSE, "edge limits: %g", mEdgeLimit);
     }
 
     public void setEdge(UIRectEdge direction) {

@@ -31,7 +31,9 @@ For more info about the ui gesture recognizers look this WWDC video [https://dev
 * [UIPanGestureRecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
 > A panning gesture is continuous. It begins (began) when the minimum number of fingers allowed (minimumNumberOfTouches) has moved enough to be considered a pan. It changes (changed) when a finger moves while at least the minimum number of fingers are pressed down. It ends (ended) when all fingers are lifted.
 
-* ~~UIScreenEdgePanGestureRecognizer~~
+* [UIScreenEdgePanGestureRecognizer](https://developer.apple.com/reference/uikit/uiscreenedgepangesturerecognizer)
+> A gesture recognizer that looks for panning (dragging) gestures that starts near the edge of the screen.<br />
+The maximum distance between the screen edge can be changed overriding the resource dimension of *gestures\_screen\_edge\_limit*.
 
 * [UILongPressGestureRecognizer](https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer)
 > Long-press gestures are continuous. The gesture begins (began) when the number of allowable fingers (numberOfTouchesRequired) have been pressed for the specified period (minimumPressDuration) and the touches do not move beyond the allowable range of movement (allowableMovement). The gesture recognizer transitions to the Change state whenever a finger moves, and it ends (ended) when any of the fingers are lifted.
