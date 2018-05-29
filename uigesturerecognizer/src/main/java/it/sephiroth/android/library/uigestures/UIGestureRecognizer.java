@@ -133,6 +133,9 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     }
 
     protected void setLastEvent(final MotionEvent mLastEvent) {
+        if (null != mLastEvent) {
+            mLastEvent.recycle();
+        }
         this.mLastEvent = mLastEvent;
     }
 
@@ -173,8 +176,16 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
     }
 
     protected boolean onTouchEvent(MotionEvent event) {
-        mLastEvent = MotionEvent.obtain(event);
+        setLastEvent(MotionEvent.obtain(event));
         return false;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (null != mLastEvent) {
+            mLastEvent.recycle();
+        }
+        super.finalize();
     }
 
     protected abstract void handleMessage(final Message msg);
