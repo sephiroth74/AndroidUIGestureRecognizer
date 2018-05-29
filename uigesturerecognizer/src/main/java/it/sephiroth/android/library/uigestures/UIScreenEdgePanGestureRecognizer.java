@@ -5,7 +5,6 @@ import android.graphics.PointF;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
