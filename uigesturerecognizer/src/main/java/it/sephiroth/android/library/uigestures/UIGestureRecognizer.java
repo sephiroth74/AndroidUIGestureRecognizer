@@ -182,9 +182,9 @@ public abstract class UIGestureRecognizer implements OnGestureRecognizerStateCha
 
     @Override
     protected void finalize() throws Throwable {
-        if (null != mLastEvent) {
-            mLastEvent.recycle();
-        }
+//        if (null != mLastEvent) {
+//            mLastEvent.recycle();
+//        }
         super.finalize();
     }
 
