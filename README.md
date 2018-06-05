@@ -50,15 +50,9 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
 
 # Installation
 
-The library is currently under heavy development, so there are no stable artifacts so far. I'm publishing snapshots to the sonatype repository at this time. In order to use it, you need to have the sonatype url inside your `repositories` container:
+Add the library dependency:
 
-    repositories {
-        maven { url uri("https://oss.sonatype.org/content/repositories/snapshots") }
-    }
-
-Then add the library dependency:
-
-    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:1.0.0-r1-SNAPSHOT'
+    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:**version**'
 
 
 # Example
