@@ -83,22 +83,9 @@ public class MainActivity extends AppCompatActivity
         recognizer8.setNumberOfTouchesRequired(1);
         recognizer8.setDirection(UISwipeGestureRecognizer.UP | UISwipeGestureRecognizer.RIGHT);
 
-        recognizer1.requireFailureOf(recognizer2);
-
         //recognizer3.requireFailureOf(recognizer4);
-        //        recognizer5.requireFailureOf(recognizer4);
-        //        recognizer8.requireFailureOf(recognizer4);
 
-        mDelegate.addGestureRecognizer(recognizer1);
-        mDelegate.addGestureRecognizer(recognizer2);
-        mDelegate.addGestureRecognizer(recognizer3);
-        //        mDelegate.addGestureRecognizer(recognizer2);
-        // mDelegate.addGestureRecognizer(recognizer3);
-        // mDelegate.addGestureRecognizer(recognizer4);
-        //         mDelegate.addGestureRecognizer(recognizer5);
-        // mDelegate.addGestureRecognizer(recognizer6);
-        // mDelegate.addGestureRecognizer(recognizer7);
-        // mDelegate.addGestureRecognizer(recognizer8);
+        //        mDelegate.addGestureRecognizer(recognizer7);
 
         // start listening for MotionEvent
 

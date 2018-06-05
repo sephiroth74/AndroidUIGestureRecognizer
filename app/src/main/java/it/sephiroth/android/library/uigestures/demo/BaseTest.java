@@ -3,6 +3,7 @@ package it.sephiroth.android.library.uigestures.demo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
 
         timeSpan = System.currentTimeMillis();
 
+        UIGestureRecognizer.setLogEnabled(true);
         delegate = new UIGestureRecognizerDelegate(null);
         findViewById(R.id.activity_main).setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -74,13 +76,15 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-        mTextView = ((TextView) findViewById(R.id.text));
-        mTextView2 = ((TextView) findViewById(R.id.text2));
+        mTextView = findViewById(R.id.text);
+        mTextView2 = findViewById(R.id.text2);
     }
 
     @Override
     public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
+        Log.i(getClass().getSimpleName(), "onGestureRecognized: " + recognizer);
         mCurrentState = recognizer.getState();
         mTextView.setText(recognizer.getTag() + ": " + recognizer.getState().name());
+        Log.v(getClass().getSimpleName(), mTextView.getText().toString());
     }
 }
