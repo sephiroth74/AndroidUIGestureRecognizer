@@ -15,6 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
+import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
+
 import static android.content.Context.POWER_SERVICE;
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
 import static android.os.PowerManager.FULL_WAKE_LOCK;
@@ -38,6 +40,8 @@ public class TestBaseClass {
         device = UiDevice.getInstance(instrumentation);
         context = InstrumentationRegistry.getContext();
         device.wait(Until.hasObject(By.pkg(PACKAGE_NAME).depth(0)), LAUNCH_TIMEOUT);
+
+        UIGestureRecognizer.setLogEnabled(true);
 
         PowerManager power = (PowerManager) context.getSystemService(POWER_SERVICE);
         wakeLock = power.newWakeLock(FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP | ON_AFTER_RELEASE, "test");

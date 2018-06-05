@@ -44,7 +44,7 @@ public class TestTapGesture extends TestBaseClass {
         getTextView().setText("None");
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click());
-        SystemClock.sleep(2000);
+        SystemClock.sleep(200);
 
         assertEquals(recognizer.getTag() + ": " + State.Ended, getTextView().getText());
     }
@@ -67,10 +67,10 @@ public class TestTapGesture extends TestBaseClass {
         getTitleView().setText("1 Tap 2 Fingers");
 
         mainView.performTwoPointerGesture(
-            new Point(200, 300),
             new Point(200, 400),
-            new Point(200, 300),
+            new Point(400, 800),
             new Point(200, 400),
+            new Point(400, 800),
             1
         );
         SystemClock.sleep(200);
@@ -78,14 +78,14 @@ public class TestTapGesture extends TestBaseClass {
     }
 
     @Test
-    public void test_singleTap2Taps() throws UiObjectNotFoundException, InterruptedException {
+    public void test_doubleTap() throws UiObjectNotFoundException, InterruptedException {
         BaseTest activity = activityTestRule.getActivity();
 
         final UIGestureRecognizerDelegate delegate = activity.delegate;
         delegate.clear();
 
         UITapGestureRecognizer recognizer = new UITapGestureRecognizer(context);
-        recognizer.setTag("single-tap");
+        recognizer.setTag("double-tap");
         recognizer.setNumberOfTouchesRequired(1);
         recognizer.setNumberOfTapsRequired(2);
         recognizer.setActionListener(activityTestRule.getActivity());
