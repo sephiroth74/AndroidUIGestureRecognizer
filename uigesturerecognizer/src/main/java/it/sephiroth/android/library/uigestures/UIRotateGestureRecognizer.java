@@ -221,8 +221,9 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                 }
 
                 if (inState(State.Began, State.Changed)) {
+                    final boolean began = hasBeganFiringEvents();
                     setState(State.Ended);
-                    if (hasBeganFiringEvents()) {
+                    if (began) {
                         fireActionEvent();
                     }
                     mHandler.sendEmptyMessage(MESSAGE_RESET);
