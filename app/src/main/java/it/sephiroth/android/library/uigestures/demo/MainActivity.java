@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         UIPanGestureRecognizer recognizer5 = new UIPanGestureRecognizer(this);
         recognizer5.setTag("pan");
         recognizer5.setActionListener(this);
-        recognizer5.setMinimumNumberOfTouches(1);
+        recognizer5.setMinimumNumberOfTouches(2);
         recognizer5.setMaximumNumberOfTouches(5);
 
         UIPinchGestureRecognizer recognizer6 = new UIPinchGestureRecognizer(this);
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity
 
         mDelegate.addGestureRecognizer(recognizer1);
         mDelegate.addGestureRecognizer(recognizer3);
+        mDelegate.addGestureRecognizer(recognizer5);
 
         // start listening for MotionEvent
 
