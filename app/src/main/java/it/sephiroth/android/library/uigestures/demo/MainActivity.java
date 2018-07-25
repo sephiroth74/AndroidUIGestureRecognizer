@@ -39,16 +39,16 @@ public class MainActivity extends AppCompatActivity
         mDelegate = new UIGestureRecognizerDelegate(this);
 
         UITapGestureRecognizer recognizer1 = new UITapGestureRecognizer(this);
-        recognizer1.setNumberOfTapsRequired(1);
-        recognizer1.setNumberOfTouchesRequired(1);
+        recognizer1.setTapsRequired(1);
+        recognizer1.setTouchesRequired(1);
         recognizer1.setTag("single-tap");
         recognizer1.setTapTimeout(200);
         recognizer1.setActionListener(this);
 
         UITapGestureRecognizer recognizer2 = new UITapGestureRecognizer(this);
         recognizer2.setTag("double-tap");
-        recognizer2.setNumberOfTapsRequired(2);
-        recognizer2.setNumberOfTouchesRequired(1);
+        recognizer2.setTapsRequired(2);
+        recognizer2.setTouchesRequired(1);
         recognizer2.setActionListener(this);
 
         UILongPressGestureRecognizer recognizer3 = new UILongPressGestureRecognizer(this);
