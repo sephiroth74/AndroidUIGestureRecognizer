@@ -81,16 +81,15 @@ public class MainActivity extends AppCompatActivity
         UISwipeGestureRecognizer recognizer8 = new UISwipeGestureRecognizer(this);
         recognizer8.setTag("swipe");
         recognizer8.setActionListener(this);
-        recognizer8.setNumberOfTouchesRequired(1);
         recognizer8.setDirection(UISwipeGestureRecognizer.UP | UISwipeGestureRecognizer.RIGHT);
 
         //recognizer3.requireFailureOf(recognizer4);
 
-        mDelegate.addGestureRecognizer(recognizer1);
+//        mDelegate.addGestureRecognizer(recognizer1);
 //        mDelegate.addGestureRecognizer(recognizer3);
 //        mDelegate.addGestureRecognizer(recognizer5);
 //        mDelegate.addGestureRecognizer(recognizer6);
-        mDelegate.addGestureRecognizer(recognizer7);
+        mDelegate.addGestureRecognizer(recognizer8);
 
         // start listening for MotionEvent
 
