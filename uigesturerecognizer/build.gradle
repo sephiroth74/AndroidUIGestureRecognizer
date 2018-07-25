@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -26,6 +29,13 @@ android {
         textReport true
         textOutput "stdout"
     }
+
+    sourceSets {
+        main {
+            kotlin.srcDirs += 'src/main/kotlin'
+            java.srcDirs += 'src/main/kotlin'
+        }
+    }
 }
 
 task javadoc(type: Javadoc) {
@@ -49,6 +59,7 @@ dependencies {
     }
 
     implementation rootProject.ext.dependencies.androidSupportAnnotations
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 

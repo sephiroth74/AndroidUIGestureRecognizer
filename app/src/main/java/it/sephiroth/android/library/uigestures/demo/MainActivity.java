@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
 
         //recognizer3.requireFailureOf(recognizer4);
 
-        //        mDelegate.addGestureRecognizer(recognizer7);
+        mDelegate.addGestureRecognizer(recognizer1);
 
         // start listening for MotionEvent
 
