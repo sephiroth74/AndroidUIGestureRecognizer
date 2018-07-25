@@ -15,10 +15,6 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uitapgesturerecognizer](https://developer.apple.com/reference/uikit/uitapgesturerecognizer)
  */
-/**
- * UITapGestureRecognizer looks for single or multiple taps. For the
- * gesture to be recognized, the specified number of fingers must tap the view a specified number of times.
- */
 class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
     private val mDoubleTapTouchSlopSquare: Int

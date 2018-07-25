@@ -53,12 +53,13 @@ public class MainActivity extends AppCompatActivity
 
         UILongPressGestureRecognizer recognizer3 = new UILongPressGestureRecognizer(this);
         recognizer3.setTag("long-press");
-        recognizer3.setNumberOfTapsRequired(0);
+        recognizer3.setTapsRequired(0);
+        recognizer3.setTouchesRequired(1);
         recognizer3.setActionListener(this);
 
         UILongPressGestureRecognizer recognizer4 = new UILongPressGestureRecognizer(this);
         recognizer4.setTag("long-press-2");
-        recognizer4.setNumberOfTapsRequired(0);
+        recognizer4.setTapsRequired(0);
         recognizer4.setMinimumPressDuration(4000);
         recognizer4.setAllowableMovement(500);
         recognizer4.setActionListener(this);
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
         //recognizer3.requireFailureOf(recognizer4);
 
         mDelegate.addGestureRecognizer(recognizer1);
+        mDelegate.addGestureRecognizer(recognizer3);
 
         // start listening for MotionEvent
 
