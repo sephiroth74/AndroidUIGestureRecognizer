@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
         dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
 
-        UIGestureRecognizer.setLogEnabled(BuildConfig.DEBUG);
+        UIGestureRecognizer.Companion.setLogEnabled(BuildConfig.DEBUG);
 
         mDelegate = new UIGestureRecognizerDelegate(this);
 

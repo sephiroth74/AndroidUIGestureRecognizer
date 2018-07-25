@@ -385,7 +385,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
                 mDown = false;
                 removeMessages(MESSAGE_RESET);
                 setState(State.Cancelled);
-                mHandler.sendEmptyMessage(MESSAGE_RESET);
+                getMHandler().sendEmptyMessage(MESSAGE_RESET);
                 break;
 
             default:

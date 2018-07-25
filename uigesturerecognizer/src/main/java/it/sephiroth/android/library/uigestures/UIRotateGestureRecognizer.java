@@ -226,7 +226,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
                     if (began) {
                         fireActionEvent();
                     }
-                    mHandler.sendEmptyMessage(MESSAGE_RESET);
+                    getMHandler().sendEmptyMessage(MESSAGE_RESET);
                 }
                 break;
 
@@ -312,7 +312,7 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
 
                 setState(State.Cancelled);
                 setBeginFiringEvents(false);
-                mHandler.sendEmptyMessage(MESSAGE_RESET);
+                getMHandler().sendEmptyMessage(MESSAGE_RESET);
 
                 break;
 

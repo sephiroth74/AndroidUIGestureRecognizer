@@ -340,14 +340,14 @@ public class UIScreenEdgePanGestureRecognizer extends UIGestureRecognizer implem
                     mVelocityTracker = null;
                 }
 
-                mHandler.sendEmptyMessage(MESSAGE_RESET);
+                getMHandler().sendEmptyMessage(MESSAGE_RESET);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
                 removeMessages(MESSAGE_RESET);
                 setState(State.Cancelled);
                 setBeginFiringEvents(false);
-                mHandler.sendEmptyMessage(MESSAGE_RESET);
+                getMHandler().sendEmptyMessage(MESSAGE_RESET);
                 break;
 
             default:

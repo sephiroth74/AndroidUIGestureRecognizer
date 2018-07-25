@@ -70,7 +70,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
         } else {
             final ViewConfiguration configuration = ViewConfiguration.get(context);
             touchSlop = configuration.getScaledTouchSlop();
-            doubleTapTouchSlop = DOUBLE_TAP_TOUCH_SLOP;
+            doubleTapTouchSlop = Companion.getDOUBLE_TAP_TOUCH_SLOP();
         }
 
         mTapTimeout = ViewConfiguration.getTapTimeout();
@@ -133,7 +133,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     @Override
     public void onStateChanged(@NonNull final UIGestureRecognizer recognizer) {
-        if (sDebug) {
+        if (Companion.getSDebug()) {
             logMessage(Log.VERBOSE, "onStateChanged(%s): %s", recognizer, recognizer.getState());
             logMessage(Log.VERBOSE, "this.state: %s", getState());
             logMessage(Log.VERBOSE, "mStarted: %s", mStarted);
@@ -201,7 +201,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                     mStarted = true;
                 }
 
-                mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, mTapTimeout);
+                getMHandler().sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, mTapTimeout);
 
                 mNumTaps++;
                 mDownFocusX = focusX;
@@ -231,9 +231,9 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
                     mDownFocusX = focusX;
                     mDownFocusY = focusY;
 
-                    Message message = mHandler.obtainMessage(MESSAGE_POINTER_UP);
+                    Message message = getMHandler().obtainMessage(MESSAGE_POINTER_UP);
                     message.arg1 = mNumTouches - 1;
-                    mHandler.sendMessageDelayed(message, TAP_TIMEOUT);
+                    getMHandler().sendMessageDelayed(message, Companion.getTAP_TIMEOUT());
                 }
                 break;
 
@@ -328,11 +328,11 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
     }
 
     private void postReset() {
-        mHandler.sendEmptyMessage(MESSAGE_RESET);
+        getMHandler().sendEmptyMessage(MESSAGE_RESET);
     }
 
     private void delayedFail() {
-        mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, DOUBLE_TAP_TIMEOUT);
+        getMHandler().sendEmptyMessageDelayed(MESSAGE_FAILED, Companion.getDOUBLE_TAP_TIMEOUT());
     }
 
     private void handleFailed() {

@@ -174,7 +174,7 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
             if (began) {
                 fireActionEvent();
             }
-            mHandler.sendEmptyMessage(MESSAGE_RESET);
+            getMHandler().sendEmptyMessage(MESSAGE_RESET);
         }
     }
 

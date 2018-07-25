@@ -20,7 +20,7 @@ import android.view.ViewConfiguration;
  */
 @SuppressWarnings ("unused")
 public class UILongPressGestureRecognizer extends UIGestureRecognizer implements UIContinuousRecognizer {
-    private long longPressTimeOut = TAP_TIMEOUT + LONG_PRESS_TIMEOUT;
+    private long longPressTimeOut = Companion.getTAP_TIMEOUT() + Companion.getLONG_PRESS_TIMEOUT();
 
     // request to change the current state to Failed
     private static final int MESSAGE_FAILED = 1;
@@ -199,13 +199,13 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                 }
 
                 if (mNumTaps == mTapsRequired) {
-                    mHandler.sendEmptyMessageAtTime(MESSAGE_LONG_PRESS, ev.getDownTime() + longPressTimeOut);
+                    getMHandler().sendEmptyMessageAtTime(MESSAGE_LONG_PRESS, ev.getDownTime() + longPressTimeOut);
                 } else {
-                    long timeout = LONG_PRESS_TIMEOUT;
+                    long timeout = Companion.getLONG_PRESS_TIMEOUT();
                     if (timeout >= longPressTimeOut) {
                         timeout = longPressTimeOut - 1;
                     }
-                    mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, timeout);
+                    getMHandler().sendEmptyMessageDelayed(MESSAGE_FAILED, timeout);
                 }
 
                 mDownFocusX = focusX;
@@ -238,9 +238,9 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
                     mDownFocusX = focusX;
                     mDownFocusY = focusY;
 
-                    Message message = mHandler.obtainMessage(MESSAGE_POINTER_UP);
+                    Message message = getMHandler().obtainMessage(MESSAGE_POINTER_UP);
                     message.arg1 = mNumTouches - 1;
-                    mHandler.sendMessageDelayed(message, TAP_TIMEOUT);
+                    getMHandler().sendMessageDelayed(message, Companion.getTAP_TIMEOUT());
                 } else if (inState(State.Began, State.Changed)) {
                     if (mNumTouches - 1 < mTouchesRequired) {
                         final boolean began = hasBeganFiringEvents();
@@ -351,11 +351,11 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     }
 
     private void postReset() {
-        mHandler.sendEmptyMessage(MESSAGE_RESET);
+        getMHandler().sendEmptyMessage(MESSAGE_RESET);
     }
 
     private void delayedFail() {
-        mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, DOUBLE_TAP_TIMEOUT);
+        getMHandler().sendEmptyMessageDelayed(MESSAGE_FAILED, Companion.getDOUBLE_TAP_TIMEOUT());
     }
 
     private void handleFailed() {
