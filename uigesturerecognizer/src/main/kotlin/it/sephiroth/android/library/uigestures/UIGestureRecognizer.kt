@@ -48,10 +48,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
                 }
             }
         }
-    /**
-     * @return True if the recognizer is enabled
-     * @since 1.0.0
-     */
+
     /**
      * Toggle the recognizer enabled state.
      *
@@ -60,11 +57,9 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var isEnabled: Boolean = false
+
     private var mBeganFiringEvents: Boolean = false
-    /**
-     * @see UIGestureRecognizer.setCancelsTouchesInView
-     * @since 1.0.0
-     */
+
     /**
      * @param value A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
      * @see [
@@ -73,7 +68,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var cancelsTouchesInView: Boolean = false
-    /*internal*/ var delegate: UIGestureRecognizerDelegate? = null
+    internal var delegate: UIGestureRecognizerDelegate? = null
         set
 
 
@@ -182,23 +177,23 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     /**
      * @return Has began firing events
      */
-    /*internal */open fun hasBeganFiringEvents(): Boolean {
+    internal open fun hasBeganFiringEvents(): Boolean {
         return mBeganFiringEvents
     }
 
-    protected fun setBeginFiringEvents(value: Boolean) {
+    internal fun setBeginFiringEvents(value: Boolean) {
         mBeganFiringEvents = value
     }
 
     protected abstract fun removeMessages()
 
-    protected fun removeMessages(vararg messages: Int) {
+    internal fun removeMessages(vararg messages: Int) {
         for (message in messages) {
             mHandler.removeMessages(message)
         }
     }
 
-    protected fun hasMessages(vararg messages: Int): Boolean {
+    internal fun hasMessages(vararg messages: Int): Boolean {
         for (message in messages) {
             if (mHandler.hasMessages(message)) {
                 return true
@@ -207,7 +202,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return false
     }
 
-    fun clearStateListeners() {
+    internal fun clearStateListeners() {
         mStateListeners.clear()
     }
 
@@ -231,7 +226,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return mStateListeners.contains(listener)
     }
 
-    /*internal */open fun onTouchEvent(event: MotionEvent): Boolean {
+    internal open fun onTouchEvent(event: MotionEvent): Boolean {
         lastEvent = MotionEvent.obtain(event)
         return false
     }
