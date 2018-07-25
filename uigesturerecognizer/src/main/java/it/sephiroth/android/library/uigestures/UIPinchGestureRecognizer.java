@@ -69,7 +69,7 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
     }
 
     @Override
-    protected boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
 
         if (isEnabled()) {
@@ -191,7 +191,7 @@ public class UIPinchGestureRecognizer extends UIGestureRecognizer
     }
 
     @Override
-    protected boolean hasBeganFiringEvents() {
+    public boolean hasBeganFiringEvents() {
         return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 

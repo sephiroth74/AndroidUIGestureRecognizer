@@ -152,7 +152,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
 
     @SuppressWarnings ("checkstyle:cyclomaticcomplexity")
     @Override
-    protected boolean onTouchEvent(final MotionEvent ev) {
+    public boolean onTouchEvent(final MotionEvent ev) {
         super.onTouchEvent(ev);
 
         if (!isEnabled()) {
@@ -418,7 +418,7 @@ public class UILongPressGestureRecognizer extends UIGestureRecognizer implements
     }
 
     @Override
-    protected boolean hasBeganFiringEvents() {
+    public boolean hasBeganFiringEvents() {
         return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 

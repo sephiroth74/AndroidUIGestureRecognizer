@@ -143,7 +143,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
 
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
-    protected boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
 
         if (!isEnabled()) {
@@ -366,7 +366,7 @@ public class UIPanGestureRecognizer extends UIGestureRecognizer implements UICon
     }
 
     @Override
-    protected boolean hasBeganFiringEvents() {
+    public boolean hasBeganFiringEvents() {
         return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 

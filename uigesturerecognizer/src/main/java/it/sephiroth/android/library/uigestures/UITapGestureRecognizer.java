@@ -158,7 +158,8 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
 
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
-    protected boolean onTouchEvent(final MotionEvent ev) {
+    public boolean onTouchEvent(final MotionEvent ev) {
+        logMessage(Log.VERBOSE, "onTouchEvent: %s", ev);
         super.onTouchEvent(ev);
 
         if (!isEnabled()) {
@@ -318,7 +319,7 @@ public final class UITapGestureRecognizer extends UIGestureRecognizer implements
     }
 
     @Override
-    protected boolean hasBeganFiringEvents() {
+    public boolean hasBeganFiringEvents() {
         return super.hasBeganFiringEvents() && inState(State.Ended);
     }
 

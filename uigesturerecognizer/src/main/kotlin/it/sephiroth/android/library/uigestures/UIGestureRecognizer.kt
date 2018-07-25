@@ -73,8 +73,10 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var cancelsTouchesInView: Boolean = false
-    protected var delegate: UIGestureRecognizerDelegate? = null
+    /*internal*/ var delegate: UIGestureRecognizerDelegate? = null
         set
+
+
     /**
      * @return current tag assigned to this instance
      * @since 1.0.0
@@ -180,7 +182,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     /**
      * @return Has began firing events
      */
-    protected open fun hasBeganFiringEvents(): Boolean {
+    /*internal */open fun hasBeganFiringEvents(): Boolean {
         return mBeganFiringEvents
     }
 
@@ -229,7 +231,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return mStateListeners.contains(listener)
     }
 
-    protected open fun onTouchEvent(event: MotionEvent): Boolean {
+    /*internal */open fun onTouchEvent(event: MotionEvent): Boolean {
         lastEvent = MotionEvent.obtain(event)
         return false
     }

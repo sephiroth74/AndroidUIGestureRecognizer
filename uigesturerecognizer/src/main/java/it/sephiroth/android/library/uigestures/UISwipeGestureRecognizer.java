@@ -157,7 +157,7 @@ public class UISwipeGestureRecognizer extends UIGestureRecognizer implements UID
 
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
-    protected boolean onTouchEvent(final MotionEvent ev) {
+    public boolean onTouchEvent(final MotionEvent ev) {
         super.onTouchEvent(ev);
 
         if (!isEnabled()) {

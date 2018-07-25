@@ -113,13 +113,13 @@ public class UIRotateGestureRecognizer extends UIGestureRecognizer implements UI
     }
 
     @Override
-    protected boolean hasBeganFiringEvents() {
+    public boolean hasBeganFiringEvents() {
         return super.hasBeganFiringEvents() && inState(State.Began, State.Changed);
     }
 
     @SuppressWarnings ({"checkstyle:cyclomaticcomplexity", "checkstyle:innerassignment"})
     @Override
-    protected boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
 
         if (!isEnabled()) {
