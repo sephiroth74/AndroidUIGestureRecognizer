@@ -52,7 +52,11 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
 
 Add the library dependency:
 
-    compile 'it.sephiroth.android.library.uigestures:uigesture-recognizer:**version**'
+    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer:**version**'
+
+# Kotlin
+
+    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:**version**'
 
 
 # Example
