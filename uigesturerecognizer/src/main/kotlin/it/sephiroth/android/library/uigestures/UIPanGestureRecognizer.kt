@@ -54,17 +54,16 @@ class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(context), U
      * @return the relative scroll x between gestures
      * @since 1.1.2
      */
-    fun getRelativeScrollX(): Float {
-        return -scrollX
-    }
+    val relativeScrollX: Float
+        get() = -scrollX
+
 
     /**
      * @return the relative scroll y between gestures
      * @since 1.1.2
      */
-    fun getRelativeScrollY(): Float {
-        return -scrollY
-    }
+    val relativeScrollY: Float
+        get() = -scrollY
 
     /**
      * @return The translation X of the pan gesture
