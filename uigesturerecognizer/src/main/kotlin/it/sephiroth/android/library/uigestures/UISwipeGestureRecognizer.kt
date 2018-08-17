@@ -17,7 +17,7 @@ import android.view.ViewConfiguration
  * https://developer.apple.com/reference/uikit/uiswipegesturerecognizer](https://developer.apple.com/reference/uikit/uiswipegesturerecognizer)
  */
 
-class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
+open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
     private val mTouchSlopSquare: Int
     private val mMaximumFlingVelocity: Int
@@ -79,7 +79,7 @@ class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context),
         private set
 
     override var numberOfTouches: Int = 0
-        private set
+        internal set
 
     private var mDown: Boolean = false
 

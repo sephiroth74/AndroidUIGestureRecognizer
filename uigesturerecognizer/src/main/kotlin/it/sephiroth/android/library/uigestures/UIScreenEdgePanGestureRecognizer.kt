@@ -17,7 +17,7 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uipangesturerecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
  */
-class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
+open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
     private val mEdgeLimit: Float
     private val mTouchSlopSquare: Int
 
@@ -81,7 +81,7 @@ class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecognizer(c
     private val mCurrentLocation: PointF
 
     override var numberOfTouches: Int = 0
-        private set
+        internal set
 
     var edge = UIRectEdge.LEFT
 

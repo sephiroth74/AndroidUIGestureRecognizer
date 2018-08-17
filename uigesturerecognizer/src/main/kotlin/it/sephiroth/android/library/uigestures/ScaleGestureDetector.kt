@@ -18,13 +18,13 @@ package it.sephiroth.android.library.uigestures
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import it.sephiroth.android.library.uigestures.ScaleGestureDetector.OnScaleGestureListener
 
 /**
  * This is a slightly modified version of the Android's ScaleGestureDetector which

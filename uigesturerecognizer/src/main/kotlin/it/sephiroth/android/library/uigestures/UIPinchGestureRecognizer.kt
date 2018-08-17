@@ -17,7 +17,7 @@ import android.view.MotionEvent
  * https://developer.apple.com/reference/uikit/uipinchgesturerecognizer](https://developer.apple.com/reference/uikit/uipinchgesturerecognizer)
  */
 
-class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer, ScaleGestureDetector.OnScaleGestureListener {
+open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer, ScaleGestureDetector.OnScaleGestureListener {
     private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this)
 
     /**

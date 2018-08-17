@@ -17,7 +17,7 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uipangesturerecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
  */
-class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
+open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
     private val mTouchSlopSquare: Int
     val minimumFlingVelocity: Int
     val maximumFlingVelocity: Int
@@ -96,7 +96,7 @@ class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(context), U
     private val mCurrentLocation: PointF
 
     override var numberOfTouches: Int = 0
-        private set
+        internal  set
 
     val isFling: Boolean
         get() = state === UIGestureRecognizer.State.Ended && (Math.abs(xVelocity) > minimumFlingVelocity || Math.abs(yVelocity) > minimumFlingVelocity)

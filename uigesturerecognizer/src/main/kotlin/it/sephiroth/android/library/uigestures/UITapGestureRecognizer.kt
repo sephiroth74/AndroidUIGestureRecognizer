@@ -15,7 +15,7 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uitapgesturerecognizer](https://developer.apple.com/reference/uikit/uitapgesturerecognizer)
  */
-class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
+open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
     private val mDoubleTapTouchSlopSquare: Int
 
@@ -46,7 +46,7 @@ class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), U
     private var mNumTaps = 0
 
     override var numberOfTouches = 0
-        private set
+        internal set
 
 
     private val mCurrentLocation: PointF

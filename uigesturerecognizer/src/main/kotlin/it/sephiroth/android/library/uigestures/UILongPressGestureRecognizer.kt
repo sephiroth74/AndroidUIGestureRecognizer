@@ -16,7 +16,7 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer](https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer)
  */
-class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
+open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
     /**
      * @return The minimum period fingers must press on the view for the gesture to be recognized.
      * @since 1.0.0
@@ -51,7 +51,8 @@ class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(conte
 
     private var mNumTaps = 0
     override var numberOfTouches = 0
-        private set
+        internal set
+
     private val mCurrentLocation: PointF
     private var mBegan: Boolean = false
 

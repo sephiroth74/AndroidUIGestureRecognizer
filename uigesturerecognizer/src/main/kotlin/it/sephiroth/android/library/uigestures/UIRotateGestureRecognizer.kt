@@ -16,7 +16,7 @@ import android.view.MotionEvent
  * https://developer.apple.com/reference/uikit/uirotationgesturerecognizer](https://developer.apple.com/reference/uikit/uirotationgesturerecognizer)
  */
 
-class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
+open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
     /**
      * Change the minimum rotation threshold (in radians)
@@ -57,7 +57,7 @@ class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context)
     private val mCurrentLocation = PointF()
 
     override var numberOfTouches: Int = 0
-        private set
+        internal set
 
     /**
      * Returns the rotation in degrees

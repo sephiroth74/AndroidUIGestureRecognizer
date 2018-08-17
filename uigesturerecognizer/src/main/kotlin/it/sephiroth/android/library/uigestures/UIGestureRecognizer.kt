@@ -1,7 +1,9 @@
 package it.sephiroth.android.library.uigestures
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
@@ -52,7 +54,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     /**
      * Toggle the recognizer enabled state.
      *
-     * @param enabled Set to false to prevent any motion event
+     * Set to false to prevent any motion event
      * to be intercepted by this recognizer
      * @since 1.0.0
      */
@@ -61,23 +63,18 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     private var mBeganFiringEvents: Boolean = false
 
     /**
-     * @param value A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
+     * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
      * @see [
      * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview)
      *
      * @since 1.0.0
      */
     var cancelsTouchesInView: Boolean = false
+
     internal var delegate: UIGestureRecognizerDelegate? = null
-        set
-
 
     /**
-     * @return current tag assigned to this instance
-     * @since 1.0.0
-     */
-    /**
-     * @param mTag custom object the instance should keep
+     * custom object the instance should keep
      * @since 1.0.0
      */
     var tag: Any? = null
@@ -93,8 +90,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         protected set
 
     /**
-     * @param other Creates a dependency relationship between the receiver and another gesture recognizer when the objects
-     * are created
+     * Creates a dependency relationship between the receiver and another gesture recognizer when the objects are created
      * @see [
      * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require)
      *
@@ -207,22 +203,20 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     }
 
     protected fun fireActionEvent() {
-        if (null != actionListener) {
-            actionListener!!.onGestureRecognized(this)
-        }
+        actionListener?.onGestureRecognized(this)
     }
 
-    protected fun addOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener) {
+    private fun addOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener) {
         if (!mStateListeners.contains(listener)) {
             mStateListeners.add(listener)
         }
     }
 
-    protected fun removeOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
+    private fun removeOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
         return mStateListeners.remove(listener)
     }
 
-    protected fun hasOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
+    private fun hasOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
         return mStateListeners.contains(listener)
     }
 
@@ -280,9 +274,10 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
     companion object {
 
-        val VERSION = BuildConfig.VERSION_NAME
+        const val VERSION = BuildConfig.VERSION_NAME
         /**
          * @return the instance id
          * @since 1.0.0
