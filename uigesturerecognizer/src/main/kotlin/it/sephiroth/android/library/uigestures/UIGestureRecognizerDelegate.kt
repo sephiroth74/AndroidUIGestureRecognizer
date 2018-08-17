@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -120,7 +121,6 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
         }
 
         // TODO: here we need another loop to tell each recognizer to execute its action
-
         return handled
     }
 
@@ -130,6 +130,7 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
      *
      * @param view
      */
+    @SuppressLint("ClickableViewAccessibility")
     fun startListeningView(view: View?) {
         stopListeningView()
         mView = view
@@ -139,6 +140,7 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
     /**
      * Stop listening for touch events on the associated view
      */
+    @SuppressLint("ClickableViewAccessibility")
     fun stopListeningView() {
         mView?.setOnTouchListener(null)
         mView = null
@@ -155,8 +157,9 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
             if (other !== recognizer) {
                 Log.v(javaClass.simpleName, "other: " + other + ", other.began: " + other.hasBeganFiringEvents())
                 if (other.hasBeganFiringEvents()) {
-                    result = result and (null != callback && callback!!.shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer,
-                            other))
+                    result = result and
+                            (null != callback && callback!!.shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer,
+                                    other))
                 }
             }
         }
