@@ -71,7 +71,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var cancelsTouchesInView: Boolean = false
 
-    internal var delegate: UIGestureRecognizerDelegate? = null
+    var delegate: UIGestureRecognizerDelegate? = null
 
     /**
      * custom object the instance should keep
@@ -173,23 +173,23 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     /**
      * @return Has began firing events
      */
-    internal open fun hasBeganFiringEvents(): Boolean {
+    open fun hasBeganFiringEvents(): Boolean {
         return mBeganFiringEvents
     }
 
-    internal fun setBeginFiringEvents(value: Boolean) {
+    protected fun setBeginFiringEvents(value: Boolean) {
         mBeganFiringEvents = value
     }
 
     protected abstract fun removeMessages()
 
-    internal fun removeMessages(vararg messages: Int) {
+    protected fun removeMessages(vararg messages: Int) {
         for (message in messages) {
             mHandler.removeMessages(message)
         }
     }
 
-    internal fun hasMessages(vararg messages: Int): Boolean {
+    protected fun hasMessages(vararg messages: Int): Boolean {
         for (message in messages) {
             if (mHandler.hasMessages(message)) {
                 return true
@@ -220,7 +220,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return mStateListeners.contains(listener)
     }
 
-    internal open fun onTouchEvent(event: MotionEvent): Boolean {
+    open fun onTouchEvent(event: MotionEvent): Boolean {
         lastEvent = MotionEvent.obtain(event)
         return false
     }
