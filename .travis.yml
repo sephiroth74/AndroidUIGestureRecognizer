@@ -55,6 +55,7 @@ install:
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
 before_script:
+  - android list targets
   - echo no | android create avd --force -n test -t android-27 --abi google_apis/x86
   # - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -f --abi google_apis/x86 --name test --package 'system-images;android-27;google_apis;x86'
   - emulator -avd test -no-skin -no-audio -no-window &
