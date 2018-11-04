@@ -55,7 +55,7 @@ install:
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
 before_script:
-  - echo no | android create avd --force -n test1 -t android-28 --abi x86
+  - echo no | android create avd --force -n test1 -t android-28
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
 
