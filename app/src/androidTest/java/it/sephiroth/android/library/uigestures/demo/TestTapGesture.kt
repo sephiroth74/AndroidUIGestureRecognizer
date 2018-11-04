@@ -2,12 +2,9 @@ package it.sephiroth.android.library.uigestures.demo
 
 import android.graphics.Point
 import android.os.SystemClock
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.matcher.ViewMatchers
-import android.support.test.filters.SdkSuppress
-import android.support.test.runner.AndroidJUnit4
-import android.support.test.uiautomator.UiObjectNotFoundException
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
 import junit.framework.Assert
@@ -15,12 +12,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = 18)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestTapGesture : TestBaseClass() {
 
     @Test
-    @Throws(UiObjectNotFoundException::class, InterruptedException::class)
     fun test_singleTap() {
         val activity = activityTestRule.activity
 
@@ -45,7 +40,6 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    @Throws(UiObjectNotFoundException::class, InterruptedException::class)
     fun test_singleTap2Fingers() {
         val delegate = activityTestRule.activity.delegate
         Assert.assertNotNull(delegate)
@@ -66,13 +60,12 @@ class TestTapGesture : TestBaseClass() {
                 Point(200, 400),
                 Point(400, 800),
                 1
-                                         )
+        )
         SystemClock.sleep(200)
         assertEquals(recognizer.tag as String + ": " + State.Ended, textView.text)
     }
 
     @Test
-    @Throws(UiObjectNotFoundException::class, InterruptedException::class)
     fun test_doubleTap() {
         val activity = activityTestRule.getActivity()
 

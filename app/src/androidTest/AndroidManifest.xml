@@ -6,7 +6,7 @@
     <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
-    <application android:label="@string/app_name">
+    <application android:label="Android UIGestureRecognizer">
         <activity android:name=".BaseTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
