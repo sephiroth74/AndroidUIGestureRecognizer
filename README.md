@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)
 
-[ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/_latestVersion)
+Java: [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/_latestVersion)
+<br />
+Kotlin: [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/_latestVersion)
 <br />
 
 AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.

@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), UIGestureRecognizer.OnActionListener, 
     override fun onGestureRecognized(recognizer: UIGestureRecognizer) {
         val dateTime = dateFormat!!.format(recognizer.lastEvent!!.eventTime)
         Log.d(
-                javaClass.simpleName,
+                "MainActivity",
                 "[" + dateTime + "] onGestureRecognized(" + recognizer + "). state: " + recognizer.state
         )
         (findViewById<View>(R.id.text) as TextView).text = recognizer.state!!.name
