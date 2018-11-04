@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures;
+package it.sephiroth.android.library.uigestures
 
 //
 //  ADOBE CONFIDENTIAL
@@ -16,6 +16,6 @@ package it.sephiroth.android.library.uigestures;
 //  is strictly forbidden unless prior written permission is obtained
 //  from Adobe.
 //
-public enum UIRectEdge {
+enum class UIRectEdge {
     LEFT, RIGTH, TOP, BOTTOM, NONE
 }

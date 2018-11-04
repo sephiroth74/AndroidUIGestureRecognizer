@@ -34,7 +34,7 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
 
         timeSpan = System.currentTimeMillis();
 
-        UIGestureRecognizer.setLogEnabled(true);
+        UIGestureRecognizer.Companion.setLogEnabled(true);
         delegate = new UIGestureRecognizerDelegate(null);
         findViewById(R.id.activity_main).setOnTouchListener(new View.OnTouchListener() {
             @Override

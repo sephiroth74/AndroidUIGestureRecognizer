@@ -41,7 +41,7 @@ public class TestBaseClass {
         context = InstrumentationRegistry.getContext();
         device.wait(Until.hasObject(By.pkg(PACKAGE_NAME).depth(0)), LAUNCH_TIMEOUT);
 
-        UIGestureRecognizer.setLogEnabled(true);
+        UIGestureRecognizer.Companion.setLogEnabled(true);
 
         PowerManager power = (PowerManager) context.getSystemService(POWER_SERVICE);
         wakeLock = power.newWakeLock(FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP | ON_AFTER_RELEASE, "test");
