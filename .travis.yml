@@ -3,6 +3,12 @@ language: android
 jdk:
     - oraclejdk8
 
+env:
+  global:
+  # install timeout in minutes (2 minutes by default)
+  - ANDROID_SDK_ROOT=/opt/android  # any place `travis` can write to should work  
+  - ADB_INSTALL_TIMEOUT=8
+
 android:
   components:
     - tools
@@ -31,11 +37,6 @@ notifications:
 cache: false
 sudo: false
 
-env:
-  global:
-  # install timeout in minutes (2 minutes by default)
-  - ANDROID_SDK_ROOT=/opt/android  # any place `travis` can write to should work  
-  - ADB_INSTALL_TIMEOUT=8
 
 # Emulator Management: Create, Start and Wait
 # - echo no | android update sdk --no-ui --filter sys-img-x86_64-google_apis-25 --all
@@ -49,14 +50,14 @@ env:
 
 # use sed to replace the SSH URL with the public URL, then init and update submodules
 before_install:
-  - export PATH=${ANDROID_SDK_ROOT}/tools/bin:$PATH
   - android update sdk -u -a --filter platform-tools-28.0.3
 
 install:
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
 before_script:
-  - echo no | /opt/android/bin/avdmanager create avd -f --abi google_apis/x86 --name test --package 'system-images;android-27;google_apis;x86'
+  - echo $ANDROID_HOME
+  - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -f --abi google_apis/x86 --name test --package 'system-images;android-27;google_apis;x86'
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
