@@ -13,7 +13,8 @@ android:
     - addon-google_apis-google-28
     - extra-android-m2repository
     - extra-android-suppor
-    - sys-img;android-27;google_apis;x86
+    - sys-img-x86-google_apis-27
+    # - sys-img-x86-android-27
  
 
   licenses:
