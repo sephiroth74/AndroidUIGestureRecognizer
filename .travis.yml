@@ -7,7 +7,7 @@ env:
   global:
   # install timeout in minutes (2 minutes by default)
   - ADB_INSTALL_TIMEOUT=8
-  - ANDROID_API=26
+  - ANDROID_API=25
 
 android:
   components:
