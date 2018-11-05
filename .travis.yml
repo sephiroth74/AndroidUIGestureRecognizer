@@ -14,13 +14,11 @@ android:
     - platform-tools
     - build-tools-28.0.3
     - android-27
-    - android-28
     - addon-google_apis-google-27
-    - addon-google_apis-google-28
     - extra-android-m2repository
     - extra-android-suppor
     - sys-img-x86-google_apis-27
-    - sys-img-x86-android-27
+    # - sys-img-x86-android-27
  
 
   licenses:
