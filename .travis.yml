@@ -51,7 +51,7 @@ sudo: false
 
 # use sed to replace the SSH URL with the public URL, then init and update submodules
 before_install:
-  - android update sdk -u -a
+  - echo y | android update sdk -u -a
 
 install:
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
