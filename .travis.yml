@@ -6,7 +6,6 @@ jdk:
 env:
   global:
   # install timeout in minutes (2 minutes by default)
-  - ANDROID_SDK_ROOT=/opt/android  # any place `travis` can write to should work  
   - ADB_INSTALL_TIMEOUT=8
 
 android:
@@ -14,9 +13,10 @@ android:
     - tools
     - platform-tools
     - build-tools-28.0.3
+    - android-27
     - android-28
-    - addon-google_apis-google-28
     - addon-google_apis-google-27
+    - addon-google_apis-google-28
     - extra-android-m2repository
     - extra-android-suppor
     - sys-img-x86-google_apis-27
@@ -58,7 +58,6 @@ install:
 before_script:
   - echo android list targets
   - echo no | android create avd --force -n test -t android-27 --abi google_apis/x86
-  # - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -f --abi google_apis/x86 --name test --package 'system-images;android-27;google_apis;x86'
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
