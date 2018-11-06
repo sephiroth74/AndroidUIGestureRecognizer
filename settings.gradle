@@ -1,1 +1,2 @@
-include ':app', ':uigesturerecognizer'
+include ':uigesturerecognizer'
+include ':app'

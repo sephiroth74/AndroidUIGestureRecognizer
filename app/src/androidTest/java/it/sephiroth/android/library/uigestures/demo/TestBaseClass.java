@@ -3,6 +3,11 @@ package it.sephiroth.android.library.uigestures.demo;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.os.PowerManager;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+
 import androidx.test.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.uiautomator.By;
@@ -10,11 +15,6 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 
 import static android.content.Context.POWER_SERVICE;

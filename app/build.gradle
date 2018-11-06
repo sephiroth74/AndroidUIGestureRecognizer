@@ -26,24 +26,32 @@ android {
         htmlReport false
         xmlReport false
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.0.1'
     implementation 'androidx.annotation:annotation:1.0.0'
 
     implementation project(':uigesturerecognizer')
+//    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:+'
 
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     androidTestImplementation 'androidx.test:core:1.0.0'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test:rules:1.1.0'
-    androidTestImplementation "androidx.test.ext:junit:1.0.0"
-
-    testImplementation "androidx.test.ext:junit:1.0.0"
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
+    testImplementation 'androidx.test.ext:junit:1.0.0'
+}
+repositories {
+    mavenCentral()
 }
