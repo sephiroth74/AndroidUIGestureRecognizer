@@ -1,6 +1,5 @@
 package it.sephiroth.android.library.uigestures.demo
 
-import android.os.SystemClock
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
@@ -10,6 +9,7 @@ import junit.framework.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestLongPressGesture : TestBaseClass() {
@@ -20,6 +20,7 @@ class TestLongPressGesture : TestBaseClass() {
     @Test
     fun test_singleTapLongPress() {
         val delegate = activityTestRule.activity.delegate
+        val latch = CountDownLatch(2)
 
         Assert.assertNotNull(delegate)
         delegate.clear()
@@ -32,16 +33,23 @@ class TestLongPressGesture : TestBaseClass() {
         longpressRecognizer.minimumPressDuration = 300// set as .5 seconds
         longpressRecognizer.allowableMovement = 100.toFloat() //move to 100x100
 
-        longpressRecognizer.actionListener = activityTestRule.activity
+        longpressRecognizer.actionListener = {
+            if(latch.count == 2L) {
+                assertEquals(State.Began, it.state)
+                latch.countDown()
+            } else {
+                assertEquals(State.Ended, it.state)
+                latch.countDown()
+
+            }
+        }
         delegate.addGestureRecognizer(longpressRecognizer)
 
         titleView.text = "1 Tap"
         textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.longClick())
-        SystemClock.sleep(200)
-
-        assertEquals(longpressRecognizer.tag as String + ": " + State.Ended, textView.text)
+        latch.await()
     }
 
 }
