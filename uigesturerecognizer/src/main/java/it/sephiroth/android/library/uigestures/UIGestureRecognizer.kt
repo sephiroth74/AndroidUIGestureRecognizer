@@ -30,7 +30,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     private val mStateListeners = Collections.synchronizedList(ArrayList<OnGestureRecognizerStateChangeListener>())
 
-    var actionListener: OnActionListener? = null
+    var actionListener: ((UIGestureRecognizer) -> Unit)? = null
 
     /**
      * @return The current recognizer internal state
@@ -146,10 +146,6 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         Ended
     }
 
-    interface OnActionListener {
-        fun onGestureRecognized(recognizer: UIGestureRecognizer)
-    }
-
     init {
         mHandler = GestureHandler(Looper.getMainLooper())
         cancelsTouchesInView = true
@@ -203,7 +199,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     }
 
     protected fun fireActionEvent() {
-        actionListener?.onGestureRecognized(this)
+        actionListener?.invoke(this)
     }
 
     private fun addOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener) {

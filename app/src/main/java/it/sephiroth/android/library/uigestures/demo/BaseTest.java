@@ -1,8 +1,10 @@
 package it.sephiroth.android.library.uigestures.demo;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,8 +12,10 @@ import android.widget.TextView;
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer;
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
-public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.OnActionListener {
+public class BaseTest extends AppCompatActivity {
 
     public UIGestureRecognizerDelegate delegate;
     private TextView mTextView;
@@ -80,11 +84,15 @@ public class BaseTest extends AppCompatActivity implements UIGestureRecognizer.O
         mTextView2 = findViewById(R.id.text2);
     }
 
-    @Override
-    public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
-        Log.i(getClass().getSimpleName(), "onGestureRecognized: " + recognizer);
-        mCurrentState = recognizer.getState();
-        mTextView.setText(recognizer.getTag() + ": " + recognizer.getState().name());
-        Log.v(getClass().getSimpleName(), mTextView.getText().toString());
-    }
+    protected Function1<UIGestureRecognizer, Unit> actionListener = new Function1<UIGestureRecognizer, Unit>() {
+        @Override
+        public Unit invoke(UIGestureRecognizer recognizer) {
+            Log.i(getClass().getSimpleName(), "onGestureRecognized: " + recognizer);
+            mCurrentState = recognizer.getState();
+            mTextView.setText(recognizer.getTag() + ": " + recognizer.getState().name());
+            Log.v(getClass().getSimpleName(), mTextView.getText().toString());
+            return null;
+        }
+    };
+
 }
