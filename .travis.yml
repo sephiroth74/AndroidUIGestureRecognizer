@@ -39,12 +39,12 @@ before_install:
   - sdkmanager --update
   - sdkmanager "system-images;android-22;default;armeabi-v7a"
   - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
 
 install:
     - ./gradlew clean build assembleAndroidTest --stacktrace
 
 before_script:
+  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
