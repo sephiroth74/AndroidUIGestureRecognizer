@@ -177,7 +177,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             scale = detector.scaleFactor
             removeMessages(MESSAGE_RESET)
 
-            if (delegate!!.shouldBegin(this)) {
+            if (delegate?.shouldBegin?.invoke(this)!!) {
                 state = UIGestureRecognizer.State.Began
 
                 if (null == requireFailureOf) {

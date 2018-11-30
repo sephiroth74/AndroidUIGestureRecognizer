@@ -351,7 +351,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         removeMessages(MESSAGE_FAILED)
 
         if (state === UIGestureRecognizer.State.Possible && mStarted) {
-            if (numberOfTouches == touchesRequired && delegate!!.shouldBegin(this)) {
+            if (numberOfTouches == touchesRequired && delegate?.shouldBegin?.invoke(this)!!) {
                 state = UIGestureRecognizer.State.Began
                 if (null == requireFailureOf) {
                     fireActionEventIfCanRecognizeSimultaneously()

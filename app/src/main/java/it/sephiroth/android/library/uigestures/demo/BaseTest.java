@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures.demo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -31,6 +32,7 @@ public class BaseTest extends AppCompatActivity {
         return mTextView2;
     }
 
+    @SuppressLint ("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,18 +41,15 @@ public class BaseTest extends AppCompatActivity {
         timeSpan = System.currentTimeMillis();
 
         UIGestureRecognizer.Companion.setLogEnabled(true);
-        delegate = new UIGestureRecognizerDelegate(null);
-        findViewById(R.id.activity_main).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(final View view, final MotionEvent motionEvent) {
-                long time = System.currentTimeMillis() - timeSpan;
-                CharSequence currentText = mTextView2.getText();
-                mTextView2.setText(time + "ms, action:" + actionToString(motionEvent.getActionMasked()));
-                mTextView2.append("\n");
-                mTextView2.append(currentText);
+        delegate = new UIGestureRecognizerDelegate();
+        findViewById(R.id.activity_main).setOnTouchListener((view, motionEvent) -> {
+            long time = System.currentTimeMillis() - timeSpan;
+            CharSequence currentText = mTextView2.getText();
+            mTextView2.setText(time + "ms, action:" + actionToString(motionEvent.getActionMasked()));
+            mTextView2.append("\n");
+            mTextView2.append(currentText);
 
-                return delegate.onTouchEvent(view, motionEvent);
-            }
+            return delegate.onTouchEvent(view, motionEvent);
         });
     }
 

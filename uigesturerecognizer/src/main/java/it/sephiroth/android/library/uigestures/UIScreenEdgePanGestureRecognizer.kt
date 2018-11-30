@@ -273,7 +273,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                         mStarted = true
 
                         if (count in minimumNumberOfTouches..maximumNumberOfTouches
-                                && delegate!!.shouldBegin(this)
+                                && delegate?.shouldBegin?.invoke(this)!!
                                 && getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, xVelocity, yVelocity) === edge) {
 
                             state = UIGestureRecognizer.State.Began
@@ -393,6 +393,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
         removeMessages(MESSAGE_RESET)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun getTouchDirection(
             x1: Float, y1: Float, x2: Float, y2: Float, velocityX: Float, velocityY: Float): UIRectEdge {
         val diffY = y2 - y1

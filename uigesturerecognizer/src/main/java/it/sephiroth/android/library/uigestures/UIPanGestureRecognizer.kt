@@ -279,7 +279,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                         mLastFocusY = focusY
                         mStarted = true
 
-                        if (count in minimumNumberOfTouches..maximumNumberOfTouches && delegate?.shouldBegin(this)!!) {
+                        if (count in minimumNumberOfTouches..maximumNumberOfTouches && delegate?.shouldBegin?.invoke(this)!!) {
                             state = UIGestureRecognizer.State.Began
 
                             if (null == requireFailureOf) {

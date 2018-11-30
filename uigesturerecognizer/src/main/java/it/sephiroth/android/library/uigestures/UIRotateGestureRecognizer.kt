@@ -258,7 +258,7 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                     if (Math.abs(rotationInRadians) > rotationThreshold) {
                         mStarted = true
 
-                        if (delegate!!.shouldBegin(this)) {
+                        if (delegate?.shouldBegin?.invoke(this)!!) {
                             state = UIGestureRecognizer.State.Began
 
                             if (null == requireFailureOf) {

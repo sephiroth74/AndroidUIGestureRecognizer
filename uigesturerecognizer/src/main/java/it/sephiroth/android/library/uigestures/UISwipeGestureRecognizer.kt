@@ -318,7 +318,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                             if (direction != -1) {
                                 if (this.direction and direction != 0) {
-                                    if (delegate!!.shouldBegin(this)) {
+                                    if (delegate?.shouldBegin?.invoke(this)!!) {
                                         state = UIGestureRecognizer.State.Ended
                                         if (null == requireFailureOf) {
                                             fireActionEventIfCanRecognizeSimultaneously()

@@ -224,7 +224,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                             delayedFail()
                         } else {
                             // nailed!
-                            if (delegate!!.shouldBegin(this)) {
+                            if (delegate?.shouldBegin?.invoke(this)!!) {
                                 state = UIGestureRecognizer.State.Ended
 
                                 if (null == requireFailureOf) {

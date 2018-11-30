@@ -22,8 +22,7 @@ import java.util.*
  *
  * @author alessandro crugnola
  * @version 1.0.0
- * @see [
- * https://developer.apple.com/reference/uikit/uigesturerecognizer](https://developer.apple.com/reference/uikit/uigesturerecognizer)
+ * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer'>uigesturerecognizer</a>
  */
 
 abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateChangeListener {
@@ -64,8 +63,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     /**
      * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
-     * @see [
-     * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview)
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview'>cancelstouchesinview</a>
      *
      * @since 1.0.0
      */
@@ -91,8 +89,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     /**
      * Creates a dependency relationship between the receiver and another gesture recognizer when the objects are created
-     * @see [
-     * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require)
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require'>1624203-require</a>
      *
      * @since 1.0.0
      */

@@ -12,7 +12,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class MainActivity : AppCompatActivity(), UIGestureRecognizerDelegate.Callback {
+class MainActivity : AppCompatActivity() {
 
     private var mRoot: ViewGroup? = null
     private var mDelegate: UIGestureRecognizerDelegate? = null
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), UIGestureRecognizerDelegate.Callback {
 
         UIGestureRecognizer.logEnabled = BuildConfig.DEBUG
 
-        mDelegate = UIGestureRecognizerDelegate(this)
+        mDelegate = UIGestureRecognizerDelegate()
 
         val recognizer1 = UITapGestureRecognizer(this)
         recognizer1.tapsRequired = 1
@@ -80,6 +80,8 @@ class MainActivity : AppCompatActivity(), UIGestureRecognizerDelegate.Callback {
         //recognizer3.requireFailureOf(recognizer4);
 
         mDelegate!!.addGestureRecognizer(recognizer1)
+        mDelegate!!.addGestureRecognizer(recognizer3)
+        mDelegate!!.addGestureRecognizer(recognizer5)
         //        mDelegate.addGestureRecognizer(recognizer3);
         //        mDelegate.addGestureRecognizer(recognizer5);
         //        mDelegate.addGestureRecognizer(recognizer6);
@@ -105,18 +107,5 @@ class MainActivity : AppCompatActivity(), UIGestureRecognizerDelegate.Callback {
         )
         (findViewById<View>(R.id.text) as TextView).text = recognizer.state!!.name
         (findViewById<View>(R.id.text2) as TextView).text = "[" + dateTime + "] " + recognizer.toString()
-    }
-
-    override fun shouldBegin(recognizer: UIGestureRecognizer): Boolean {
-        return true
-    }
-
-    override fun shouldRecognizeSimultaneouslyWithGestureRecognizer(
-            current: UIGestureRecognizer, recognizer: UIGestureRecognizer): Boolean {
-        return true
-    }
-
-    override fun shouldReceiveTouch(recognizer: UIGestureRecognizer): Boolean {
-        return true
     }
 }
