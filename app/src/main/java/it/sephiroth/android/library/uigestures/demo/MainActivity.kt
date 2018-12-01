@@ -1,28 +1,25 @@
 package it.sephiroth.android.library.uigestures.demo
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
-import android.view.View
+import android.os.Handler
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import it.sephiroth.android.library.uigestures.*
-
-import java.text.DateFormat
+import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private var mRoot: ViewGroup? = null
-    private var mDelegate: UIGestureRecognizerDelegate? = null
-    private var dateFormat: DateFormat? = null
+    private lateinit var mDelegate: UIGestureRecognizerDelegate
+    private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
+    val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 
         UIGestureRecognizer.logEnabled = BuildConfig.DEBUG
 
@@ -79,9 +76,10 @@ class MainActivity : AppCompatActivity() {
 
         //recognizer3.requireFailureOf(recognizer4);
 
-        mDelegate!!.addGestureRecognizer(recognizer1)
-        mDelegate!!.addGestureRecognizer(recognizer3)
-        mDelegate!!.addGestureRecognizer(recognizer5)
+        mDelegate.addGestureRecognizer(recognizer1)
+//        mDelegate.addGestureRecognizer(recognizer2)
+//        mDelegate.addGestureRecognizer(recognizer3)
+//        mDelegate.addGestureRecognizer(recognizer5)
         //        mDelegate.addGestureRecognizer(recognizer3);
         //        mDelegate.addGestureRecognizer(recognizer5);
         //        mDelegate.addGestureRecognizer(recognizer6);
@@ -90,7 +88,23 @@ class MainActivity : AppCompatActivity() {
 
         // start listening for MotionEvent
 
-        mDelegate!!.startListeningView(mRoot)
+        mDelegate.startListeningView(mRoot)
+
+        mDelegate.shouldReceiveTouch = { true }
+
+        mDelegate.shouldBegin = { true }
+
+        mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = {recognizer, other ->
+            Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer: ${recognizer.tag}, ${other.tag}")
+            when(other.tag) {
+                "single-tap" -> false
+                "double-tap" -> false
+                else -> {
+                    true
+                }
+            }
+        }
+
     }
 
     override fun onContentChanged() {
@@ -99,13 +113,19 @@ class MainActivity : AppCompatActivity() {
         mRoot = findViewById(R.id.activity_main)
     }
 
-    val actionListener = { recognizer: UIGestureRecognizer ->
-        val dateTime = dateFormat!!.format(recognizer.lastEvent!!.eventTime)
-        Log.d(
-                "MainActivity",
-                "[" + dateTime + "] onGestureRecognized(" + recognizer + "). state: " + recognizer.state
-        )
-        (findViewById<View>(R.id.text) as TextView).text = recognizer.state!!.name
-        (findViewById<View>(R.id.text2) as TextView).text = "[" + dateTime + "] " + recognizer.toString()
+    val runner = Runnable {
+        text2.text = ""
+    }
+
+    private val actionListener = { recognizer: UIGestureRecognizer ->
+        val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
+        Timber.d("onGestureRecognized($recognizer)")
+
+        text.setText(recognizer.state?.name)
+        text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
+        text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
+
+        handler.removeCallbacks(runner)
+        handler.postDelayed(runner, 5000)
     }
 }

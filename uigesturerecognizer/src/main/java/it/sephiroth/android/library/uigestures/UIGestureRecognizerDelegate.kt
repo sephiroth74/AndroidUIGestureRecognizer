@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -137,22 +138,22 @@ class UIGestureRecognizerDelegate {
         mView = null
     }
 
-    fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer): Boolean {
-        Log.i(javaClass.simpleName, "shouldRecognizeSimultaneouslyWithGestureRecognizer($recognizer)")
+    internal fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer): Boolean {
         if (mSet.size == 1) {
             return true
         }
 
+        Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer")
+
         var result = true
         for (other in mSet) {
             if (other != recognizer) {
-                Log.v(javaClass.simpleName, "other: " + other + ", other.began: " + other.hasBeganFiringEvents())
                 if (other.hasBeganFiringEvents()) {
                     result = result and (shouldRecognizeSimultaneouslyWithGestureRecognizer.invoke(recognizer, other))
                 }
             }
         }
-        Log.v(javaClass.simpleName, "result: $result")
+        Timber.v("result: $result")
         return result
     }
 }

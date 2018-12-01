@@ -101,7 +101,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
         mTouchSlopSquare = touchSlop * touchSlop
         mCurrentLocation = PointF()
         mEdgeLimit = context.resources.getDimension(R.dimen.gestures_screen_edge_limit)
-        logMessage(Log.VERBOSE, "edge limits: %g", mEdgeLimit)
+        logMessage(Log.VERBOSE, "edge limits: $mEdgeLimit")
     }
 
     override fun handleMessage(msg: Message) {
