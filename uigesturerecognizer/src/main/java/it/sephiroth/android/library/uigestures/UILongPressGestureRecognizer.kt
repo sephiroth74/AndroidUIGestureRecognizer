@@ -167,14 +167,11 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         val focusX = sumX / div
         val focusY = sumY / div
 
-        val oldFocusX = mCurrentLocation.x
-        val oldFocusY = mCurrentLocation.y
         mCurrentLocation.set(focusX, focusY)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
                 if (!mStarted && !delegate?.shouldReceiveTouch?.invoke(this)!!) {
-                    mCurrentLocation.set(oldFocusX, oldFocusY)
                     return cancelsTouchesInView
                 }
 

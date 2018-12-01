@@ -150,15 +150,12 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         val focusX = sumX / div
         val focusY = sumY / div
 
-        val oldLocationX = mCurrentLocation.x
-        val oldLocationY = mCurrentLocation.y
         mCurrentLocation.set(focusX, focusY)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
 
                 if (!mStarted && !delegate?.shouldReceiveTouch?.invoke(this)!!) {
-                    mCurrentLocation.set(oldLocationX, oldLocationY)
                     return cancelsTouchesInView
                 }
 
