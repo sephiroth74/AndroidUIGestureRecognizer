@@ -173,6 +173,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             mVelocityTracker = VelocityTracker.obtain()
         }
 
+        val tracker = mVelocityTracker!!
         val pointerUp = action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_POINTER_UP
         val skipIndex = if (pointerUp) event.actionIndex else -1
 
@@ -219,25 +220,25 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mDownFocusY = mLastFocusY
                 numberOfTouches = count - 1
 
-                mVelocityTracker!!.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
+                tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
 
                 val id1 = event.getPointerId(upIndex)
-                val x1 = mVelocityTracker!!.getXVelocity(id1)
-                val y1 = mVelocityTracker!!.getYVelocity(id1)
+                val x1 = tracker.getXVelocity(id1)
+                val y1 = tracker.getYVelocity(id1)
                 for (i in 0 until count) {
                     if (i == upIndex) {
                         continue
                     }
 
                     val id2 = event.getPointerId(i)
-                    val x = x1 * mVelocityTracker!!.getXVelocity(id2)
-                    val y = y1 * mVelocityTracker!!.getYVelocity(id2)
+                    val x = x1 * tracker.getXVelocity(id2)
+                    val y = y1 * tracker.getYVelocity(id2)
 
                     val dot = x + y
 
                     if (dot < 0) {
-                        mVelocityTracker!!.clear()
+                        tracker.clear()
                         break
                     }
                 }
@@ -262,8 +263,8 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mLastFocusY = focusY
                 mDownFocusY = mLastFocusY
 
-                mVelocityTracker!!.clear()
-                mVelocityTracker!!.addMovement(event)
+                tracker.clear()
+                tracker.addMovement(event)
 
                 mStarted = false
                 mDown = true
@@ -278,7 +279,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 scrollX = mLastFocusX - focusX
                 scrollY = mLastFocusY - focusY
 
-                mVelocityTracker!!.addMovement(event)
+                tracker.addMovement(event)
 
                 if (state === UIGestureRecognizer.State.Possible && !mStarted && mDown) {
                     val deltaX = (focusX - mDownFocusX).toDouble()
@@ -287,9 +288,9 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     val distance = sqrt(Math.pow(deltaX, 2.0) + Math.pow(deltaY, 2.0))
                     if (distance > minimumTouchDistance) {
 
-                        mVelocityTracker!!.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
-                        yVelocity = mVelocityTracker!!.yVelocity
-                        xVelocity = mVelocityTracker!!.xVelocity
+                        tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
+                        yVelocity = tracker.yVelocity
+                        xVelocity = tracker.xVelocity
 
                         translationX -= scrollX
                         translationY -= scrollY
@@ -325,9 +326,9 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     translationY -= scrollY
 
                     val pointerId = event.getPointerId(0)
-                    mVelocityTracker!!.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
-                    yVelocity = mVelocityTracker!!.getYVelocity(pointerId)
-                    xVelocity = mVelocityTracker!!.getXVelocity(pointerId)
+                    tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
+                    yVelocity = tracker.getYVelocity(pointerId)
+                    xVelocity = tracker.getXVelocity(pointerId)
 
                     if (hasBeganFiringEvents()) {
                         state = UIGestureRecognizer.State.Changed
