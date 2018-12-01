@@ -109,18 +109,9 @@ class UIGestureRecognizerDelegate {
     @Suppress("UNUSED_PARAMETER")
     fun onTouchEvent(view: View, event: MotionEvent): Boolean {
         var handled = false
-
-        // TODO: each recognizer should prepare its internal status here
-        // but don't execute any action
         for (recognizer in mSet) {
-            handled = if (shouldReceiveTouch.invoke(recognizer)) {
-                handled or recognizer.onTouchEvent(event)
-            } else {
-                handled or recognizer.onTouchEvent(event)
-            }
+            handled = handled or recognizer.onTouchEvent(event)
         }
-
-        // TODO: here we need another loop to tell each recognizer to execute its action
         return handled
     }
 

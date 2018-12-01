@@ -48,7 +48,6 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     override var numberOfTouches = 0
         internal set
 
-
     private val mCurrentLocation: PointF
 
     override val currentLocationX: Float
@@ -146,10 +145,19 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         val div = if (pointerUp) count - 1 else count
         val focusX = sumX / div
         val focusY = sumY / div
+
+        val oldLocationX = mCurrentLocation.x
+        val oldLocationY = mCurrentLocation.y
         mCurrentLocation.set(focusX, focusY)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
+
+                if (!mStarted && !delegate?.shouldReceiveTouch?.invoke(this)!!) {
+                    mCurrentLocation.set(oldLocationX, oldLocationY)
+                    return cancelsTouchesInView
+                }
+
                 removeMessages()
                 mAlwaysInTapRegion = true
                 numberOfTouches = count
@@ -171,6 +179,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_POINTER_UP)
 
                 numberOfTouches = count
@@ -185,6 +194,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_POINTER_UP -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP)
 
                 mDownFocusX = focusX
@@ -196,6 +206,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_MOVE -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+                mCurrentLocation.set(focusX, focusY)
                 if (mAlwaysInTapRegion) {
                     val deltaX = (focusX - mDownFocusX).toInt()
                     val deltaY = (focusY - mDownFocusY).toInt()
@@ -214,6 +225,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_UP -> {
+                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
 
                 if (state === UIGestureRecognizer.State.Possible && mStarted) {
@@ -236,7 +248,8 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                                             fireActionEventIfCanRecognizeSimultaneously()
                                             postReset()
                                         }
-                                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state = UIGestureRecognizer.State.Failed
+                                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
+                                                UIGestureRecognizer.State.Failed
                                         else -> {
                                             listenForOtherStateChanges()
                                             logMessage(Log.DEBUG, "waiting...")
@@ -269,7 +282,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (delegate!!.shouldRecognizeSimultaneouslyWithGestureRecognizer(this)) {
+        if (delegate?.shouldRecognizeSimultaneouslyWithGestureRecognizer(this)!!) {
             setBeginFiringEvents(true)
             fireActionEvent()
         }
