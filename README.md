@@ -111,6 +111,3 @@ Add the library dependency:
         }
 
 ```
-
-# JavaDocs
-**JavaDocs** are available here: [javadoc.zip](javadoc.zip)
