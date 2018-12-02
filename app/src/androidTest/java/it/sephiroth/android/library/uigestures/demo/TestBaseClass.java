@@ -57,10 +57,6 @@ public class TestBaseClass {
         return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/activity_main"));
     }
 
-    UiObject getTitleView() {
-        return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/title"));
-    }
-
     UiObject getTextView() {
         return device.findObject(new UiSelector().resourceId(PACKAGE_NAME + ":id/text"));
     }

@@ -1,11 +1,9 @@
 package it.sephiroth.android.library.uigestures.demo
 
 import android.graphics.Point
-import android.os.SystemClock
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
-import it.sephiroth.android.library.uigestures.UIGestureRecognizer
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
 import junit.framework.Assert
@@ -29,20 +27,19 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "single-tap"
         recognizer.touchesRequired = 1
         recognizer.tapsRequired = 1
-        recognizer.actionListener =  {
+        recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
             latch.countDown()
         }
         delegate.addGestureRecognizer(recognizer)
 
-        titleView.text = "1 Tap"
         textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
         latch.await()
     }
 
-    @Test
+//    @Test
     fun test_singleTap2Fingers() {
         val latch = CountDownLatch(1)
         val delegate = activityTestRule.activity.delegate
@@ -55,22 +52,19 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tapsRequired = 1
         recognizer.actionListener = activityTestRule.activity.actionListener
 
-        recognizer.actionListener =  {
+        recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
             latch.countDown()
         }
 
         delegate.addGestureRecognizer(recognizer)
 
-        titleView.text = "1 Tap 2 Fingers"
-
         mainView.performTwoPointerGesture(
                 Point(100, 200),
                 Point(200, 300),
                 Point(100, 200),
                 Point(200, 300),
-                1
-        )
+                1)
 
         latch.await()
     }
@@ -88,14 +82,13 @@ class TestTapGesture : TestBaseClass() {
         recognizer.touchesRequired = 1
         recognizer.tapsRequired = 2
         recognizer.tapTimeout = 400
-        recognizer.actionListener =  {
+        recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
             latch.countDown()
         }
 
         delegate.addGestureRecognizer(recognizer)
 
-        titleView.text = "2 Taps"
         textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
