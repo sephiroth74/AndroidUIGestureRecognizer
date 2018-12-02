@@ -125,7 +125,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         maximumFlingVelocity = configuration.scaledMaximumFlingVelocity
         minimumTouchDistance = configuration.scaledTouchSlop
         mCurrentLocation = PointF()
-        logMessage(Log.VERBOSE, "touchSlop: $minimumTouchDistance")
+        logMessage(Log.VERBOSE, "minimumTouchDistance: $minimumTouchDistance")
     }
 
     override fun handleMessage(msg: Message) {
