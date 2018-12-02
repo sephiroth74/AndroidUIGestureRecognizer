@@ -45,7 +45,6 @@ class TestLongPressGesture : TestBaseClass() {
         }
         delegate.addGestureRecognizer(longpressRecognizer)
 
-        titleView.text = "1 Tap"
         textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.longClick())

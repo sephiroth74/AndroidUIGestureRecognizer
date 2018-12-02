@@ -10,24 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@null"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:inputType="none"
-        android:text="None"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-    <EditText
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
         android:layout_marginBottom="8dp"
         android:background="@null"
         android:clickable="false"
@@ -37,7 +23,7 @@
         android:text="None"
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -45,6 +31,8 @@
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
+        android:gravity="bottom"
         android:text=""
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+        android:textSize="11sp"
+        android:textAppearance="?textAppearanceListItemSmall" />
 </RelativeLayout>

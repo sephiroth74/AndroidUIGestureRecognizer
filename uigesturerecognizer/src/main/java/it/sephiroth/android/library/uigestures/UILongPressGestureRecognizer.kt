@@ -17,16 +17,23 @@ import android.view.ViewConfiguration
  * https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer](https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer)
  */
 open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
-    /**
-     * @return The minimum period fingers must press on the view for the gesture to be recognized.
-     * @since 1.0.0
-     */
+
+    val tapTimeout = ViewConfiguration.getTapTimeout().toLong()
+
+    var longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
+        set(value) {
+            field = value
+            minimumPressDuration = tapTimeout + value
+        }
+
+    var doubleTapTimeout = ViewConfiguration.getDoubleTapTimeout().toLong()
+
     /**
      * The minimum period fingers must press on the view for the gesture to be recognized.<br></br>
      * Value is in milliseconds
      * @since 1.0.0
      */
-    var minimumPressDuration = UIGestureRecognizer.TAP_TIMEOUT + UIGestureRecognizer.LONG_PRESS_TIMEOUT
+    var minimumPressDuration = tapTimeout + longPressTimeout
 
     /**
      * The number of required touches for this recognizer to succeed.<br></br>
@@ -41,6 +48,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
      * @since 1.0.0
      */
     var tapsRequired = 0
+
 
     private var mAlwaysInTapRegion: Boolean = false
     private var mDownFocusX: Float = 0.toFloat()
@@ -112,8 +120,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(%s, %s)", recognizer, recognizer.state?.name!!)
-        logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, state?.name!!)
+        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name}, started: $mStarted)")
 
         if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
             stopListenForOtherStateChanges()
@@ -159,10 +166,15 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         val div = if (pointerUp) count - 1 else count
         val focusX = sumX / div
         val focusY = sumY / div
+
         mCurrentLocation.set(focusX, focusY)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
+                if (!mStarted && !delegate?.shouldReceiveTouch?.invoke(this)!!) {
+                    return cancelsTouchesInView
+                }
+
                 removeMessages()
 
                 mAlwaysInTapRegion = true
@@ -182,7 +194,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                 if (mNumTaps == tapsRequired) {
                     mHandler.sendEmptyMessageAtTime(MESSAGE_LONG_PRESS, event.downTime + minimumPressDuration)
                 } else {
-                    var timeout = UIGestureRecognizer.LONG_PRESS_TIMEOUT
+                    var timeout = longPressTimeout
                     if (timeout >= minimumPressDuration) {
                         timeout = minimumPressDuration - 1
                     }
@@ -218,7 +230,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 val message = mHandler.obtainMessage(MESSAGE_POINTER_UP)
                 message.arg1 = numberOfTouches - 1
-                mHandler.sendMessageDelayed(message, UIGestureRecognizer.TAP_TIMEOUT)
+                mHandler.sendMessageDelayed(message, tapTimeout)
             } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
                 if (numberOfTouches - 1 < touchesRequired) {
                     val began = hasBeganFiringEvents()
@@ -328,7 +340,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     }
 
     private fun delayedFail() {
-        mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, UIGestureRecognizer.DOUBLE_TAP_TIMEOUT)
+        mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, doubleTapTimeout)
     }
 
     private fun handleFailed() {
@@ -351,7 +363,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         removeMessages(MESSAGE_FAILED)
 
         if (state === UIGestureRecognizer.State.Possible && mStarted) {
-            if (numberOfTouches == touchesRequired && delegate!!.shouldBegin(this)) {
+            if (numberOfTouches == touchesRequired && delegate?.shouldBegin?.invoke(this)!!) {
                 state = UIGestureRecognizer.State.Began
                 if (null == requireFailureOf) {
                     fireActionEventIfCanRecognizeSimultaneously()

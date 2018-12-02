@@ -5,7 +5,6 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -52,12 +51,8 @@ task javadoc(type: Javadoc) {
 }
 
 dependencies {
-    implementation('it.sephiroth.android.library.simplelogger:simple-logger:1.0.0') {
-        exclude group: 'com.android.support'
-    }
-
+    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'androidx.annotation:annotation:1.0.0'
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 

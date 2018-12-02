@@ -3,7 +3,6 @@ package it.sephiroth.android.library.uigestures
 import android.content.Context
 import android.os.Build
 import android.os.Message
-import androidx.annotation.RequiresApi
 import android.util.Log
 import android.view.MotionEvent
 
@@ -17,7 +16,10 @@ import android.view.MotionEvent
  * https://developer.apple.com/reference/uikit/uipinchgesturerecognizer](https://developer.apple.com/reference/uikit/uipinchgesturerecognizer)
  */
 
-open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer, ScaleGestureDetector.OnScaleGestureListener {
+@Suppress("unused")
+open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context),
+        UIContinuousRecognizer,
+        ScaleGestureDetector.OnScaleGestureListener {
     private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this)
 
     /**
@@ -45,49 +47,49 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         get() = mScaleGestureDetector.focusY
 
     /**
-     * @see ScaleGestureDetector.getCurrentSpan
+     * @see ScaleGestureDetector.currentSpan
      * @since 1.0.0
      */
     val currentSpan: Float
         get() = mScaleGestureDetector.currentSpan
 
     /**
-     * @see ScaleGestureDetector.getCurrentSpanX
+     * @see ScaleGestureDetector.currentSpanX
      * @since 1.0.0
      */
     val currentSpanX: Float
         get() = mScaleGestureDetector.currentSpanX
 
     /**
-     * @see ScaleGestureDetector.getCurrentSpanY
+     * @see ScaleGestureDetector.currentSpanY
      * @since 1.0.0
      */
     val currentSpanY: Float
         get() = mScaleGestureDetector.currentSpanY
 
     /**
-     * @see ScaleGestureDetector.getPreviousSpan
+     * @see ScaleGestureDetector.previousSpan
      * @since 1.0.0
      */
     val previousSpan: Float
         get() = mScaleGestureDetector.previousSpan
 
     /**
-     * @see ScaleGestureDetector.getPreviousSpanX
+     * @see ScaleGestureDetector.previousSpanX
      * @since 1.0.0
      */
     val previousSpanX: Float
         get() = mScaleGestureDetector.previousSpanX
 
     /**
-     * @see ScaleGestureDetector.getPreviousSpanY
+     * @see ScaleGestureDetector.previousSpanY
      * @since 1.0.0
      */
     val previousSpanY: Float
         get() = mScaleGestureDetector.previousSpanY
 
     /**
-     * @see ScaleGestureDetector.getTimeDelta
+     * @see ScaleGestureDetector.timeDelta
      * @since 1.0.0
      */
     val timeDelta: Long
@@ -101,32 +103,38 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         }
     }
 
-    init {
-        setQuickScaleEnabled(false)
-    }
-
     /**
      * Set whether the associated [ScaleGestureDetector.OnScaleGestureListener] should receive onScale callbacks
      * when the user performs a doubleTap followed by a swipe. Note that this is enabled by default
      * if the app targets API 19 and newer.<br></br>
      * Default value is false.
      *
-     * @param enabled true to enable quick scaling, false to disable
+     * true to enable quick scaling, false to disable
      * @since 1.0.0
      */
-    fun setQuickScaleEnabled(enabled: Boolean) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            mScaleGestureDetector.isQuickScaleEnabled = enabled
+    var isQuickScaleEnabled: Boolean
+        get() {
+            return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) mScaleGestureDetector.isQuickScaleEnabled else false
         }
-    }
+        set(value) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                mScaleGestureDetector.isQuickScaleEnabled = value
+            }
+        }
 
     /**
-     * @param enabled enable/disable stylus scaling. Note: it is only available for android 23 and above
+     * enable/disable stylus scaling. Note: it is only available for android 23 and above
      * @since 1.0.0
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    fun setStylusScaleEnabled(enabled: Boolean) {
-        mScaleGestureDetector.isStylusScaleEnabled = enabled
+    @Suppress("unused")
+    var isStylusScaleEnabled: Boolean
+        get() = mScaleGestureDetector.isStylusScaleEnabled
+        set(value) {
+            mScaleGestureDetector.isStylusScaleEnabled = value
+        }
+
+    init {
+        isQuickScaleEnabled = false
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -140,8 +148,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(%s, %s)", recognizer, recognizer.state?.name!!)
-        logMessage(Log.VERBOSE, "state: %s", state?.name!!)
+        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name})")
 
         if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
             stopListenForOtherStateChanges()
@@ -173,11 +180,11 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
         state = UIGestureRecognizer.State.Possible
 
-        if (isEnabled && state === UIGestureRecognizer.State.Possible) {
+        if (isEnabled && state === UIGestureRecognizer.State.Possible && delegate?.shouldReceiveTouch?.invoke(this)!!) {
             scale = detector.scaleFactor
             removeMessages(MESSAGE_RESET)
 
-            if (delegate!!.shouldBegin(this)) {
+            if (delegate?.shouldBegin?.invoke(this)!!) {
                 state = UIGestureRecognizer.State.Began
 
                 if (null == requireFailureOf) {
@@ -185,7 +192,8 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                 } else {
                     when {
                         requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state = UIGestureRecognizer.State.Failed
+                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
+                                UIGestureRecognizer.State.Failed
                         else -> {
                             listenForOtherStateChanges()
                             setBeginFiringEvents(false)

@@ -10,7 +10,7 @@ import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import it.sephiroth.android.library.simplelogger.LoggerFactory
+import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -22,15 +22,14 @@ import java.util.*
  *
  * @author alessandro crugnola
  * @version 1.0.0
- * @see [
- * https://developer.apple.com/reference/uikit/uigesturerecognizer](https://developer.apple.com/reference/uikit/uigesturerecognizer)
+ * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer'>uigesturerecognizer</a>
  */
 
 abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateChangeListener {
 
     private val mStateListeners = Collections.synchronizedList(ArrayList<OnGestureRecognizerStateChangeListener>())
 
-    var actionListener: ((UIGestureRecognizer) -> Unit)? = null
+    var actionListener: ((UIGestureRecognizer) -> Any?)? = null
 
     /**
      * @return The current recognizer internal state
@@ -38,7 +37,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var state: State? = null
         protected set(state) {
-            logMessage(Log.INFO, "setState: %s", state ?: "null")
+            // logMessage(Log.INFO, "setState: ${state?.name}")
 
             val changed = this.state != state || state == State.Changed
             field = state
@@ -64,8 +63,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     /**
      * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
-     * @see [
-     * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview)
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview'>cancelstouchesinview</a>
      *
      * @since 1.0.0
      */
@@ -78,21 +76,13 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var tag: Any? = null
-        set(mTag) {
-            field = mTag
-
-            if (sDebug) {
-                logger.tag = mTag.toString()
-            }
-        }
 
     var id: Long = 0
         protected set
 
     /**
      * Creates a dependency relationship between the receiver and another gesture recognizer when the objects are created
-     * @see [
-     * https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require](https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require)
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624203-require'>1624203-require</a>
      *
      * @since 1.0.0
      */
@@ -109,7 +99,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             field = mLastEvent
         }
     private val mContextRef: WeakReference<Context>
-    private val logger = LoggerFactory.getLogger(javaClass.simpleName)
+    private val logger = Timber.asTree()
 
     protected val mHandler: GestureHandler
 
@@ -134,6 +124,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     abstract val currentLocationY: Float
 
+    @Suppress("unused")
     protected val isListeningForOtherStateChanges: Boolean
         get() = null != requireFailureOf && requireFailureOf!!.hasOnStateChangeListenerListener(this)
 
@@ -185,6 +176,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         }
     }
 
+    @Suppress("unused")
     protected fun hasMessages(vararg messages: Int): Boolean {
         for (message in messages) {
             if (mHandler.hasMessages(message)) {
@@ -221,6 +213,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return false
     }
 
+    @Suppress("unused")
     @Throws(Throwable::class)
     protected fun finalize() {
         //        if (null != mLastEvent) {
@@ -258,18 +251,10 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         if (!sDebug) {
             return
         }
-
-        when (level) {
-            Log.INFO -> logger.info(fmt, *args)
-            Log.DEBUG -> logger.debug(fmt, *args)
-            Log.ASSERT, Log.ERROR -> logger.error(fmt, *args)
-            Log.WARN -> logger.warn(fmt, *args)
-            Log.VERBOSE -> logger.verbose(fmt, *args)
-            else -> {
-            }
-        }
+        logger.log(level, fmt, args)
     }
 
+    @Suppress("unused")
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     companion object {
 
@@ -285,9 +270,9 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         val LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout().toLong()
         val TAP_TIMEOUT = ViewConfiguration.getTapTimeout().toLong()
         val DOUBLE_TAP_TIMEOUT = ViewConfiguration.getDoubleTapTimeout().toLong()
-        val TOUCH_SLOP = 8
-        val DOUBLE_TAP_SLOP = 100
-        val DOUBLE_TAP_TOUCH_SLOP = TOUCH_SLOP
+        const val TOUCH_SLOP = 8
+        const val DOUBLE_TAP_SLOP = 100
+        const val DOUBLE_TAP_TOUCH_SLOP = TOUCH_SLOP
 
         var logEnabled: Boolean
             get() = sDebug

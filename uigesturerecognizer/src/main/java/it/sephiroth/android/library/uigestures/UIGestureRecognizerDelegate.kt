@@ -4,12 +4,14 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import timber.log.Timber
 import java.util.*
 
 /**
  * @author alessandro crugnola
  */
-class UIGestureRecognizerDelegate(var callback: Callback?) {
+@Suppress("unused")
+class UIGestureRecognizerDelegate {
 
     private var mView: View? = null
 
@@ -28,40 +30,38 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
 
     private val mSet = LinkedHashSet<UIGestureRecognizer>()
 
-    interface Callback {
-        /**
-         * Asks the delegate if a gesture recognizer should begin interpreting touches.
-         *
-         * @param recognizer the current recognizer
-         * @return true if the recognizer should begin interpreting touches.
-         * @see  [
-         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin](https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin)
-         */
-        fun shouldBegin(recognizer: UIGestureRecognizer): Boolean
+    /**
+     * Asks the delegate if a gesture recognizer should begin interpreting touches.
+     *
+     * @param recognizer the current recognizer
+     * @return true if the recognizer should begin interpreting touches.
+     * @see  <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin'>gesturerecognizershouldbegin</a>
+     */
+    var shouldBegin: ((recognizer: UIGestureRecognizer) -> Boolean) = { true }
 
-        /**
-         * Asks the delegate if two gesture recognizers should be allowed to recognize gestures simultaneously.<br></br>
-         * true to allow both gestureRecognizer and otherGestureRecognizer to recognize their gestures simultaneously. The
-         * default implementation returns false.
-         *
-         * @param recognizer the first recognizer
-         * @param other      the second recognizer
-         * @return true if both recognizers shouls be recognized simultaneously
-         * @see [
-         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer](https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer)
-         */
-        fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer, other: UIGestureRecognizer): Boolean
+    /**
+     * Ask the delegate if a gesture recognizer should receive an object representing a touch.
+     *
+     * @param recognizer the recognizer that should receive the touch
+     * @return true if the recognizer should receive the motion event
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer'>1624214-gesturerecognizer</a>
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    var shouldReceiveTouch: ((recognizer: UIGestureRecognizer) -> Boolean) = { true }
 
-        /**
-         * Ask the delegate if a gesture recognizer should receive an object representing a touch.
-         *
-         * @param recognizer the recognizer that should receive the touch
-         * @return true if the recognizer should receive the motion event
-         * @see [
-         * https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer](https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer)
-         */
-        fun shouldReceiveTouch(recognizer: UIGestureRecognizer): Boolean
-    }
+
+    /**
+     * Asks the delegate if two gesture recognizers should be allowed to recognize gestures simultaneously.
+     * true to allow both gestureRecognizer and otherGestureRecognizer to recognize their gestures simultaneously.
+     *
+     * @param recognizer the first recognizer
+     * @param other      the second recognizer
+     * @return true if both recognizers shouls be recognized simultaneously
+     * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer'>1624208-gesturerecognizer</a>
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    var shouldRecognizeSimultaneouslyWithGestureRecognizer: (recognizer: UIGestureRecognizer, other: UIGestureRecognizer) ->
+    Boolean = { _, _ -> true }
 
     /**
      * @param recognizer add a new gesture recognizer to the chain
@@ -107,20 +107,12 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
      * @return true if handled
      * @since 1.0.0
      */
+    @Suppress("UNUSED_PARAMETER")
     fun onTouchEvent(view: View, event: MotionEvent): Boolean {
         var handled = false
-
-        // TODO: each recognizer should prepare its internal status here
-        // but don't execute any action
         for (recognizer in mSet) {
-            handled = if (shouldReceiveTouch(recognizer)) {
-                handled or recognizer.onTouchEvent(event)
-            } else {
-                handled or recognizer.onTouchEvent(event)
-            }
+            handled = handled or recognizer.onTouchEvent(event)
         }
-
-        // TODO: here we need another loop to tell each recognizer to execute its action
         return handled
     }
 
@@ -146,37 +138,22 @@ class UIGestureRecognizerDelegate(var callback: Callback?) {
         mView = null
     }
 
-    fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer): Boolean {
-        Log.i(javaClass.simpleName, "shouldRecognizeSimultaneouslyWithGestureRecognizer($recognizer)")
+    internal fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer): Boolean {
         if (mSet.size == 1) {
             return true
         }
 
+        Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer")
+
         var result = true
         for (other in mSet) {
-            if (other !== recognizer) {
-                Log.v(javaClass.simpleName, "other: " + other + ", other.began: " + other.hasBeganFiringEvents())
+            if (other != recognizer) {
                 if (other.hasBeganFiringEvents()) {
-                    result = result and
-                            (null != callback && callback!!.shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer,
-                                    other))
+                    result = result and (shouldRecognizeSimultaneouslyWithGestureRecognizer.invoke(recognizer, other))
                 }
             }
         }
-        Log.v(javaClass.simpleName, "result: $result")
+        Timber.v("result: $result")
         return result
-    }
-
-    fun shouldBegin(recognizer: UIGestureRecognizer): Boolean {
-        return null == callback || callback!!.shouldBegin(recognizer)
-    }
-
-    private fun shouldRecognizeSimultaneouslyWithGestureRecognizer(
-            current: UIGestureRecognizer, recognizer: UIGestureRecognizer): Boolean {
-        return null == callback || callback!!.shouldRecognizeSimultaneouslyWithGestureRecognizer(current, recognizer)
-    }
-
-    private fun shouldReceiveTouch(recognizer: UIGestureRecognizer): Boolean {
-        return null == callback || callback!!.shouldReceiveTouch(recognizer)
     }
 }

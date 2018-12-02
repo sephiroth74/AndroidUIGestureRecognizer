@@ -64,84 +64,50 @@ Add the library dependency:
 # Example
 
 ```java
-    public class MainActivity extends AppCompatActivity
-        implements UIGestureRecognizer.OnActionListener, UIGestureRecognizerDelegate.Callback {
+    class MainActivity : AppCompatActivity() {
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
+        override fun onCreate(savedInstanceState: Bundle?) {
             ...
 
-            final UIGestureRecognizerDelegate delegate = new UIGestureRecognizerDelegate(null);
-
-            // optional, override the delegate behaviors
-            delegate.setCallback(this);
+            val delegate = UIGestureRecognizerDelegate();
 
             // single tap gesture
-            UITapGestureRecognizer recognizer1 = new UITapGestureRecognizer(this);
-            recognizer1.setNumberOfTapsRequired(1);
-            recognizer1.setNumberOfTouchesRequired(1);
-            recognizer1.setTag("single-tap");
-            recognizer1.setActionListener(this);
+            val recognizer1 = new UITapGestureRecognizer(this)
+            recognizer1.tapsRequired = 1
+            recognizer1.touchesRequired = 1
+            recognizer1.tag = "single-tap";
+            recognizer1.actionListener = actionListener
 
             // double tap gesture
-            UITapGestureRecognizer recognizer2 = new UITapGestureRecognizer(this);
-            recognizer2.setTag("double-tap");
-            recognizer2.setNumberOfTapsRequired(2);
-            recognizer2.setNumberOfTouchesRequired(1);
-            recognizer2.setActionListener(this);
+            val recognizer2 = UITapGestureRecognizer(this)
+            recognizer2.tag = "double-tap"
+            recognizer2.tapsRequired = 2
+            recognizer2.touchesRequired = 1
+            recognizer2.actionListener = actionListener
 
             // We want to recognize a single tap and a double tap separately. Normally, when the user
             // performs a double tap, the single tap would be triggered twice.
             // In this way, however, the single tap will wait until the double tap will fail. So a single tap
             // and a double tap will be triggered separately.
-            recognizer1.requireFailureOf(recognizer2);
+            recognizer1.requireFailureOf = recognizer2
 
             // add both gestures to the delegate
-            delegate.addGestureRecognizer(recognizer);
-            delegate.addGestureRecognizer(recognizer2);
+            delegate.addGestureRecognizer(recognizer)
+            delegate.addGestureRecognizer(recognizer2)
 
             // forward the touch events to the delegate
-            findViewById(R.id.root).setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(final View view, final MotionEvent motionEvent) {
-                    return delegate.onTouchEvent(view, motionEvent);
-                }
-            });
+            val rootView = findViewById(R.id.root)
+            delegate.startListeningView(rootView)
+
+            // optional delegate methods
+            delegate.shouldReceiveTouch = { recognizer -> true }
+            delegate.shouldBegin = { recognizer -> true }
+            delegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other -> true }
         }
 
-        // ui gesture recognizer event callback
-        @Override
-        public void onGestureRecognized(@NonNull final UIGestureRecognizer recognizer) {
-            Log.d(getClass().getSimpleName(), "onGestureRecognized(" + recognizer + "). state: " + recognizer.getState());
+        // gesture recognizer actionlistener
+        private val actionListener = { recognizer: UIGestureRecognizer ->
+            // gesture recognized
         }
 
-        // delegate methods
-
-        /**
-         * @see https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624213-gesturerecognizershouldbegin
-         */
-        @Override
-        public boolean shouldBegin(final UIGestureRecognizer recognizer) {
-            return true;
-        }
-
-        /**
-         * @see https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624208-gesturerecognizer
-         */
-        @Override
-        public boolean shouldRecognizeSimultaneouslyWithGestureRecognizer(
-            final UIGestureRecognizer current, final UIGestureRecognizer recognizer) {
-            return true;
-        }
-
-        /**
-         * @see https://developer.apple.com/reference/uikit/uigesturerecognizerdelegate/1624214-gesturerecognizer
-         */
-        @Override
-        public boolean shouldReceiveTouch(final UIGestureRecognizer recognizer) {
-            return true;
-        }        
 ```
-
-# JavaDocs
-**JavaDocs** are available here: [javadoc.zip](javadoc.zip)

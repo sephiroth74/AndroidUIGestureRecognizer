@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -35,12 +36,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.0.1'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     implementation project(':uigesturerecognizer')
-//    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:+'
-
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
