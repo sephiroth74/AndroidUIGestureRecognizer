@@ -37,7 +37,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var state: State? = null
         protected set(state) {
-            logMessage(Log.INFO, "setState: ${state?.name}")
+            // logMessage(Log.INFO, "setState: ${state?.name}")
 
             val changed = this.state != state || state == State.Changed
             field = state
