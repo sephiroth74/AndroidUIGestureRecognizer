@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)
 
-Java: [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer/_latestVersion)
+Java: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer)
 <br />
-Kotlin: [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/_latestVersion)
+Kotlin: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin)
+
+
 <br />
 
 AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.
