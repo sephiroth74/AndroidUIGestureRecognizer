@@ -9,7 +9,7 @@ Kotlin: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.se
 
 <br />
 
-AndroidGestureRecognizer is an Android implementation  of the Apple's UIGestureRecognizer framework.
+AndroidGestureRecognizer is an Android implementation of the Apple's UIGestureRecognizer framework (Reverse engineered).
 https://developer.apple.com/reference/uikit/uigesturerecognizer
 
 For more info about the ui gesture recognizers look this WWDC video [https://developer.apple.com/videos/play/wwdc2012/233/](https://developer.apple.com/videos/play/wwdc2012/233)
