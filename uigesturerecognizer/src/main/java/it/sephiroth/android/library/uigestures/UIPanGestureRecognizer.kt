@@ -118,8 +118,11 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     override val currentLocationY: Float
         get() = mCurrentLocation.y
 
-    val startLocationX: Float = mStartLocation.x
-    val startLocationY: Float = mStartLocation.y
+    val startLocationX: Float
+        get() = mStartLocation.x
+
+    val startLocationY: Float
+        get() = mStartLocation.y
 
     init {
         minimumNumberOfTouches = 1
