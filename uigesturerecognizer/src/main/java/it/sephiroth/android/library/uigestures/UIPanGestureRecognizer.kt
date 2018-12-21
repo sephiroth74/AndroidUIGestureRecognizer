@@ -35,6 +35,8 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     private var mDownFocusX: Float = 0.toFloat()
     private var mDownFocusY: Float = 0.toFloat()
 
+    private var mStartLocation = PointF()
+
     private var mVelocityTracker: VelocityTracker? = null
     /**
      * The minimum number of fingers that can be touching the view for this gesture to be recognized.
@@ -115,6 +117,9 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
     override val currentLocationY: Float
         get() = mCurrentLocation.y
+
+    val startLocationX: Float = mStartLocation.x
+    val startLocationY: Float = mStartLocation.y
 
     init {
         minimumNumberOfTouches = 1
@@ -262,6 +267,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mDownFocusX = mLastFocusX
                 mLastFocusY = focusY
                 mDownFocusY = mLastFocusY
+                mStartLocation.set(mCurrentLocation)
 
                 tracker.clear()
                 tracker.addMovement(event)
