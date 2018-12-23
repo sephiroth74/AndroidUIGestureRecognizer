@@ -1,7 +1,5 @@
 package it.sephiroth.android.library.uigestures
 
-import android.annotation.SuppressLint
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import timber.log.Timber
@@ -19,14 +17,6 @@ class UIGestureRecognizerDelegate {
      * Enable/Disable any registered gestures
      */
     var isEnabled = true
-        set(enabled) {
-            field = enabled
-            if (!enabled) {
-                stopListeningView()
-            } else {
-                startListeningView(mView)
-            }
-        }
 
     private val mSet = LinkedHashSet<UIGestureRecognizer>()
 
@@ -109,6 +99,7 @@ class UIGestureRecognizerDelegate {
      */
     @Suppress("UNUSED_PARAMETER")
     fun onTouchEvent(view: View, event: MotionEvent): Boolean {
+        if (!isEnabled) return false
         var handled = false
         for (recognizer in mSet) {
             handled = handled or recognizer.onTouchEvent(event)
@@ -116,34 +107,11 @@ class UIGestureRecognizerDelegate {
         return handled
     }
 
-    /**
-     * Helper method to start listening for touch events. Use this instead
-     * of [.onTouchEvent]
-     *
-     * @param view
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    fun startListeningView(view: View?) {
-        stopListeningView()
-        mView = view
-        mView?.setOnTouchListener { v, event -> onTouchEvent(v, event) }
-    }
-
-    /**
-     * Stop listening for touch events on the associated view
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    fun stopListeningView() {
-        mView?.setOnTouchListener(null)
-        mView = null
-    }
 
     internal fun shouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer): Boolean {
         if (mSet.size == 1) {
             return true
         }
-
-        Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer")
 
         var result = true
         for (other in mSet) {

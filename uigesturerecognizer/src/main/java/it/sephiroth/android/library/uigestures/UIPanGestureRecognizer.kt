@@ -36,6 +36,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     private var mDownFocusY: Float = 0.toFloat()
 
     private var mStartLocation = PointF()
+    private var mDownLocation = PointF()
 
     private var mVelocityTracker: VelocityTracker? = null
     /**
@@ -214,10 +215,20 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mDownFocusY = mLastFocusY
 
                 if (mDown && state === UIGestureRecognizer.State.Possible) {
-                    if (count > maximumNumberOfTouches) {
-                        state = UIGestureRecognizer.State.Failed
-                        removeMessages(MESSAGE_RESET)
-                    }
+                    if (count in minimumNumberOfTouches..maximumNumberOfTouches) {
+                        var totalX = 0f
+                        var totalY = 0f
+                        for (i in 0 until event.pointerCount) {
+                            totalX += event.getX(i)
+                            totalY += event.getY(i)
+                        }
+                        mStartLocation.x = totalX / event.pointerCount
+                        mStartLocation.y = totalY / event.pointerCount
+                    } else
+                        if (count > maximumNumberOfTouches) {
+                            state = UIGestureRecognizer.State.Failed
+                            removeMessages(MESSAGE_RESET)
+                        }
                 }
             }
 
@@ -251,7 +262,16 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     }
                 }
 
-                if (mDown && state === UIGestureRecognizer.State.Possible) {
+                if (mDown && state == State.Possible) {
+                    var totalX = 0f
+                    var totalY = 0f
+                    for (i in 0 until event.pointerCount) {
+                        totalX += event.getX(i)
+                        totalY += event.getY(i)
+                    }
+                    mStartLocation.x = totalX / event.pointerCount
+                    mStartLocation.y = totalY / event.pointerCount
+                } else if (mDown && state === UIGestureRecognizer.State.Possible) {
                     if (count - 1 < minimumNumberOfTouches) {
                         state = UIGestureRecognizer.State.Failed
                         removeMessages(MESSAGE_RESET)
@@ -270,6 +290,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mDownFocusX = mLastFocusX
                 mLastFocusY = focusY
                 mDownFocusY = mLastFocusY
+                mDownLocation.set(mCurrentLocation)
                 mStartLocation.set(mCurrentLocation)
 
                 tracker.clear()

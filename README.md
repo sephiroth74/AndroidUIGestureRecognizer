@@ -99,7 +99,7 @@ Add the library dependency:
 
             // forward the touch events to the delegate
             val rootView = findViewById(R.id.root)
-            delegate.startListeningView(rootView)
+            rootView.setGestureDelegate(delegate)
 
             // optional delegate methods
             delegate.shouldReceiveTouch = { recognizer -> true }
