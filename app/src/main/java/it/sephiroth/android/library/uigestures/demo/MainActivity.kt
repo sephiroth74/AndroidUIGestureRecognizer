@@ -12,7 +12,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var mRoot: ViewGroup? = null
+    private lateinit var mRoot: ViewGroup
     private lateinit var mDelegate: UIGestureRecognizerDelegate
     private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
     val handler = Handler()
@@ -54,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         val recognizer5 = UIPanGestureRecognizer(this)
         recognizer5.tag = "pan"
         recognizer5.actionListener = actionListener
-        recognizer5.minimumNumberOfTouches = 2
-        recognizer5.maximumNumberOfTouches = 5
+        recognizer5.minimumNumberOfTouches = 1
+        recognizer5.maximumNumberOfTouches = 1
 
         val recognizer6 = UIPinchGestureRecognizer(this)
         recognizer6.tag = "pinch"
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         //recognizer3.requireFailureOf(recognizer4);
 
-        mDelegate.addGestureRecognizer(recognizer1)
+        mDelegate.addGestureRecognizer(recognizer5)
 //        mDelegate.addGestureRecognizer(recognizer2)
 //        mDelegate.addGestureRecognizer(recognizer3)
 //        mDelegate.addGestureRecognizer(recognizer5)
@@ -88,7 +88,9 @@ class MainActivity : AppCompatActivity() {
 
         // start listening for MotionEvent
 
-        mDelegate.startListeningView(mRoot)
+//        mDelegate.startListeningView(mRoot)
+
+        mRoot.setGestureDelegate(mDelegate)
 
         mDelegate.shouldReceiveTouch = { true }
 
@@ -115,15 +117,20 @@ class MainActivity : AppCompatActivity() {
 
     val runner = Runnable {
         text2.text = ""
+        mDelegate.isEnabled = false
     }
 
     private val actionListener = { recognizer: UIGestureRecognizer ->
         val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
         Timber.d("onGestureRecognized($recognizer)")
 
-        text.setText(recognizer.state?.name)
+        text.text = recognizer.state?.name
         text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
         text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
+
+        if(recognizer is UIPanGestureRecognizer) {
+            text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
+        }
 
         handler.removeCallbacks(runner)
         handler.postDelayed(runner, 5000)
