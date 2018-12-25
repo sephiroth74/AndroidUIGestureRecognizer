@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import timber.log.Timber
@@ -58,6 +57,14 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var isEnabled: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                if (!value) {
+                    state = null
+                }
+            }
+        }
 
     private var mBeganFiringEvents: Boolean = false
 
