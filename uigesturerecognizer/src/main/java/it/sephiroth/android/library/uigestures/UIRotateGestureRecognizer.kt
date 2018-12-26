@@ -94,15 +94,21 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> {
-                stopListenForOtherStateChanges()
-                state = UIGestureRecognizer.State.Possible
-                mInitialRotation = 0.0
-                setBeginFiringEvents(false)
-            }
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
+    }
+
+    private fun handleReset() {
+        state = UIGestureRecognizer.State.Possible
+        mInitialRotation = 0.0
+        setBeginFiringEvents(false)
     }
 
     init {

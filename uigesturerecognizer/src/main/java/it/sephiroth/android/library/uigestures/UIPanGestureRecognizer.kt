@@ -139,15 +139,22 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> {
-                mStarted = false
-                mDown = false
-                setBeginFiringEvents(false)
-                state = UIGestureRecognizer.State.Possible
-            }
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    private fun handleReset() {
+        mStarted = false
+        mDown = false
+        setBeginFiringEvents(false)
+        state = UIGestureRecognizer.State.Possible
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {

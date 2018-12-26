@@ -61,7 +61,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             if (field != value) {
                 field = value
                 if (!value) {
-                    state = null
+                    reset()
                 }
             }
         }
@@ -105,6 +105,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             mLastEvent?.recycle()
             field = mLastEvent
         }
+
     private val mContextRef: WeakReference<Context>
     private val logger = Timber.asTree()
 
@@ -162,6 +163,13 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         override fun handleMessage(msg: Message) {
             this@UIGestureRecognizer.handleMessage(msg)
         }
+    }
+
+    open fun reset() {
+        state = null
+        stopListenForOtherStateChanges()
+        setBeginFiringEvents(false)
+        removeMessages()
     }
 
     /**

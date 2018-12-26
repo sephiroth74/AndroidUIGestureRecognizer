@@ -375,14 +375,17 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         removeMessages()
         state = UIGestureRecognizer.State.Failed
         setBeginFiringEvents(false)
-
         mStarted = false
     }
 
     private fun handleReset() {
         state = UIGestureRecognizer.State.Possible
-        setBeginFiringEvents(false)
         mStarted = false
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
     }
 
     private fun handleLongPress() {
