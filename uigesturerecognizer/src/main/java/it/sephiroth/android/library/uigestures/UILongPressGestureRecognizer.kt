@@ -56,6 +56,8 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     private val mTouchSlopSquare: Float
     private var mAllowableMovementSquare: Float = 0.toFloat()
     private var mStarted: Boolean = false
+    private var mStartLocation = PointF()
+    private var mDownLocation = PointF()
 
     private var mNumTaps = 0
     override var numberOfTouches = 0
@@ -69,6 +71,12 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
     override val currentLocationY: Float
         get() = mCurrentLocation.y
+
+    val startLocationX: Float
+        get() = mStartLocation.x
+
+    val startLocationY: Float
+        get() = mStartLocation.y
 
     /**
      * @return The maximum allowed movement of the fingers on the view before the gesture fails.
@@ -203,6 +211,8 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 mDownFocusX = focusX
                 mDownFocusY = focusY
+                mDownLocation.set(mCurrentLocation)
+                mStartLocation.set(mCurrentLocation)
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
@@ -218,6 +228,9 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 mDownFocusX = focusX
                 mDownFocusY = focusY
+
+                updateStartLocation(event)
+
             } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed) && mStarted) {
                 numberOfTouches = count
             }
@@ -231,6 +244,10 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                 val message = mHandler.obtainMessage(MESSAGE_POINTER_UP)
                 message.arg1 = numberOfTouches - 1
                 mHandler.sendMessageDelayed(message, tapTimeout)
+
+                updateStartLocation(event)
+
+
             } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
                 if (numberOfTouches - 1 < touchesRequired) {
                     val began = hasBeganFiringEvents()
@@ -331,6 +348,17 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         return cancelsTouchesInView
     }
 
+    private fun updateStartLocation(event: MotionEvent) {
+        var totalX = 0f
+        var totalY = 0f
+        for (i in 0 until event.pointerCount) {
+            totalX += event.getX(i)
+            totalY += event.getY(i)
+        }
+        mStartLocation.x = totalX / event.pointerCount
+        mStartLocation.y = totalY / event.pointerCount
+    }
+
     override fun removeMessages() {
         removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
     }
@@ -347,14 +375,17 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         removeMessages()
         state = UIGestureRecognizer.State.Failed
         setBeginFiringEvents(false)
-
         mStarted = false
     }
 
     private fun handleReset() {
         state = UIGestureRecognizer.State.Possible
-        setBeginFiringEvents(false)
         mStarted = false
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
     }
 
     private fun handleLongPress() {

@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import timber.log.Timber
@@ -58,6 +57,14 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * @since 1.0.0
      */
     var isEnabled: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                if (!value) {
+                    reset()
+                }
+            }
+        }
 
     private var mBeganFiringEvents: Boolean = false
 
@@ -98,6 +105,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             mLastEvent?.recycle()
             field = mLastEvent
         }
+
     private val mContextRef: WeakReference<Context>
     private val logger = Timber.asTree()
 
@@ -155,6 +163,13 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         override fun handleMessage(msg: Message) {
             this@UIGestureRecognizer.handleMessage(msg)
         }
+    }
+
+    open fun reset() {
+        state = null
+        stopListenForOtherStateChanges()
+        setBeginFiringEvents(false)
+        removeMessages()
     }
 
     /**

@@ -97,10 +97,19 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> state = UIGestureRecognizer.State.Possible
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    private fun handleReset() {
+        state = UIGestureRecognizer.State.Possible
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
     }
 
     /**

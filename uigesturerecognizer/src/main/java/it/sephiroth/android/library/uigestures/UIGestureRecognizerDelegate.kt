@@ -17,6 +17,10 @@ class UIGestureRecognizerDelegate {
      * Enable/Disable any registered gestures
      */
     var isEnabled = true
+    set(value) {
+        field = value
+        mSet.forEach { it.isEnabled = value }
+    }
 
     private val mSet = LinkedHashSet<UIGestureRecognizer>()
 

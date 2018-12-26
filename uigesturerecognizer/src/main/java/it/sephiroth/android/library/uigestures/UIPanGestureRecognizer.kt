@@ -139,15 +139,22 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> {
-                mStarted = false
-                mDown = false
-                setBeginFiringEvents(false)
-                state = UIGestureRecognizer.State.Possible
-            }
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    private fun handleReset() {
+        mStarted = false
+        mDown = false
+        setBeginFiringEvents(false)
+        state = UIGestureRecognizer.State.Possible
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
@@ -216,14 +223,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
                 if (mDown && state === UIGestureRecognizer.State.Possible) {
                     if (count in minimumNumberOfTouches..maximumNumberOfTouches) {
-                        var totalX = 0f
-                        var totalY = 0f
-                        for (i in 0 until event.pointerCount) {
-                            totalX += event.getX(i)
-                            totalY += event.getY(i)
-                        }
-                        mStartLocation.x = totalX / event.pointerCount
-                        mStartLocation.y = totalY / event.pointerCount
+                        updateStartLocartion(event)
                     } else
                         if (count > maximumNumberOfTouches) {
                             state = UIGestureRecognizer.State.Failed
@@ -263,15 +263,8 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 }
 
                 if (mDown && state == State.Possible) {
-                    var totalX = 0f
-                    var totalY = 0f
-                    for (i in 0 until event.pointerCount) {
-                        totalX += event.getX(i)
-                        totalY += event.getY(i)
-                    }
-                    mStartLocation.x = totalX / event.pointerCount
-                    mStartLocation.y = totalY / event.pointerCount
-                } else if (mDown && state === UIGestureRecognizer.State.Possible) {
+                    updateStartLocartion(event)
+//                } else if (mDown && state === State.Possible) {
                     if (count - 1 < minimumNumberOfTouches) {
                         state = UIGestureRecognizer.State.Failed
                         removeMessages(MESSAGE_RESET)
@@ -411,6 +404,17 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         }
 
         return cancelsTouchesInView
+    }
+
+    private fun updateStartLocartion(event: MotionEvent) {
+        var totalX = 0f
+        var totalY = 0f
+        for (i in 0 until event.pointerCount) {
+            totalX += event.getX(i)
+            totalY += event.getY(i)
+        }
+        mStartLocation.x = totalX / event.pointerCount
+        mStartLocation.y = totalY / event.pointerCount
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {

@@ -104,14 +104,22 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> {
-                mStarted = false
-                setBeginFiringEvents(false)
-                state = UIGestureRecognizer.State.Possible
-            }
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
+    }
+
+    private fun handleReset() {
+        mStarted = false
+        setBeginFiringEvents(false)
+        state = UIGestureRecognizer.State.Possible
+
     }
 
     override fun removeMessages() {

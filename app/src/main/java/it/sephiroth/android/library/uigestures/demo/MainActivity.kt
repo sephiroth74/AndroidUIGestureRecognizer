@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         //recognizer3.requireFailureOf(recognizer4);
 
-        mDelegate.addGestureRecognizer(recognizer5)
+        mDelegate.addGestureRecognizer(recognizer3)
 //        mDelegate.addGestureRecognizer(recognizer2)
 //        mDelegate.addGestureRecognizer(recognizer3)
 //        mDelegate.addGestureRecognizer(recognizer5)
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
     val runner = Runnable {
         text2.text = ""
-        mDelegate.isEnabled = false
+//        mDelegate.isEnabled = false
     }
 
     private val actionListener = { recognizer: UIGestureRecognizer ->
@@ -129,6 +129,9 @@ class MainActivity : AppCompatActivity() {
         text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
 
         if(recognizer is UIPanGestureRecognizer) {
+            text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
+        }
+        else if(recognizer is UILongPressGestureRecognizer) {
             text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
         }
 

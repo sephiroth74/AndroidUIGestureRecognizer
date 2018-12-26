@@ -315,6 +315,11 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         mStarted = false
     }
 
+    override fun reset() {
+        super.reset()
+        handleReset()
+    }
+
     companion object {
 
         // request to change the current state to Failed

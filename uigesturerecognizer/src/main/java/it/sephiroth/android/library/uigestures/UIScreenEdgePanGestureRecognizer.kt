@@ -105,15 +105,22 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
-            MESSAGE_RESET -> {
-                mStarted = false
-                mDown = false
-                setBeginFiringEvents(false)
-                state = UIGestureRecognizer.State.Possible
-            }
+            MESSAGE_RESET -> handleReset()
             else -> {
             }
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        handleReset()
+    }
+
+    private fun handleReset() {
+        mStarted = false
+        mDown = false
+        setBeginFiringEvents(false)
+        state = UIGestureRecognizer.State.Possible
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
