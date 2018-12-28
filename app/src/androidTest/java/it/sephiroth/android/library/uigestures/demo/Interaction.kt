@@ -60,7 +60,7 @@ class Interaction {
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or AccessibilityEvent.TYPE_VIEW_SELECTED), timeout) != null
     }
 
-    fun swipe(downX: Int, downY: Int, upX: Int, upY: Int, steps: Int, drag: Boolean,
+    fun swipe(downX: Int, downY: Int, upX: Int, upY: Int, steps: Int, drag: Boolean = false,
               timeout: Long = ViewConfiguration.getLongPressTimeout().toLong()): Boolean {
         var ret: Boolean
         var swipeSteps = steps
@@ -267,6 +267,7 @@ class Interaction {
         const val DEBUG: Boolean = true
         const val REGULAR_CLICK_LENGTH: Long = 100
         const val MOTION_EVENT_INJECTION_DELAY_MILLIS = 5
+        const val SWIPE_MARGIN_LIMIT = 5
 
         val LOG_TAG: String = Interaction::class.java.name
 

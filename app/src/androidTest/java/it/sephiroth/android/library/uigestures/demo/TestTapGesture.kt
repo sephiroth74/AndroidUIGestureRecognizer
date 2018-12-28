@@ -54,6 +54,7 @@ class TestTapGesture : TestBaseClass() {
 
         recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
+            activityTestRule.activity.actionListener.invoke(recognizer)
             latch.countDown()
         }
 
@@ -87,6 +88,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tapTimeout = 400
         recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
+            activityTestRule.activity.actionListener.invoke(recognizer)
             latch.countDown()
         }
 

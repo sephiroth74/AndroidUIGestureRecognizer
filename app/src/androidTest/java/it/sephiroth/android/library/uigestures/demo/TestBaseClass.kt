@@ -10,6 +10,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.*
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer
+import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +23,7 @@ open class TestBaseClass {
     lateinit var device: UiDevice
     lateinit var wakeLock: PowerManager.WakeLock
     lateinit var interaction: Interaction
+    lateinit var delegate: UIGestureRecognizerDelegate
 
     var screenWidth: Int = 0
     var screenHeight: Int = 0
@@ -29,6 +31,7 @@ open class TestBaseClass {
     @get:Rule
     var activityTestRule = ActivityTestRule(BaseTest::class.java)
 
+    @Suppress("unused")
     internal val mainView: UiObject
         get() = device.findObject(UiSelector().resourceId("$PACKAGE_NAME:id/activity_main"))
 
@@ -41,6 +44,10 @@ open class TestBaseClass {
         val w = (Math.random() * screenWidth.toFloat()).toInt()
         val h = (Math.random() * a).toInt() + top
         return Point(w, h.toInt())
+    }
+
+    fun topCenter() {
+        mainView.swipeDown(10)
     }
 
     @Before
@@ -60,6 +67,8 @@ open class TestBaseClass {
         wakeLock.acquire()
 
         interaction = Interaction()
+
+        delegate = activityTestRule.activity.delegate
 
         Timber.plant(Timber.DebugTree())
     }
