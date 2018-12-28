@@ -38,7 +38,7 @@ before_install:
   - sdkmanager tools
   - sdkmanager --update
   - sdkmanager "system-images;android-22;default;armeabi-v7a"
-  - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
+  - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a" -d pixel
 
 install:
     - ./gradlew clean build assemble --stacktrace
