@@ -1,5 +1,7 @@
 package it.sephiroth.android.library.uigestures.demo
 
+import android.view.MotionEvent
+import androidx.test.core.view.PointerCoordsBuilder
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import it.sephiroth.android.library.uigestures.UIPanGestureRecognizer
 import it.sephiroth.android.library.uigestures.demo.Interaction.Companion.SWIPE_MARGIN_LIMIT
@@ -48,6 +50,53 @@ class TestPanGesture : TestBaseClass() {
                 rect.centerX(),
                 rect.bottom - SWIPE_MARGIN_LIMIT, 10)
 
+        latch.await()
+    }
+
+    @Test
+    fun testPanDoubleFingers() {
+        val latch = CountDownLatch(3)
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIPanGestureRecognizer(context)
+        recognizer.tag = "pan"
+        recognizer.minimumNumberOfTouches = 2
+        recognizer.maximumNumberOfTouches = 2
+
+        recognizer.actionListener = {
+            activityTestRule.activity.actionListener.invoke(recognizer)
+            Timber.v("actionListener: $recognizer")
+
+            when (recognizer.state) {
+                State.Began -> latch.countDown()
+                State.Changed -> {
+                    if (latch.count == 2L) {
+                        latch.countDown()
+                    }
+                }
+                State.Ended -> latch.countDown()
+            }
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        var rect = mainView.visibleBounds
+        rect.inset(50, 50)
+
+        val distance = rect.bottom - rect.top
+        val steps = distance.toFloat() / 20f
+
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+
+        for (i in 0..10) {
+            array.add(arrayOf(
+                    PointerCoordsBuilder.newBuilder().setCoords(rect.centerX().toFloat() - 20f, rect.top + (steps * i)).build(),
+                    PointerCoordsBuilder.newBuilder().setCoords(rect.centerX().toFloat() + 20f, rect.top + (steps * i)).build()
+                             ))
+        }
+
+        interaction.performMultiPointerGesture(array.toTypedArray())
         latch.await()
     }
 }
