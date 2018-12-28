@@ -41,7 +41,7 @@ before_install:
   - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
 
 install:
-    - ./gradlew clean build assembleAndroidTest --stacktrace
+    - ./gradlew clean build assemble --stacktrace
 
 before_script:
   - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
@@ -49,7 +49,7 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew app:connectedCheck --stacktrace
+  - ./gradlew app:connectedAndroidTest --stacktrace
 
 sudo: false
 

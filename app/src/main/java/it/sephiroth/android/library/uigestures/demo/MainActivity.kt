@@ -96,9 +96,9 @@ class MainActivity : AppCompatActivity() {
 
         mDelegate.shouldBegin = { true }
 
-        mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = {recognizer, other ->
+        mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other ->
             Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer: ${recognizer.tag}, ${other.tag}")
-            when(other.tag) {
+            when (other.tag) {
                 "single-tap" -> false
                 "double-tap" -> false
                 else -> {
@@ -117,10 +117,9 @@ class MainActivity : AppCompatActivity() {
 
     val runner = Runnable {
         text2.text = ""
-//        mDelegate.isEnabled = false
     }
 
-    private val actionListener = { recognizer: UIGestureRecognizer ->
+    val actionListener = { recognizer: UIGestureRecognizer ->
         val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
         Timber.d("onGestureRecognized($recognizer)")
 
@@ -128,10 +127,9 @@ class MainActivity : AppCompatActivity() {
         text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
         text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
 
-        if(recognizer is UIPanGestureRecognizer) {
+        if (recognizer is UIPanGestureRecognizer) {
             text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
-        }
-        else if(recognizer is UILongPressGestureRecognizer) {
+        } else if (recognizer is UILongPressGestureRecognizer) {
             text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
         }
 

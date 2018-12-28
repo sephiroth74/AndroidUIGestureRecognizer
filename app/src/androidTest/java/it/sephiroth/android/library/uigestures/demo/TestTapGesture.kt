@@ -1,13 +1,13 @@
 package it.sephiroth.android.library.uigestures.demo
 
-import android.graphics.Point
+import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
-import junit.framework.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -20,7 +20,7 @@ class TestTapGesture : TestBaseClass() {
         val latch = CountDownLatch(1)
         val activity = activityTestRule.activity
         val delegate = activity.delegate
-        Assert.assertNotNull(delegate)
+        assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UITapGestureRecognizer(context)
@@ -39,18 +39,17 @@ class TestTapGesture : TestBaseClass() {
         latch.await()
     }
 
-//    @Test
+    @Test
     fun test_singleTap2Fingers() {
         val latch = CountDownLatch(1)
         val delegate = activityTestRule.activity.delegate
-        Assert.assertNotNull(delegate)
+        assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UITapGestureRecognizer(context)
         recognizer.tag = "single-tap"
         recognizer.touchesRequired = 2
         recognizer.tapsRequired = 1
-        recognizer.actionListener = activityTestRule.activity.actionListener
 
         recognizer.actionListener = {
             assertEquals(State.Ended, it.state)
@@ -59,13 +58,13 @@ class TestTapGesture : TestBaseClass() {
 
         delegate.addGestureRecognizer(recognizer)
 
-        mainView.performTwoPointerGesture(
-                Point(100, 200),
-                Point(200, 300),
-                Point(100, 200),
-                Point(200, 300),
-                1)
+        val pt1 = super.randomPointOnScreen()
+        val pt2 = super.randomPointOnScreen()
 
+        Log.v(TAG, "pt1: $pt1")
+        Log.v(TAG, "pt2: $pt2")
+
+        mainView.performTwoPointerGesture(pt1, pt2, pt1, pt2, 2)
         latch.await()
     }
 

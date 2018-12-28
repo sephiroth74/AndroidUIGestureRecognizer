@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import timber.log.Timber
@@ -224,6 +225,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     }
 
     open fun onTouchEvent(event: MotionEvent): Boolean {
+        logMessage(Log.INFO, "onTouchEvent: $event, pointerCount: ${event.pointerCount}")
         lastEvent = MotionEvent.obtain(event)
         return false
     }
