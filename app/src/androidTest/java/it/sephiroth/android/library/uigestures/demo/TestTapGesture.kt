@@ -1,6 +1,7 @@
 package it.sephiroth.android.library.uigestures.demo
 
-import android.util.Log
+import android.view.MotionEvent
+import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
@@ -61,10 +62,13 @@ class TestTapGesture : TestBaseClass() {
         val pt1 = super.randomPointOnScreen()
         val pt2 = super.randomPointOnScreen()
 
-        Log.v(TAG, "pt1: $pt1")
-        Log.v(TAG, "pt2: $pt2")
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setSize(1f).setPressure(1f).setCoords(pt1.x.toFloat(), pt1.y.toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setSize(1f).setPressure(1f).setCoords(pt2.x.toFloat(), pt2.y.toFloat()).build()
+                         ))
 
-        mainView.performTwoPointerGesture(pt1, pt2, pt1, pt2, 2)
+        interaction.performMultiPointerGesture(array.toTypedArray())
         latch.await()
     }
 

@@ -19,16 +19,6 @@ import java.util.concurrent.CountDownLatch
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestLongPressGesture : TestBaseClass() {
 
-//    @get:Rule
-//    val interaction = Interaction()
-
-    lateinit var interaction: Interaction
-
-    override fun setup() {
-        super.setup()
-        interaction = Interaction()
-    }
-
     @Test
     fun test_singleTap1Finger_longPressWithMotion() {
         val latchBegan = CountDownLatch(1)

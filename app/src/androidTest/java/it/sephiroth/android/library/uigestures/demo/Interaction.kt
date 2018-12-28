@@ -119,9 +119,9 @@ class Interaction {
     fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>): Boolean {
         Log.i(LOG_TAG, "performMultiPointerGesture, size: ${touches.size}")
         var ret = true
-        if (touches.size < 2) {
-            throw IllegalArgumentException("Must provide coordinates for at least 2 pointers")
-        }
+//        if (touches.size < 2) {
+//            throw IllegalArgumentException("Must provide coordinates for at least 2 pointers")
+//        }
 
         // Get the pointer with the max steps to inject.
         val maxSteps = touches.size - 1

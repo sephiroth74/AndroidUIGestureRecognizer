@@ -21,6 +21,8 @@ open class TestBaseClass {
     lateinit var context: Context
     lateinit var device: UiDevice
     lateinit var wakeLock: PowerManager.WakeLock
+    lateinit var interaction: Interaction
+
     var screenWidth: Int = 0
     var screenHeight: Int = 0
 
@@ -56,6 +58,8 @@ open class TestBaseClass {
         val power = context.getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = power.newWakeLock(FULL_WAKE_LOCK or ACQUIRE_CAUSES_WAKEUP or ON_AFTER_RELEASE, "test")
         wakeLock.acquire()
+
+        interaction = Interaction()
 
         Timber.plant(Timber.DebugTree())
     }
