@@ -50,7 +50,7 @@ before_script:
 
 script:
   - ./gradlew jacocoTestReport --stacktrace
-  - ./gradlew app:connectedAndroidTest --stacktrace
+#  - ./gradlew app:connectedAndroidTest --stacktrace
 
 sudo: false
 
