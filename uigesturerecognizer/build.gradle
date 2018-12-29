@@ -2,6 +2,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'jacoco'
+
+
+jacoco {
+    toolVersion = "0.8.2"
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -15,13 +21,20 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
+
     buildTypes {
         release {
             minifyEnabled false
             debuggable true
+            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            testCoverageEnabled true
+        }
     }
+
     lintOptions {
         htmlReport false
         xmlReport false
@@ -33,6 +46,22 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+//        execution 'ANDROID_TEST_ORCHESTRATOR'
+        animationsDisabled true
+
+        unitTests {
+            includeAndroidResources = true
+
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
+        }
+    }
+
 }
 
 task javadoc(type: Javadoc) {
@@ -47,13 +76,42 @@ task javadoc(type: Javadoc) {
         author true
         docTitle "Android UIGestureRecognizer $VERSION_NAME"
     }
+}
 
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for the ${name.capitalize()} build."
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/coverage.ec'
+    ])
 }
 
 dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.annotation:annotation:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+
+    testImplementation 'androidx.test:core:1.1.0'
+    testImplementation 'androidx.test:runner:1.1.1'
+    testImplementation 'androidx.test:rules:1.1.1'
+    testImplementation 'androidx.test.ext:junit:1.1.0'
+    testImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation "org.robolectric:robolectric:4.0.2"
+
+    androidTestUtil 'androidx.test:orchestrator:1.1.1'
 }
 
 

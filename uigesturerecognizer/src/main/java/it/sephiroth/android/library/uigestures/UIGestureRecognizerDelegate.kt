@@ -17,10 +17,10 @@ class UIGestureRecognizerDelegate {
      * Enable/Disable any registered gestures
      */
     var isEnabled = true
-    set(value) {
-        field = value
-        mSet.forEach { it.isEnabled = value }
-    }
+        set(value) {
+            field = value
+            mSet.forEach { it.isEnabled = value }
+        }
 
     private val mSet = LinkedHashSet<UIGestureRecognizer>()
 
@@ -79,6 +79,11 @@ class UIGestureRecognizerDelegate {
         }
         return false
     }
+
+    /**
+     * Returns the number of UIGestureRecognizer currently registered
+     */
+    fun size() = mSet.size
 
     /**
      * Remove all the gesture recognizers currently associated with the delegate
