@@ -1,35 +1,14 @@
 package it.sephiroth.android.library.uigestures
 
-import android.app.Activity
 import android.os.SystemClock
 import android.view.MotionEvent
-import android.view.ViewGroup.LayoutParams
-import android.widget.FrameLayout
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(minSdk = 28)
-class TestUIGestureRecognizerDelegate {
-
-    private lateinit var activity: Activity
-    private lateinit var layout: FrameLayout
-    private lateinit var delegate: UIGestureRecognizerDelegate
-
-    @Before
-    fun setup() {
-        delegate = UIGestureRecognizerDelegate()
-        activity = Robolectric.buildActivity(Activity::class.java).create().get()
-        layout = FrameLayout(activity.baseContext)
-
-        val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        activity.addContentView(layout, params)
-    }
+class TestUIGestureRecognizerDelegate : TestBase() {
 
     @Test
     fun testCount() {
