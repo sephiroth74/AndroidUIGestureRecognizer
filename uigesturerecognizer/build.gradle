@@ -48,7 +48,6 @@ android {
     }
 
     testOptions {
-//        execution 'ANDROID_TEST_ORCHESTRATOR'
         animationsDisabled true
 
         unitTests {
@@ -97,6 +96,57 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
             'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/coverage.ec'
     ])
 }
+
+task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn: 'jacocoTestReport') {
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/coverage.ec'
+    ])
+
+
+    violationRules {
+        setFailOnViolation(true)
+
+        rule {
+            element = 'PACKAGE'
+
+            limit {
+                value = 'COVEREDRATIO'
+                counter = 'BRANCH'
+                minimum = 0.8
+            }
+        }
+
+        rule {
+            element = 'PACKAGE'
+
+            limit {
+                value = 'COVEREDRATIO'
+                counter = 'INSTRUCTION'
+                minimum = 0.6
+            }
+        }
+
+        rule {
+            element = 'PACKAGE'
+            includes = ['it.sephiroth.android.library.*']
+            enabled = true
+
+            limit {
+                counter = 'CLASS'
+                value = 'MISSEDCOUNT'
+                maximum = 0
+            }
+        }
+    }
+}
+
 
 dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
