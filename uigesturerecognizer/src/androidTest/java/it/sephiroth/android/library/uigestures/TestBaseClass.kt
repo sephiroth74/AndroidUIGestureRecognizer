@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import android.app.Instrumentation
 import android.content.Context
@@ -9,8 +9,6 @@ import android.os.PowerManager.*
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.*
-import it.sephiroth.android.library.uigestures.UIGestureRecognizer
-import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -29,14 +27,12 @@ open class TestBaseClass {
     var screenHeight: Int = 0
 
     @get:Rule
-    var activityTestRule = ActivityTestRule(BaseTest::class.java)
+    var activityTestRule = ActivityTestRule(TestActivity::class.java)
 
     @Suppress("unused")
     internal val mainView: UiObject
         get() = device.findObject(UiSelector().resourceId("$PACKAGE_NAME:id/activity_main"))
 
-    internal val textView: UiObject
-        get() = device.findObject(UiSelector().resourceId("$PACKAGE_NAME:id/text"))
 
     fun randomPointOnScreen(): Point {
         val top = screenHeight.toFloat() * 0.2f
@@ -79,7 +75,7 @@ open class TestBaseClass {
     }
 
     companion object {
-        internal const val PACKAGE_NAME = "it.sephiroth.android.library.uigestures.demo"
+        internal const val PACKAGE_NAME = "it.sephiroth.android.library.uigestures.test"
         internal const val LAUNCH_TIMEOUT = 5000
         internal const val TAG = "TestBaseClass"
     }

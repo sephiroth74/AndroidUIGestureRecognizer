@@ -1,10 +1,9 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
+import it.sephiroth.android.library.uigestures.Interaction.Companion.SWIPE_MARGIN_LIMIT
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import it.sephiroth.android.library.uigestures.UIPanGestureRecognizer
-import it.sephiroth.android.library.uigestures.demo.Interaction.Companion.SWIPE_MARGIN_LIMIT
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,8 +25,9 @@ class TestPanGesture : TestBaseClass() {
         recognizer.maximumNumberOfTouches = 1
 
         recognizer.actionListener = {
-            activityTestRule.activity.actionListener.invoke(recognizer)
             Timber.v("actionListener: $recognizer")
+
+            activityTestRule.activity.actionListener.invoke(it)
 
             when (recognizer.state) {
                 State.Began -> latch.countDown()
@@ -65,8 +65,9 @@ class TestPanGesture : TestBaseClass() {
         recognizer.maximumNumberOfTouches = 2
 
         recognizer.actionListener = {
-            activityTestRule.activity.actionListener.invoke(recognizer)
             Timber.v("actionListener: $recognizer")
+
+            activityTestRule.activity.actionListener.invoke(it)
 
             when (recognizer.state) {
                 State.Began -> latch.countDown()

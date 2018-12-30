@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import android.util.Log
 import android.view.MotionEvent
@@ -7,9 +7,7 @@ import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
-import it.sephiroth.android.library.uigestures.UIGestureRecognizer
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import it.sephiroth.android.library.uigestures.UILongPressGestureRecognizer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -36,6 +34,8 @@ class TestLongPressGesture : TestBaseClass() {
         recognizer.longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
         recognizer.actionListener = { recognizer: UIGestureRecognizer ->
             Log.v(TAG, "recognizer: $recognizer")
+
+            activityTestRule.activity.actionListener.invoke(recognizer)
 
             when (recognizer.state) {
                 State.Began -> latchBegan.countDown()
@@ -142,6 +142,7 @@ class TestLongPressGesture : TestBaseClass() {
         longpressRecognizer.allowableMovement = 100.toFloat() //move to 100x100
 
         longpressRecognizer.actionListener = {
+            activityTestRule.activity.actionListener.invoke(it)
             if (latch.count == 2L) {
                 assertEquals(State.Began, it.state)
                 latch.countDown()

@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import android.app.UiAutomation
 import android.os.SystemClock
@@ -93,7 +93,7 @@ class Interaction {
             Log.d(LOG_TAG, "touchDown ($x, $y)")
         }
         mDownTime = SystemClock.uptimeMillis()
-        val event = getMotionEvent(mDownTime, mDownTime, MotionEvent.ACTION_DOWN, x.toFloat(), y.toFloat())
+        val event = getMotionEvent(mDownTime, mDownTime, ACTION_DOWN, x.toFloat(), y.toFloat())
         return injectEventSync(event)
     }
 

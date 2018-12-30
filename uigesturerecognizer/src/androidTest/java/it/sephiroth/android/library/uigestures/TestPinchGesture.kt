@@ -1,7 +1,6 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import it.sephiroth.android.library.uigestures.UIPinchGestureRecognizer
 import org.hamcrest.Matchers
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThat
@@ -24,8 +23,9 @@ class TestPinchGesture : TestBaseClass() {
         recognizer.isQuickScaleEnabled = true
 
         recognizer.actionListener = {
-            activityTestRule.activity.actionListener.invoke(recognizer)
             Timber.v("actionListener: $recognizer")
+
+            activityTestRule.activity.actionListener.invoke(it)
 
             when (recognizer.state) {
                 State.Began -> {

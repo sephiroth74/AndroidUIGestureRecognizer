@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="it.sephiroth.android.library.uigestures.demo"
+<manifest package="it.sephiroth.android.library.uigestures"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18" />
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
-    <application android:label="Android UIGestureRecognizer">
-        <activity android:name=".BaseTest">
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:label="Android UIGestureRecognizer"
+        android:theme="@style/AppTheme">
+        <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

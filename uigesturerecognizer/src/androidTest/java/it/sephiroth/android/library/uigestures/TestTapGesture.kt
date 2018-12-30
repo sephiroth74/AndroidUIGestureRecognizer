@@ -1,4 +1,4 @@
-package it.sephiroth.android.library.uigestures.demo
+package it.sephiroth.android.library.uigestures
 
 import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
@@ -6,7 +6,6 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -29,12 +28,11 @@ class TestTapGesture : TestBaseClass() {
         recognizer.touchesRequired = 1
         recognizer.tapsRequired = 1
         recognizer.actionListener = {
+            activityTestRule.activity.actionListener.invoke(it)
             assertEquals(State.Ended, it.state)
             latch.countDown()
         }
         delegate.addGestureRecognizer(recognizer)
-
-        textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
         latch.await()
@@ -53,8 +51,8 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tapsRequired = 1
 
         recognizer.actionListener = {
+            activityTestRule.activity.actionListener.invoke(it)
             assertEquals(State.Ended, it.state)
-            activityTestRule.activity.actionListener.invoke(recognizer)
             latch.countDown()
         }
 
@@ -87,14 +85,12 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tapsRequired = 2
         recognizer.tapTimeout = 400
         recognizer.actionListener = {
+            activityTestRule.activity.actionListener.invoke(it)
             assertEquals(State.Ended, it.state)
-            activityTestRule.activity.actionListener.invoke(recognizer)
             latch.countDown()
         }
 
         delegate.addGestureRecognizer(recognizer)
-
-        textView.text = "None"
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
         latch.await()

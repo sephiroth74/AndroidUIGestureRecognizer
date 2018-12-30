@@ -2,6 +2,7 @@ package it.sephiroth.android.library.uigestures
 
 import android.os.SystemClock
 import android.view.MotionEvent
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,18 +27,46 @@ class TestUITapGestureRecognizer : TestBase() {
         delegate.addGestureRecognizer(recognizer)
         layout.setGestureDelegate(delegate)
 
-        val downTime = SystemClock.uptimeMillis()
-
-        var event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100f, 100f, 0)
+        var event = getMotionEvent(MotionEvent.ACTION_DOWN, 100f, 100f)
         var result = layout.dispatchTouchEvent(event)
         assertTrue(result)
 
         SystemClock.sleep(recognizer.tapTimeout / 2)
-        event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 100f, 100f, 0)
+        event = getMotionEvent(MotionEvent.ACTION_UP, 100f, 100f)
         result = layout.dispatchTouchEvent(event)
         assertTrue(result)
+        latch.await()
+    }
+
+    @Test
+    fun testDoubleTap() {
+        val latch = CountDownLatch(1)
+
+        val recognizer = UITapGestureRecognizer(activity)
+        recognizer.tapsRequired = 2
+        recognizer.touchesRequired = 1
+        recognizer.actionListener = { r ->
+            System.out.println("recognizer: $r")
+            assertEquals(1, latch.count)
+            assertEquals(UIGestureRecognizer.State.Ended, r.state)
+            latch.countDown()
+        }
+
+        delegate.clear()
+        delegate.addGestureRecognizer(recognizer)
+
+        layout.setGestureDelegate(delegate)
+
+        layout.dispatchTouchEvent(getMotionEvent(MotionEvent.ACTION_DOWN, 100f, 100f))
+        SystemClock.sleep(recognizer.tapTimeout / 2)
+        layout.dispatchTouchEvent(getMotionEvent(MotionEvent.ACTION_UP, 100f, 100f))
+        SystemClock.sleep(recognizer.tapTimeout / 2)
+        layout.dispatchTouchEvent(getMotionEvent(MotionEvent.ACTION_DOWN, 100f, 100f))
+        SystemClock.sleep(recognizer.tapTimeout / 2)
+        layout.dispatchTouchEvent(getMotionEvent(MotionEvent.ACTION_UP, 100f, 100f))
 
         latch.await()
+
     }
 
 }
