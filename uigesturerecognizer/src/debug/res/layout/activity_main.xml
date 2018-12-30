@@ -21,7 +21,7 @@
         android:focusableInTouchMode="false"
         android:inputType="none"
         android:text="None"
-        android:textAppearance="@android:style/TextAppearance.Material.Title" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text2"
