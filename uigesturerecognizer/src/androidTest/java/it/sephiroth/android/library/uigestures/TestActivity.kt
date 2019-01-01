@@ -55,7 +55,7 @@ class TestActivity : AppCompatActivity() {
 
     val actionListener: Function1<UIGestureRecognizer, Unit> = fun(recognizer: UIGestureRecognizer): Unit {
         Log.i(javaClass.simpleName, "onGestureRecognized: $recognizer")
-        mTextView.text = recognizer.tag.toString() + ": " + recognizer.state!!.name
+        mTextView.text = "${recognizer.tag.toString()} : ${recognizer.state?.name}"
         Log.v(javaClass.simpleName, mTextView.text.toString())
     }
 }

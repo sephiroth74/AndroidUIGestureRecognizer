@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestSwipeGesture : TestBaseClass() {
@@ -34,7 +35,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeRight(3)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -60,7 +61,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeLeft(3)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -86,7 +87,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeUp(3)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -112,7 +113,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeDown(3)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -137,7 +138,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeDown(3)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
 }
