@@ -1,61 +1,56 @@
 language: android
+jdk: oraclejdk8
 
-jdk:
-    - oraclejdk8
+# Choosing faster environment since it's a full VM.
+# https://docs.travis-ci.com/user/reference/overview/
+sudo: required
+dist: trusty
 
 env:
+  matrix:
+    # Notice matrix environment variables are not available during the install phase for android >
+    # components.
+    # These CANNOT BE USED in the android > components section, only in before_script and script.
+    - TEST_TYPE=unit
+    - TEST_TYPE=instrumentation EMULATOR_TAG=android EMULATOR_API=22 ABI=armeabi-v7a
   global:
-  # install timeout in minutes (2 minutes by default)
-  - ADB_INSTALL_TIMEOUT=15
-
-android:
-  components:
-    - tools
-    - platform-tools
-    - tools
-    - build-tools-28.0.3
-    - android-22
-    - extra-android-m2repository
-    - extra-android-suppor
-    - add-on
-    - extra
-
-  licenses:
-    - 'android-sdk-license-.+'
-    - 'android-sdk-preview-license-.+'
-    - 'google-gdk-license-.+'
-    - 'intel-android-extra-license-.+'
-    - 'google-gdk-license-.+'
-    - 'android-googletv-license-.+'
+    # install timeout in minutes (2 minutes by default)
+    - ADB_INSTALL_TIMEOUT=15
 
 notifications:
   email:
     - alessandro.crugnola@gmail.com
 
-before_install:
-  - mkdir "$ANDROID_HOME/licenses" || true
-  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
-  - sdkmanager tools
-  - sdkmanager --update
-  - sdkmanager "system-images;android-22;default;armeabi-v7a"
-  - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a" -d pixel
-
-install:
-    - ./gradlew clean build assemble --stacktrace
-
-before_script:
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
-
-script:
-#  - travis_wait 20 ./gradlew jacocoTestReport --stacktrace
-#  - travis_wait 20 ./gradlew createDebugCoverageReport --stacktrace
-  - ./gradlew connectedAndroidTest coveralls
-#  - ./gradlew app:connectedAndroidTest --stacktrace
-
-sudo: false
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
-    - $HOME/.gradle
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+android:
+  components:
+    # https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943
+    - tools
+    - tools
+
+before_install:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+
+install:
+  - ./gradlew clean build assemble --stacktrace
+
+before_script:
+  - ./travis_before_script.sh
+  - 
+
+script:
+  - ./gradlew assemble -PdisablePreDex;
+  - ./travis_run_unit_tests.sh
+  - travis_wait ./travis_set_up_emulator.sh
+  - travis_wait 60 ./travis_run_instrumentation_tests.sh
