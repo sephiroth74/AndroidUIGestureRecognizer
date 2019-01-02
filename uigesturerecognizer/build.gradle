@@ -85,7 +85,7 @@ task javadoc(type: Javadoc) {
     }
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
     group = "Reporting"
     description = "Generate Jacoco coverage reports for the ${name.capitalize()} build."
 

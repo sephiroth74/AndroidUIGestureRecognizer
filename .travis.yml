@@ -47,7 +47,6 @@ install:
 
 before_script:
   - ./travis_before_script.sh
-  - 
 
 script:
   - ./gradlew assemble -PdisablePreDex;
