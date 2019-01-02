@@ -23,6 +23,6 @@ echo "Creating the emulator"
 echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n test -k "system-images;$EMULATOR_TAG-$EMULATOR_API;default;$ABI" -d pixel
 
 echo "Starting the emulator"
-emulator -avd test -no-audio -netfast -no-window &
+$ANDROID_HOME/emulator/emulator -avd test -no-audio -netfast -no-window &
 
 exit 0
