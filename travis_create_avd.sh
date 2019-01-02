@@ -12,6 +12,9 @@ echo "Running android update sdk"
 echo y | android update sdk --no-ui --all --filter "android-$EMULATOR_API"
 android-update-sdk --components="sys-img-$ABI-$EMULATOR_TAG-$EMULATOR_API" --accept-licenses='android-sdk-license-[0-9a-f]{8}'
 
+echo "Running sdkmanager"
+$ANDROID_HOME/tools/bin/sdkmanager "system-images;$EMULATOR_TAG-$EMULATOR_API;default;$ABI"
+
 echo "Running android list target"
 android list target
 # echo no | android create avd --force -n test -k $EMULATOR_TAG-$EMULATOR_API --abi $ABI --skin QVGA
