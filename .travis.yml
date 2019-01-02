@@ -51,7 +51,7 @@ before_script:
 script:
 #  - travis_wait 20 ./gradlew jacocoTestReport --stacktrace
 #  - travis_wait 20 ./gradlew createDebugCoverageReport --stacktrace
-  - ./gradlew connectedAndroidTest coveralls
+  - travis_wait 20 ./gradlew connectedAndroidTest coveralls
 #  - ./gradlew app:connectedAndroidTest --stacktrace
 
 sudo: false
