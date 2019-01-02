@@ -4,7 +4,7 @@ jdk: oraclejdk8
 # Choosing faster environment since it's a full VM.
 # https://docs.travis-ci.com/user/reference/overview/
 sudo: required
-dist: trusty
+# dist: trusty
 
 env:
   matrix:
@@ -46,6 +46,7 @@ install:
   - ./gradlew clean build assemble --stacktrace
 
 before_script:
+  - sdkmanager --update  
   - ./travis_before_script.sh
 
 script:

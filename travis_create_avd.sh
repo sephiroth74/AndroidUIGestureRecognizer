@@ -10,7 +10,7 @@ echo "ABI=$ABI"
 echo y | android update sdk --no-ui --all --filter "android-$EMULATOR_API"
 android-update-sdk --components="sys-img-$ABI-$EMULATOR_TAG-$EMULATOR_API" --accept-licenses='android-sdk-license-[0-9a-f]{8}'
 android list targets
-# echo no | android create avd --force -n test -t $EMULATOR_TAG-$EMULATOR_API --abi $ABI --skin QVGA
+# echo no | android create avd --force -n test -k $EMULATOR_TAG-$EMULATOR_API --abi $ABI --skin QVGA
 echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n test -k "system-images;$EMULATOR_TAG-$EMULATOR_API;default;$ABI" -d pixel
 emulator -avd test -no-audio -netfast -no-window &
 
