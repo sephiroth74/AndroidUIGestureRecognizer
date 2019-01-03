@@ -8,7 +8,7 @@ echo "ABI=$ABI"
 
 if [ "$TEST_TYPE" == "unit" ]; then
   echo "Starting unit tests..."
-  ./gradlew assemble lint build test -PdisablePreDex;
+  ./gradlew assemble lint build test -PdisablePreDex coveralls;
 elif [ "$TEST_TYPE" == "instrumentation" ]; then
   echo "Skipping unit tests for instrumentation builds."
 else
