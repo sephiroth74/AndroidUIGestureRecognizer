@@ -12,26 +12,28 @@ import java.util.concurrent.TimeUnit
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestSwipeGesture : TestBaseClass() {
 
+    private lateinit var latch: CountDownLatch
+
+    private val actionListener = { it: UIGestureRecognizer ->
+        Timber.v("actionListener: $it")
+        activityTestRule.activity.actionListener.invoke(it)
+        assertEquals(State.Ended, it.state)
+        latch.countDown()
+    }
+
     @Test
     fun testSwipeRight() {
-        val latch = CountDownLatch(1)
+        setTitle("Swipe Right")
+
+        latch = CountDownLatch(1)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UISwipeGestureRecognizer(context)
-        recognizer.tag = "swipe"
+        recognizer.tag = "swipe-right"
         recognizer.numberOfTouchesRequired = 1
         recognizer.direction = UISwipeGestureRecognizer.RIGHT
-
-        recognizer.actionListener = {
-            Timber.v("actionListener: $it")
-
-            activityTestRule.activity.actionListener.invoke(it)
-            assertEquals(State.Ended, it.state)
-
-            latch.countDown()
-        }
-
+        recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeRight(3)
 
@@ -41,24 +43,16 @@ class TestSwipeGesture : TestBaseClass() {
 
     @Test
     fun testSwipeLeft() {
-        val latch = CountDownLatch(1)
+        setTitle("Swipe Left")
+        latch = CountDownLatch(1)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UISwipeGestureRecognizer(context)
-        recognizer.tag = "swipe"
+        recognizer.tag = "swipe-left"
         recognizer.numberOfTouchesRequired = 1
         recognizer.direction = UISwipeGestureRecognizer.LEFT
-
-        recognizer.actionListener = {
-            Timber.v("actionListener: $it")
-
-            activityTestRule.activity.actionListener.invoke(it)
-            assertEquals(State.Ended, it.state)
-
-            latch.countDown()
-        }
-
+        recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeLeft(3)
 
@@ -68,24 +62,16 @@ class TestSwipeGesture : TestBaseClass() {
 
     @Test
     fun testSwipeUp() {
-        val latch = CountDownLatch(1)
+        setTitle("Swipe Up")
+        latch = CountDownLatch(1)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UISwipeGestureRecognizer(context)
-        recognizer.tag = "swipe"
+        recognizer.tag = "swipe-up"
         recognizer.numberOfTouchesRequired = 1
         recognizer.direction = UISwipeGestureRecognizer.UP
-
-        recognizer.actionListener = {
-            Timber.v("actionListener: $it")
-
-            activityTestRule.activity.actionListener.invoke(it)
-            assertEquals(State.Ended, it.state)
-
-            latch.countDown()
-        }
-
+        recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeUp(3)
 
@@ -95,24 +81,16 @@ class TestSwipeGesture : TestBaseClass() {
 
     @Test
     fun testSwipeDown() {
-        val latch = CountDownLatch(1)
+        setTitle("Swipe Down")
+        latch = CountDownLatch(1)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UISwipeGestureRecognizer(context)
-        recognizer.tag = "swipe"
+        recognizer.tag = "swipe-down"
         recognizer.numberOfTouchesRequired = 1
         recognizer.direction = UISwipeGestureRecognizer.DOWN
-
-        recognizer.actionListener = {
-            Timber.v("actionListener: $it")
-
-            activityTestRule.activity.actionListener.invoke(it)
-            assertEquals(State.Ended, it.state)
-
-            latch.countDown()
-        }
-
+        recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeDown(3)
 
@@ -122,12 +100,13 @@ class TestSwipeGesture : TestBaseClass() {
 
     @Test
     fun testFailSwipe() {
+        setTitle("Fail Swipe")
         val latch = CountDownLatch(1)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UISwipeGestureRecognizer(context)
-        recognizer.tag = "swipe"
+        recognizer.tag = "swipe-up"
         recognizer.numberOfTouchesRequired = 1
         recognizer.direction = UISwipeGestureRecognizer.UP
 
@@ -136,7 +115,6 @@ class TestSwipeGesture : TestBaseClass() {
             if (State.Failed == it.state) {
                 latch.countDown()
             }
-
         }
 
         delegate.addGestureRecognizer(recognizer)

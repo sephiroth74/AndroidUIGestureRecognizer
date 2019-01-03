@@ -18,6 +18,7 @@ class TestTapGesture : TestBaseClass() {
 
     @Test
     fun test_singleTap() {
+        setTitle("Single Tap")
         val latch = CountDownLatch(1)
         val activity = activityTestRule.activity
         val delegate = activity.delegate
@@ -42,6 +43,7 @@ class TestTapGesture : TestBaseClass() {
 
     @Test
     fun test_singleTap2Fingers() {
+        setTitle("Single Tap 2 Fingers")
         val latch = CountDownLatch(1)
         val delegate = activityTestRule.activity.delegate
         assertNotNull(delegate)
@@ -76,6 +78,7 @@ class TestTapGesture : TestBaseClass() {
 
     @Test
     fun test_doubleTap() {
+        setTitle("Double Tap")
         val latch = CountDownLatch(1)
         val activity = activityTestRule.activity
 

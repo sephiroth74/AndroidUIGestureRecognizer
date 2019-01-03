@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/activity_main"
+<LinearLayout android:id="@+id/activity_main"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="16dp"
-    tools:context=".TestActivity">
+    android:paddingTop="16dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@null"
+        android:clickable="false"
+        android:ellipsize="end"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="none"
+        android:lines="1"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text"
@@ -20,8 +33,7 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:inputType="none"
-        android:text="None"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text2"
@@ -35,4 +47,4 @@
         android:text=""
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textSize="11sp" />
-</RelativeLayout>
+</LinearLayout>

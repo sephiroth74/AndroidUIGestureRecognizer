@@ -14,6 +14,7 @@ class TestActivity : AppCompatActivity() {
     val delegate: UIGestureRecognizerDelegate = UIGestureRecognizerDelegate()
     val timeSpan = System.currentTimeMillis()
 
+    private lateinit var mTitleView: TextView
     private lateinit var mTextView: TextView
     private lateinit var mTextView2: TextView
     private lateinit var mMainView: View
@@ -37,8 +38,15 @@ class TestActivity : AppCompatActivity() {
     override fun onContentChanged() {
         super.onContentChanged()
         mMainView = findViewById<View>(R.id.activity_main)
+        mTitleView = findViewById(R.id.title)
         mTextView = findViewById(R.id.text)
         mTextView2 = findViewById(R.id.text2)
+    }
+
+    fun setTitle(string: String) {
+        runOnUiThread {
+            mTitleView.text = string
+        }
     }
 
     private fun actionToString(action: Int): String {

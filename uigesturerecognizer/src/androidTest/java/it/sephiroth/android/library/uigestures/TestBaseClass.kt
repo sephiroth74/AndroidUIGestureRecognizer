@@ -33,6 +33,7 @@ open class TestBaseClass {
     internal val mainView: UiObject
         get() = device.findObject(UiSelector().resourceId("$PACKAGE_NAME:id/activity_main"))
 
+    fun setTitle(string: String) = activityTestRule.activity.setTitle(string)
 
     fun randomPointOnScreen(): Point {
         val top = screenHeight.toFloat() * 0.2f
