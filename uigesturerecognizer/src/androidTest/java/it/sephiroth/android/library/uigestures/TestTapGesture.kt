@@ -11,6 +11,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestTapGesture : TestBaseClass() {
@@ -35,7 +36,7 @@ class TestTapGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -68,7 +69,7 @@ class TestTapGesture : TestBaseClass() {
                          ))
 
         interaction.performMultiPointerGesture(array.toTypedArray())
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -93,7 +94,7 @@ class TestTapGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
 }

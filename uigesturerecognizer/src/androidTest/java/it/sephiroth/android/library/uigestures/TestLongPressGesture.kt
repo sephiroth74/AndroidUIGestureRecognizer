@@ -13,6 +13,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestLongPressGesture : TestBaseClass() {
@@ -51,9 +52,9 @@ class TestLongPressGesture : TestBaseClass() {
 
         interaction.swipe(pt1.x, pt1.y, pt2.x, pt2.y, 5, true, (ViewConfiguration.getLongPressTimeout() * 2.5).toLong())
 
-        latchBegan.await()
-        latchChanged.await()
-        latchEnd.await()
+        latchBegan.await(10, TimeUnit.SECONDS)
+        latchChanged.await(10, TimeUnit.SECONDS)
+        latchEnd.await(10, TimeUnit.SECONDS)
     }
 
 
@@ -120,9 +121,9 @@ class TestLongPressGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
 
-        latchBegan.await()
-        latchChanged.await()
-        latchEnd.await()
+        latchBegan.await(10, TimeUnit.SECONDS)
+        latchChanged.await(10, TimeUnit.SECONDS)
+        latchEnd.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -154,6 +155,6 @@ class TestLongPressGesture : TestBaseClass() {
         }
         delegate.addGestureRecognizer(longpressRecognizer)
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.longClick())
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 }

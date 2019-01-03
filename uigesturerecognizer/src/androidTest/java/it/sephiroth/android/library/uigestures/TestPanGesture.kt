@@ -9,6 +9,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestPanGesture : TestBaseClass() {
@@ -50,7 +51,7 @@ class TestPanGesture : TestBaseClass() {
                 rect.centerX(),
                 rect.bottom - SWIPE_MARGIN_LIMIT, 10)
 
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 
     @Test
@@ -98,6 +99,6 @@ class TestPanGesture : TestBaseClass() {
         }
 
         interaction.performMultiPointerGesture(array.toTypedArray())
-        latch.await()
+        latch.await(10, TimeUnit.SECONDS)
     }
 }
