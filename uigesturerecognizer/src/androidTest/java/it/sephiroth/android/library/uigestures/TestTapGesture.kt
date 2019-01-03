@@ -1,6 +1,5 @@
 package it.sephiroth.android.library.uigestures
 
-import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
@@ -117,12 +116,16 @@ class TestTapGesture : TestBaseClass() {
         val recognizer1 = UITapGestureRecognizer(activity)
         recognizer1.tag = "single-tap"
         recognizer1.tapsRequired = 1
+        recognizer1.tapTimeout = 300
 
         val recognizer2 = UITapGestureRecognizer(activity)
         recognizer2.tag = "double-tap"
         recognizer2.tapsRequired = 2
+        recognizer2.tapTimeout = 300
 
         recognizer1.requireFailureOf = recognizer2
+
+        Log.e("test", "tap timeout: ${recognizer1.tapTimeout}")
 
         recognizer1.actionListener = {
             Log.e("test", "recognizer1: $it")
@@ -135,17 +138,21 @@ class TestTapGesture : TestBaseClass() {
             fail("Unexpected code!")
         }
 
+        recognizer1.stateListener = {
+            Log.w("test", "recognizer1 state: $it")
+        }
+
+        recognizer2.stateListener = {
+            Log.w("test", "recognizer2 state: $it")
+        }
+
         delegate.addGestureRecognizer(recognizer1)
         delegate.addGestureRecognizer(recognizer2)
 
         val bounds = mainView.visibleBounds
 
-        interaction.touchDown(bounds.centerX(), bounds.centerY())
-        SystemClock.sleep(50)
-        interaction.touchUp(bounds.centerX(), bounds.centerY())
-
+        interaction.clickAndSync(bounds.centerX(), bounds.centerY(), 10)
         latch.await(10, TimeUnit.SECONDS)
-
         assertEquals(0L, latch.count)
     }
 
