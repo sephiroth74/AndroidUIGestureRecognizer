@@ -21,6 +21,7 @@ import kotlin.math.sqrt
 open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
     private val mMaximumFlingVelocity: Int
+    private val mMinimumFlingVelocity: Int
 
     private var mStarted: Boolean = false
 
@@ -33,7 +34,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
      * @since 1.0.0
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    var numberOfTouchesRequired: Int = 0
+    var numberOfTouchesRequired: Int = 1
 
     private var mLastFocusX: Float = 0.toFloat()
     private var mLastFocusY: Float = 0.toFloat()
@@ -47,29 +48,34 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     /**
      * @since 1.0.0
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     var translationX: Float = 0.toFloat()
         internal set
 
     /**
      * @since 1.0.0
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     var translationY: Float = 0.toFloat()
         internal set
 
     /**
      * @since 1.0.0
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     var yVelocity: Float = 0.toFloat()
         private set
 
     /**
      * @since 1.0.0
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     var xVelocity: Float = 0.toFloat()
         private set
 
     private val mCurrentLocation: PointF
 
+    @Suppress("MemberVisibilityCanBePrivate")
     var downTime: Long = 0
         private set
 
@@ -88,17 +94,20 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var minimumTouchDistance: Int
 
     @Suppress("MemberVisibilityCanBePrivate")
-    var minimumSwipeDistance: Int = SWIPE_THRESHOLD
+    var minimumSwipeDistance: Int = 0
 
     init {
-        numberOfTouchesRequired = 1
         direction = RIGHT
         mStarted = false
-        numberOfTouches = 0
 
         val configuration = ViewConfiguration.get(context)
+
         minimumTouchDistance = configuration.scaledTouchSlop
         mMaximumFlingVelocity = configuration.scaledMaximumFlingVelocity
+        mMinimumFlingVelocity = configuration.scaledMinimumFlingVelocity
+        minimumTouchDistance = (minimumTouchDistance * 3.5f).toInt()
+
+
         mCurrentLocation = PointF()
     }
 
@@ -399,14 +408,14 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY")
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
-            if (Math.abs(diffX) > distanceThreshold && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+            if (Math.abs(diffX) > distanceThreshold && Math.abs(velocityX) > mMinimumFlingVelocity) {
                 return if (diffX > 0) {
                     RIGHT
                 } else {
                     LEFT
                 }
             }
-        } else if (Math.abs(diffY) > distanceThreshold && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+        } else if (Math.abs(diffY) > distanceThreshold && Math.abs(velocityY) > mMinimumFlingVelocity) {
             return if (diffY > 0) {
                 DOWN
             } else {
@@ -431,8 +440,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         get() = -scrollY
 
     companion object {
-        private const val SWIPE_THRESHOLD = 100
-        private const val SWIPE_VELOCITY_THRESHOLD = 100
         private const val MESSAGE_RESET = 4
 
         const val RIGHT = 1 shl 1
