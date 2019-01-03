@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
@@ -137,7 +138,12 @@ class TestTapGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer1)
         delegate.addGestureRecognizer(recognizer2)
 
-        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        val bounds = mainView.visibleBounds
+
+        interaction.touchDown(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(50)
+        interaction.touchUp(bounds.centerX(), bounds.centerY())
+
         latch.await(10, TimeUnit.SECONDS)
 
         assertEquals(0L, latch.count)
