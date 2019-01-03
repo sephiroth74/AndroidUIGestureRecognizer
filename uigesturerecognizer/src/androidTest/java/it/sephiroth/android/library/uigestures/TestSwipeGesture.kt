@@ -36,6 +36,7 @@ class TestSwipeGesture : TestBaseClass() {
         mainView.swipeRight(3)
 
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -62,6 +63,7 @@ class TestSwipeGesture : TestBaseClass() {
         mainView.swipeLeft(3)
 
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -88,6 +90,7 @@ class TestSwipeGesture : TestBaseClass() {
         mainView.swipeUp(3)
 
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -114,6 +117,7 @@ class TestSwipeGesture : TestBaseClass() {
         mainView.swipeDown(3)
 
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -139,6 +143,7 @@ class TestSwipeGesture : TestBaseClass() {
         mainView.swipeDown(3)
 
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
 }

@@ -55,6 +55,10 @@ class TestLongPressGesture : TestBaseClass() {
         latchBegan.await(10, TimeUnit.SECONDS)
         latchChanged.await(10, TimeUnit.SECONDS)
         latchEnd.await(10, TimeUnit.SECONDS)
+
+        assertEquals(0L, latchBegan.count)
+        assertEquals(0L, latchChanged.count)
+        assertEquals(0L, latchEnd.count)
     }
 
 
@@ -124,6 +128,10 @@ class TestLongPressGesture : TestBaseClass() {
         latchBegan.await(10, TimeUnit.SECONDS)
         latchChanged.await(10, TimeUnit.SECONDS)
         latchEnd.await(10, TimeUnit.SECONDS)
+
+        assertEquals(0L, latchBegan.count)
+        assertEquals(0L, latchChanged.count)
+        assertEquals(0L, latchEnd.count)
     }
 
     @Test
@@ -156,5 +164,7 @@ class TestLongPressGesture : TestBaseClass() {
         delegate.addGestureRecognizer(longpressRecognizer)
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.longClick())
         latch.await(10, TimeUnit.SECONDS)
+
+        assertEquals(0L, latch.count)
     }
 }

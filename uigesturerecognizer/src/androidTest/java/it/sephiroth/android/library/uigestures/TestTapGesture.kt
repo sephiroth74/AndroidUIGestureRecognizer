@@ -37,6 +37,7 @@ class TestTapGesture : TestBaseClass() {
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -70,6 +71,7 @@ class TestTapGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
@@ -95,6 +97,7 @@ class TestTapGesture : TestBaseClass() {
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
 }

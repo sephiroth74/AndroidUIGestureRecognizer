@@ -49,7 +49,8 @@ class TestPinchGesture : TestBaseClass() {
         }
 
         delegate.addGestureRecognizer(recognizer)
-        mainView.pinchIn(50, 5)
+        mainView.pinchOut(50, 4)
         latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 }

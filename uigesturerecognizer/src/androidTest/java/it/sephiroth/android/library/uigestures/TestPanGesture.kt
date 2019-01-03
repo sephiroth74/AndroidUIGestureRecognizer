@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
 import it.sephiroth.android.library.uigestures.Interaction.Companion.SWIPE_MARGIN_LIMIT
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
+import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,6 +53,7 @@ class TestPanGesture : TestBaseClass() {
                 rect.bottom - SWIPE_MARGIN_LIMIT, 10)
 
         latch.await(10, TimeUnit.SECONDS)
+        Assert.assertEquals(0L, latch.count)
     }
 
     @Test
@@ -100,5 +102,6 @@ class TestPanGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
         latch.await(10, TimeUnit.SECONDS)
+        Assert.assertEquals(0L, latch.count)
     }
 }
