@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import timber.log.Timber
@@ -29,19 +30,21 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     private val mStateListeners = Collections.synchronizedList(ArrayList<OnGestureRecognizerStateChangeListener>())
 
     var actionListener: ((UIGestureRecognizer) -> Any?)? = null
+    var stateListener: ((UIGestureRecognizer) -> Unit)? = null
 
     /**
      * @return The current recognizer internal state
      * @since 1.0.0
      */
     var state: State? = null
-        protected set(state) {
-            // logMessage(Log.INFO, "setState: ${state?.name}")
+        protected set(value) {
+            logMessage(Log.INFO, "setState: ${value?.name} from ${this.state?.name}")
 
-            val changed = this.state != state || state == State.Changed
-            field = state
+            val changed = this.state != value || value == State.Changed
+            field = value
 
             if (changed) {
+                stateListener?.invoke(this)
                 val iterator = mStateListeners.listIterator()
                 while (iterator.hasNext()) {
                     iterator.next().onStateChanged(this)
@@ -209,17 +212,17 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         actionListener?.invoke(this)
     }
 
-    private fun addOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener) {
+    protected fun addOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener) {
         if (!mStateListeners.contains(listener)) {
             mStateListeners.add(listener)
         }
     }
 
-    private fun removeOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
+    protected fun removeOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
         return mStateListeners.remove(listener)
     }
 
-    private fun hasOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
+    protected fun hasOnStateChangeListenerListener(listener: OnGestureRecognizerStateChangeListener): Boolean {
         return mStateListeners.contains(listener)
     }
 

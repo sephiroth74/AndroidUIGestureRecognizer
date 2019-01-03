@@ -2,6 +2,8 @@ package it.sephiroth.android.library.uigestures
 
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -20,7 +22,7 @@ import android.view.MotionEvent
 open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context),
         UIContinuousRecognizer,
         ScaleGestureDetector.OnScaleGestureListener {
-    private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this)
+    private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this, Handler(Looper.getMainLooper()))
 
     /**
      * @return The total scale factor since the gesture began

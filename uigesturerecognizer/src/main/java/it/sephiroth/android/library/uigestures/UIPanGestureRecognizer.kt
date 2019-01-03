@@ -45,13 +45,13 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
      *
      * @since 1.0.0
      */
-    var minimumNumberOfTouches: Int = 0
+    var minimumNumberOfTouches: Int = 1
 
     /**
      * The maximum number of fingers that can be touching the view for this gesture to be recognized.
      * @since 1.0.0
      */
-    var maximumNumberOfTouches: Int = 0
+    var maximumNumberOfTouches: Int = Integer.MAX_VALUE
 
     var scrollX: Float = 0.toFloat()
         private set
@@ -126,9 +126,6 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         get() = mStartLocation.y
 
     init {
-        minimumNumberOfTouches = 1
-        maximumNumberOfTouches = Integer.MAX_VALUE
-
         val configuration = ViewConfiguration.get(context)
         minimumFlingVelocity = configuration.scaledMinimumFlingVelocity
         maximumFlingVelocity = configuration.scaledMaximumFlingVelocity
