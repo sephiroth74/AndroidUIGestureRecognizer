@@ -8,8 +8,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -132,7 +131,7 @@ class TestTapGesture : TestBaseClass() {
 
         recognizer2.actionListener = {
             Log.e("test", "recognizer2: $it")
-            assertEquals(State.Failed, it.state)
+            fail("Unexpected code!")
         }
 
         delegate.addGestureRecognizer(recognizer1)
