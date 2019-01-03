@@ -96,6 +96,12 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     @Suppress("MemberVisibilityCanBePrivate")
     var minimumSwipeDistance: Int = 0
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    var maximumTouchSlopTime = MAXIMUM_TOUCH_SLOP_TIME
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    var maximumTouchFlingTime = MAXIMUM_TOUCH_FLING_TIME
+
     init {
         direction = RIGHT
         mStarted = false
@@ -292,7 +298,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                             if (count == numberOfTouchesRequired) {
                                 val time = event.eventTime - event.downTime
-                                if (time > MAXIMUM_TOUCH_SLOP_TIME) {
+                                if (time > maximumTouchSlopTime) {
                                     logMessage(Log.WARN, "passed too much time")
                                     mStarted = false
                                     setBeginFiringEvents(false)
@@ -323,7 +329,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                         xVelocity = mVelocityTracker!!.xVelocity
                         val time = event.eventTime - event.downTime
 
-                        if (time > MAXIMUM_TOUCH_FLING_TIME) {
+                        if (time > maximumTouchFlingTime) {
                             mStarted = false
                             state = UIGestureRecognizer.State.Failed
                         } else {
