@@ -3,7 +3,7 @@
 |   |   |
 |---|---|
 |Build Status   |[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)   |
-|Coverage   |[![Coverage](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=feature%2Ftests)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer)   |
+|Coverage   |[![Coverage Status](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=master)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer?branch=master)   |
 |Maven   |[ ![Bintray](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/_latestVersion)  |
 
 
