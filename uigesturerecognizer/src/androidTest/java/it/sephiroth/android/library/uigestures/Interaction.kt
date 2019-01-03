@@ -11,9 +11,12 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.PointerCoords
 import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityEvent
+import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.Configurator
+import androidx.test.uiautomator.UiObject
 import java.util.concurrent.TimeoutException
+import kotlin.math.min
 
 
 class Interaction {
@@ -116,6 +119,35 @@ class Interaction {
         val eventTime = SystemClock.uptimeMillis()
         val event = getMotionEvent(mDownTime, eventTime, MotionEvent.ACTION_MOVE, x.toFloat(), y.toFloat())
         return injectEventSync(event)
+    }
+
+    fun rotate(view: UiObject, deg: Float, steps: Int): Boolean {
+        val rect = view.visibleBounds
+
+        val size = min(rect.height(), rect.width()).toFloat()
+        val pt1 = PointF(rect.centerX().toFloat(), (rect.centerY() - (size / 4)))
+        val pt2 = PointF(rect.centerX().toFloat(), (rect.centerY() + (size / 4)))
+        val pt11 = PointF(pt1.x, pt1.y)
+        val pt21 = PointF(pt2.x, pt2.y)
+
+        val center = PointF(rect.centerX().toFloat(), rect.centerY().toFloat())
+
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords(pt1.x, pt1.y).setSize(1f).build(),
+                PointerCoordsBuilder.newBuilder().setCoords(pt2.x, pt2.y).setSize(1f).build()))
+
+        for (i in 1 until steps) {
+            val p1 = Point2D.rotateAroundBy(pt11, center, (i.toFloat() / (steps - 1)) * deg)
+            val p2 = Point2D.rotateAroundBy(pt21, center, (i.toFloat() / (steps - 1)) * deg)
+
+            array.add(arrayOf(
+                    PointerCoordsBuilder.newBuilder().setCoords(p1.x, p1.y).setSize(1f).build(),
+                    PointerCoordsBuilder.newBuilder().setCoords(p2.x, p2.y).setSize(1f).build()))
+        }
+
+        return performMultiPointerGesture(array.toTypedArray())
     }
 
     fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>): Boolean {
@@ -328,13 +360,14 @@ object Point2D {
      * @param center   - The center point
      * @param angle    - The angle, in degrees
      */
-    fun rotateAroundBy(position: PointF, center: PointF, angle: Float) {
+    fun rotateAroundBy(position: PointF, center: PointF, angle: Float): PointF {
         val angleInRadians = angle * (Math.PI / 180)
         val cosTheta = Math.cos(angleInRadians)
         val sinTheta = Math.sin(angleInRadians)
 
-        position.x = (cosTheta * (position.x - center.x) - sinTheta * (position.y - center.y) + center.x).toFloat()
-        position.y = (sinTheta * (position.x - center.x) + cosTheta * (position.y - center.y) + center.y.toDouble()).toFloat()
+        val x = (cosTheta * (position.x - center.x) - sinTheta * (position.y - center.y) + center.x).toFloat()
+        val y = (sinTheta * (position.x - center.x) + cosTheta * (position.y - center.y) + center.y).toFloat()
+        return PointF(x, y)
     }
 
     /**
