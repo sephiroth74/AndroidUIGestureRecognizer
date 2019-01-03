@@ -35,13 +35,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.RIGHT
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
-
-        val rect = mainView.visibleBounds
-        val width = rect.width().toFloat()
-
-        interaction.swipe(
-                (rect.centerX() - (width / 5)).toInt(), rect.centerY(),
-                (rect.centerX() + (width / 5)).toInt(), rect.centerY(), 4)
+        mainView.swipeRight(3)
 
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
@@ -60,13 +54,13 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.LEFT
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
-        mainView.swipeLeft(5)
+        mainView.swipeLeft(3)
 
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
 
-    //    @Test
+    @Test
     fun testSwipeUp() {
         setTitle("Swipe Up")
         latch = CountDownLatch(1)
@@ -79,7 +73,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.UP
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
-        mainView.swipeUp(5)
+        mainView.swipeUp(4)
 
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
@@ -99,13 +93,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
 
-        val rect = mainView.visibleBounds
-        val height = rect.height()
-
-        interaction.swipe(
-                rect.centerX(), rect.centerY() - (height / 3),
-                rect.centerX(), rect.centerY() + (height / 3), 4)
-
+        mainView.swipeDown(4)
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
