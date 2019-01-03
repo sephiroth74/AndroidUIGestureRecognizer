@@ -54,6 +54,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "single-tap"
         recognizer.touchesRequired = 2
         recognizer.tapsRequired = 1
+        recognizer.tapTimeout = 400
 
         recognizer.actionListener = {
             activityTestRule.activity.actionListener.invoke(it)

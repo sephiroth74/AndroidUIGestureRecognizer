@@ -105,8 +105,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         minimumTouchDistance = configuration.scaledTouchSlop
         mMaximumFlingVelocity = configuration.scaledMaximumFlingVelocity
         mMinimumFlingVelocity = configuration.scaledMinimumFlingVelocity
-        minimumTouchDistance = (minimumTouchDistance * 3.5f).toInt()
-
+        minimumSwipeDistance = (minimumTouchDistance * 3f).toInt()
 
         mCurrentLocation = PointF()
     }
@@ -404,8 +403,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             x1: Float, y1: Float, x2: Float, y2: Float, velocityX: Float, velocityY: Float, distanceThreshold: Float): Int {
         val diffY = y2 - y1
         val diffX = x2 - x1
-        logMessage(Log.VERBOSE, "diff: $diffX, $diffY")
-        logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY")
+        logMessage(Log.VERBOSE, "diff: $diffX, $diffY, distanceThreshold: $distanceThreshold")
+        logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, mMinimumFlingVelocity: $mMinimumFlingVelocity")
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
             if (Math.abs(diffX) > distanceThreshold && Math.abs(velocityX) > mMinimumFlingVelocity) {
