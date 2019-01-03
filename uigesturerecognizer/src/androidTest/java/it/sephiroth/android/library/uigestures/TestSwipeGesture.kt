@@ -93,7 +93,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
 
-        mainView.swipeDown(4)
+        mainView.swipeDown(3)
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
