@@ -21,7 +21,7 @@ class TestSwipeGesture : TestBaseClass() {
         latch.countDown()
     }
 
-    @Test
+    //    @Test
     fun testSwipeRight() {
         setTitle("Swipe Right")
 
@@ -47,7 +47,7 @@ class TestSwipeGesture : TestBaseClass() {
         assertEquals(0L, latch.count)
     }
 
-    @Test
+    //    @Test
     fun testSwipeLeft() {
         setTitle("Swipe Left")
         latch = CountDownLatch(1)
@@ -66,7 +66,7 @@ class TestSwipeGesture : TestBaseClass() {
         assertEquals(0L, latch.count)
     }
 
-    @Test
+    //    @Test
     fun testSwipeUp() {
         setTitle("Swipe Up")
         latch = CountDownLatch(1)
