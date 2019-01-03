@@ -1,12 +1,10 @@
 # Android UIGestureRecognizer
 
-[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)
-
-[![Coverage](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=feature%2Ftests)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer)
-
-Java: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer)
-<br />
-Kotlin: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin)
+|   |   |
+|---|---|
+|Build Status   |[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)   |
+|Coverage   |[![Coverage](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=feature%2Ftests)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer)   |
+|Maven   |[![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/it.sephiroth.android.library.uigestures/uigesture-recognizer-kotlin)   |
 
 
 <br />
