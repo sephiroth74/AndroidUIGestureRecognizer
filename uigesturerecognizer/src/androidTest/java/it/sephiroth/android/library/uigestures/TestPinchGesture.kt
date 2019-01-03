@@ -1,7 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import org.hamcrest.Matchers
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,6 +13,7 @@ class TestPinchGesture : TestBaseClass() {
 
     @Test
     fun testPinchIn() {
+        setTitle("Pinch")
         val latch = CountDownLatch(3)
         assertNotNull(delegate)
         delegate.clear()

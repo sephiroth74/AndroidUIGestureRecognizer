@@ -17,6 +17,7 @@ class TestPanGesture : TestBaseClass() {
 
     @Test
     fun testPanSingleFinger() {
+        setTitle("Pan")
         val latch = CountDownLatch(3)
         assertNotNull(delegate)
         delegate.clear()
@@ -58,12 +59,13 @@ class TestPanGesture : TestBaseClass() {
 
     @Test
     fun testPanDoubleFingers() {
+        setTitle("Pan 2 fingers")
         val latch = CountDownLatch(3)
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UIPanGestureRecognizer(context)
-        recognizer.tag = "pan"
+        recognizer.tag = "pan-double"
         recognizer.minimumNumberOfTouches = 2
         recognizer.maximumNumberOfTouches = 2
 

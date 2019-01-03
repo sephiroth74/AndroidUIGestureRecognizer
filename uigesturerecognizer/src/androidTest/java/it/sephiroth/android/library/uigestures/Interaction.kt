@@ -1,6 +1,7 @@
 package it.sephiroth.android.library.uigestures
 
 import android.app.UiAutomation
+import android.graphics.PointF
 import android.os.SystemClock
 import android.util.Log
 import android.view.InputDevice
@@ -13,6 +14,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.Configurator
 import java.util.concurrent.TimeoutException
+
 
 class Interaction {
     private var mDownTime: Long = 0
@@ -313,6 +315,69 @@ class Interaction {
         fun getMotionEvent(downTime: Long, action: Int, x: Float, y: Float, pressure: Float = 1f, size: Float = 1f): MotionEvent {
             return getMotionEvent(downTime, SystemClock.uptimeMillis(), action, x, y, pressure, size)
         }
+
+    }
+}
+
+object Point2D {
+
+    /**
+     * Rotate a point around a pivot point. The point will be updated in place
+     *
+     * @param position - The point to be rotated
+     * @param center   - The center point
+     * @param angle    - The angle, in degrees
+     */
+    fun rotateAroundBy(position: PointF, center: PointF, angle: Float) {
+        val angleInRadians = angle * (Math.PI / 180)
+        val cosTheta = Math.cos(angleInRadians)
+        val sinTheta = Math.sin(angleInRadians)
+
+        position.x = (cosTheta * (position.x - center.x) - sinTheta * (position.y - center.y) + center.x).toFloat()
+        position.y = (sinTheta * (position.x - center.x) + cosTheta * (position.y - center.y) + center.y.toDouble()).toFloat()
     }
 
+    /**
+     * Rotate a point in place around it's origin
+     *
+     * @param point  - point to rotate
+     * @param origin - origin point
+     * @param deg    - angle in degrees
+     */
+    fun rotateAroundOrigin(point: PointF, origin: PointF, deg: Float) {
+        val rad = radians(deg.toDouble()).toFloat()
+        val s = Math.sin(rad.toDouble()).toFloat()
+        val c = Math.cos(rad.toDouble()).toFloat()
+
+        point.x -= origin.x
+        point.y -= origin.y
+
+        val xnew = point.x * c - point.y * s
+        val ynew = point.x * s + point.y * c
+
+        point.x = xnew + origin.x
+        point.y = ynew + origin.y
+    }
+
+    /**
+     * Get the point between 2 points at the given t distance ( between 0 and 1 )
+     *
+     * @param pt1      the first point
+     * @param pt2      the second point
+     * @param t        the distance to calculate the average point ( 0 >= t <= 1 )
+     * @param dstPoint the destination point
+     */
+    fun getLerp(pt1: PointF, pt2: PointF, t: Float): PointF {
+        return PointF(pt1.x + (pt2.x - pt1.x) * t, pt1.y + (pt2.y - pt1.y) * t)
+    }
+
+    /**
+     * Degrees to radians.
+     *
+     * @param degree the degree
+     * @return the double
+     */
+    fun radians(degree: Double): Double {
+        return degree * (Math.PI / 180)
+    }
 }

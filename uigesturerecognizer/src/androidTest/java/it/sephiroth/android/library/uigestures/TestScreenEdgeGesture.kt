@@ -1,7 +1,8 @@
 package it.sephiroth.android.library.uigestures
 
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TestScreenEdgeGesture : TestBaseClass() {
 
-    var latch: CountDownLatch? = null
+    private lateinit var latch: CountDownLatch
 
     @Before
     fun initLatch() {
@@ -26,21 +27,21 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
         when (it.state) {
             State.Began -> {
-                assertEquals(3L, latch?.count)
-                latch?.countDown()
+                assertEquals(3L, latch.count)
+                latch.countDown()
             }
 
             State.Changed -> {
-                if (latch?.count == 2L) {
-                    latch?.countDown()
+                if (latch.count == 2L) {
+                    latch.countDown()
                 } else {
                     Timber.v("skipping...")
                 }
             }
 
             State.Ended -> {
-                assertEquals(1L, latch?.count)
-                latch?.countDown()
+                assertEquals(1L, latch.count)
+                latch.countDown()
             }
             else -> {
                 Timber.w("State not handled")
@@ -50,11 +51,12 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
     @Test
     fun testSwipeRight() {
+        setTitle("Edge Left")
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
-        recognizer.tag = "swipe-left"
+        recognizer.tag = "edge-left"
         recognizer.edge = UIRectEdge.LEFT
 
         recognizer.actionListener = actionListener
@@ -62,17 +64,18 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeRight(5)
 
-        latch!!.await(10, TimeUnit.SECONDS)
-        assertEquals(0L, latch!!.count)
+        latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
     fun testSwipeLeft() {
+        setTitle("Edge Right")
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
-        recognizer.tag = "swipe-right"
+        recognizer.tag = "edge-right"
         recognizer.edge = UIRectEdge.RIGTH
 
         recognizer.actionListener = actionListener
@@ -80,17 +83,18 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeLeft(5)
 
-        latch!!.await(10, TimeUnit.SECONDS)
-        assertEquals(0L, latch!!.count)
+        latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 
     @Test
     fun testSwipeUp() {
+        setTitle("Edge Bottom")
         assertNotNull(delegate)
         delegate.clear()
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
-        recognizer.tag = "swipe-bottom"
+        recognizer.tag = "edge-bottom"
         recognizer.edge = UIRectEdge.BOTTOM
 
         recognizer.actionListener = actionListener
@@ -98,7 +102,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeUp(5)
 
-        latch!!.await(10, TimeUnit.SECONDS)
-        assertEquals(0L, latch!!.count)
+        latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 }

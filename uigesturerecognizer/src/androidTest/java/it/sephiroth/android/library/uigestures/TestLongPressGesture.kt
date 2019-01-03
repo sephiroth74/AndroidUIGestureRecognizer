@@ -20,6 +20,7 @@ class TestLongPressGesture : TestBaseClass() {
 
     @Test
     fun test_singleTap1Finger_longPressWithMotion() {
+        setTitle("Long Press 1 touch")
         val latchBegan = CountDownLatch(1)
         val latchChanged = CountDownLatch(1)
         val latchEnd = CountDownLatch(1)
@@ -64,6 +65,7 @@ class TestLongPressGesture : TestBaseClass() {
 
     @Test
     fun test_2fingers_longPressWithMotion() {
+        setTitle("Long Press 2 touches")
         val latchBegan = CountDownLatch(1)
         val latchChanged = CountDownLatch(1)
         val latchEnd = CountDownLatch(1)
@@ -136,6 +138,7 @@ class TestLongPressGesture : TestBaseClass() {
 
     @Test
     fun test_singleTapLongPress() {
+        setTitle("Long Press simple")
         val delegate = activityTestRule.activity.delegate
         val latch = CountDownLatch(2)
 

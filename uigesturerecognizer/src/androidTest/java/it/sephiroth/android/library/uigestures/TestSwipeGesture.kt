@@ -92,7 +92,13 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.DOWN
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
-        mainView.swipeDown(3)
+
+        val rect = mainView.visibleBounds
+        val height = rect.height()
+
+        interaction.swipe(
+                rect.centerX(), rect.centerY() - (height / 3),
+                rect.centerX(), rect.centerY() + (height / 3), 4)
 
         latch.await(10, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
