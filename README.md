@@ -1,11 +1,21 @@
 # Android UIGestureRecognizer
 
-|   |   |
-|---|---|
-|Build Status   |[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)   |
-|Coverage   |[![Coverage Status](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=master)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer?branch=master)   |
-|Maven   |[ ![Bintray](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/_latestVersion)  |
 
+Travis CI buils status:<br />
+[![Build Status](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer.svg?branch=master)](https://travis-ci.org/sephiroth74/AndroidUIGestureRecognizer)
+------
+
+Code Coverage:<br/>
+[![Coverage Status](https://coveralls.io/repos/github/sephiroth74/AndroidUIGestureRecognizer/badge.svg?branch=master)](https://coveralls.io/github/sephiroth74/AndroidUIGestureRecognizer?branch=master)
+------
+
+
+Latest Version:<br/>
+![Bintray](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.uigestures%3Auigesture-recognizer-kotlin/images/download.svg)
+------
+
+
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-AndroidUIGestureRecognizer-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/4716)
 
 <br />
 
