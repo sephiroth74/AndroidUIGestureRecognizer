@@ -30,7 +30,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var scale: Float = 0.toFloat()
         private set
 
-    override val numberOfTouches: Int
+    override var numberOfTouches: Int = 0
         get() = mScaleGestureDetector.numberOfTouches
 
     /**
@@ -42,11 +42,8 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     val scaleFactor: Float
         get() = mScaleGestureDetector.scaleFactor
 
-    override val currentLocationX: Float
-        get() = mScaleGestureDetector.focusX
-
-    override val currentLocationY: Float
-        get() = mScaleGestureDetector.focusY
+    override val currentLocationX: Float get() = mScaleGestureDetector.focusX
+    override val currentLocationY: Float get() = mScaleGestureDetector.focusY
 
     /**
      * @see ScaleGestureDetector.currentSpan

@@ -1,7 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
 import android.content.Context
-import android.graphics.PointF
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -18,6 +17,9 @@ import kotlin.math.atan2
  */
 
 open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
+
+    override var numberOfTouches: Int = 0
+        internal set
 
     /**
      * Change the minimum rotation threshold (in radians)
@@ -61,10 +63,6 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
     private var mPtrID1: Int = 0
     private var mPtrID2: Int = 0
     private var mPreviousEvent: MotionEvent? = null
-    private val mCurrentLocation = PointF()
-
-    final override var numberOfTouches: Int = 0
-        internal set
 
     /**
      * Returns the rotation in degrees
@@ -85,12 +83,6 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
             }
             return angle
         }
-
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
-
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {

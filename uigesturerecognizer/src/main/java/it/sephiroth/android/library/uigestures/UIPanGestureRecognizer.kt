@@ -30,13 +30,15 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
     private var mStarted: Boolean = false
 
+    override var numberOfTouches: Int = 0
+        internal set
+
     private var mLastFocusX: Float = 0.toFloat()
     private var mLastFocusY: Float = 0.toFloat()
     private var mDownFocusX: Float = 0.toFloat()
     private var mDownFocusY: Float = 0.toFloat()
 
     private var mStartLocation = PointF()
-    private var mDownLocation = PointF()
 
     private var mVelocityTracker: VelocityTracker? = null
     /**
@@ -104,20 +106,9 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     var xVelocity: Float = 0.toFloat()
         private set
 
-    private val mCurrentLocation: PointF
-
-    override var numberOfTouches: Int = 0
-        internal set
-
     @Suppress("unused")
     val isFling: Boolean
         get() = state === UIGestureRecognizer.State.Ended && (Math.abs(xVelocity) > minimumFlingVelocity || Math.abs(yVelocity) > minimumFlingVelocity)
-
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
-
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
 
     val startLocationX: Float
         get() = mStartLocation.x
@@ -130,7 +121,6 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         minimumFlingVelocity = configuration.scaledMinimumFlingVelocity
         maximumFlingVelocity = configuration.scaledMaximumFlingVelocity
         minimumTouchDistance = configuration.scaledTouchSlop
-        mCurrentLocation = PointF()
         logMessage(Log.VERBOSE, "minimumTouchDistance: $minimumTouchDistance")
     }
 
@@ -280,7 +270,6 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mDownFocusX = mLastFocusX
                 mLastFocusY = focusY
                 mDownFocusY = mLastFocusY
-                mDownLocation.set(mCurrentLocation)
                 mStartLocation.set(mCurrentLocation)
 
                 tracker.clear()

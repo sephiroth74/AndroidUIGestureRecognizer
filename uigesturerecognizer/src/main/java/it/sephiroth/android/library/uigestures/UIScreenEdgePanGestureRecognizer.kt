@@ -1,7 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
 import android.content.Context
-import android.graphics.PointF
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -30,6 +29,9 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     private var mDownFocusY: Float = 0.toFloat()
 
     private var mVelocityTracker: VelocityTracker? = null
+
+    override var numberOfTouches: Int = 0
+        internal set
 
     /**
      * The minimum number of fingers that can be touching the view for this gesture to be recognized.
@@ -77,18 +79,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     var xVelocity: Float = 0.toFloat()
         private set
 
-    private val mCurrentLocation: PointF
-
-    override var numberOfTouches: Int = 0
-        internal set
-
     var edge = UIRectEdge.LEFT
-
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
-
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
 
     @Suppress("MemberVisibilityCanBePrivate")
     var minimumTouchDistance: Int
@@ -99,7 +90,6 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
         val configuration = ViewConfiguration.get(context)
         minimumTouchDistance = configuration.scaledTouchSlop
-        mCurrentLocation = PointF()
         mEdgeLimit = context.resources.getDimension(R.dimen.gestures_screen_edge_limit)
     }
 

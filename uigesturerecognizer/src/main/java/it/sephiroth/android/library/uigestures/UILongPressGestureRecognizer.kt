@@ -18,15 +18,18 @@ import android.view.ViewConfiguration
  */
 open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
-    val tapTimeout = ViewConfiguration.getTapTimeout().toLong()
+    val tapTimeout = TAP_TIMEOUT
 
-    var longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
+    var longPressTimeout = LONG_PRESS_TIMEOUT
         set(value) {
             field = value
             minimumPressDuration = tapTimeout + value
         }
 
-    var doubleTapTimeout = ViewConfiguration.getDoubleTapTimeout().toLong()
+    var doubleTapTimeout = DOUBLE_TAP_TIMEOUT
+
+    override var numberOfTouches: Int = 0
+        internal set
 
     /**
      * The minimum period fingers must press on the view for the gesture to be recognized.<br></br>
@@ -57,20 +60,10 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     private var mAllowableMovementSquare: Float = 0.toFloat()
     private var mStarted: Boolean = false
     private var mStartLocation = PointF()
-    private var mDownLocation = PointF()
 
     private var mNumTaps = 0
-    override var numberOfTouches = 0
-        internal set
 
-    private val mCurrentLocation: PointF
     private var mBegan: Boolean = false
-
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
-
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
 
     val startLocationX: Float
         get() = mStartLocation.x
@@ -91,7 +84,6 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     init {
         mStarted = false
         mBegan = false
-        mCurrentLocation = PointF()
 
         val touchSlop: Int
         val configuration = ViewConfiguration.get(context)
@@ -211,7 +203,6 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 mDownFocusX = focusX
                 mDownFocusY = focusY
-                mDownLocation.set(mCurrentLocation)
                 mStartLocation.set(mCurrentLocation)
             }
 

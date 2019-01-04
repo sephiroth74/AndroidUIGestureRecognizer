@@ -1,7 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
 import android.content.Context
-import android.graphics.PointF
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -22,6 +21,9 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
     private val mMaximumFlingVelocity: Int
     private val mMinimumFlingVelocity: Int
+
+    override var numberOfTouches: Int = 0
+        internal set
 
     private var mStarted: Boolean = false
 
@@ -73,22 +75,11 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var xVelocity: Float = 0.toFloat()
         private set
 
-    private val mCurrentLocation: PointF
-
     @Suppress("MemberVisibilityCanBePrivate")
     var downTime: Long = 0
         private set
 
-    override var numberOfTouches: Int = 0
-        internal set
-
     private var mDown: Boolean = false
-
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
-
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
 
     @Suppress("MemberVisibilityCanBePrivate")
     var minimumTouchDistance: Int
@@ -120,7 +111,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             logMessage(Log.INFO, "mMaximumFlingVelocity: $mMaximumFlingVelocity")
         }
 
-        mCurrentLocation = PointF()
     }
 
     override fun handleMessage(msg: Message) {

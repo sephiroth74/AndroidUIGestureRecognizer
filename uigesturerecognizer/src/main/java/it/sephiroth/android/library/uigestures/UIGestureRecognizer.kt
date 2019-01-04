@@ -30,7 +30,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     private val mStateListeners = Collections.synchronizedList(ArrayList<OnGestureRecognizerStateChangeListener>())
 
     var actionListener: ((UIGestureRecognizer) -> Any?)? = null
-    var stateListener: ((UIGestureRecognizer) -> Unit)? = null
+    var stateListener: ((UIGestureRecognizer, State?, State?) -> Unit)? = null
 
     /**
      * @return The current recognizer internal state
@@ -40,11 +40,12 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         protected set(value) {
             logMessage(Log.INFO, "setState: ${value?.name} from ${this.state?.name}")
 
+            val old_value = field
             val changed = this.state != value || value == State.Changed
             field = value
 
             if (changed) {
-                stateListener?.invoke(this)
+                stateListener?.invoke(this, old_value, value)
                 val iterator = mStateListeners.listIterator()
                 while (iterator.hasNext()) {
                     iterator.next().onStateChanged(this)
@@ -71,7 +72,35 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     private var mBeganFiringEvents: Boolean = false
 
-    val mFocusPointF = PointF()
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val mDownLocation = PointF()
+
+    protected val mCurrentLocation = PointF()
+
+    /**
+     * @return Returns the X computed as the location of the original down event.
+     * @since 1.2.5
+     */
+    val downLocationX: Float get() = mDownLocation.x
+
+    /**
+     * @return Returns the Y computed as the location of the original down event.
+     * @since 1.2.5
+     */
+    val downLocationY: Float get() = mDownLocation.y
+
+    /**
+     * @return Returns the X computed as the location in a given view of the gesture represented by the receiver.
+     * @since 1.0.0
+     */
+    open val currentLocationX: Float get() = mCurrentLocation.x
+
+    /**
+     * @return Returns the Y computed as the location in a given view of the gesture represented by the receiver.
+     * @since 1.0.0
+     */
+    open val currentLocationY: Float get() = mCurrentLocation.y
+
 
     /**
      * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
@@ -117,23 +146,13 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     val context: Context?
         get() = mContextRef.get()
 
+    private var mNumberOfTouches: Int = 0
+
     /**
      * @return Returns the number of touches involved in the gesture represented by the receiver.
      * @since 1.0.0
      */
-    abstract val numberOfTouches: Int
-
-    /**
-     * @return Returns the X computed as the location in a given view of the gesture represented by the receiver.
-     * @since 1.0.0
-     */
-    abstract val currentLocationX: Float
-
-    /**
-     * @return Returns the Y computed as the location in a given view of the gesture represented by the receiver.
-     * @since 1.0.0
-     */
-    abstract val currentLocationY: Float
+    open val numberOfTouches: Int get() = mNumberOfTouches
 
     @Suppress("unused")
     protected val isListeningForOtherStateChanges: Boolean
@@ -229,9 +248,37 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     @SuppressLint("Recycle")
     open fun onTouchEvent(event: MotionEvent): Boolean {
         lastEvent = MotionEvent.obtain(event)
-        computeFocusPoint(event, mFocusPointF)
-        logMessage(Log.VERBOSE, "focusPoint: $mFocusPointF")
+
+        // action down
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) mDownLocation.set(event.x, event.y)
+
+        // compute current location
+        mNumberOfTouches = computeFocusPoint(event, mCurrentLocation)
+
+        logMessage(Log.VERBOSE, "focusPoint: $mCurrentLocation")
         return false
+    }
+
+    protected fun computeFocusPoint(event: MotionEvent, out: PointF): Int {
+        val actionMasked = event.actionMasked
+        val count = event.pointerCount
+        val pointerUp = actionMasked == MotionEvent.ACTION_POINTER_UP
+        val skipIndex = if (pointerUp) event.actionIndex else -1
+        // Determine focal point
+        var sumX = 0f
+        var sumY = 0f
+        for (i in 0 until count) {
+            if (skipIndex == i) {
+                continue
+            }
+            sumX += event.getX(i)
+            sumY += event.getY(i)
+        }
+
+        val div = if (pointerUp) count - 1 else count
+        out.x = sumX / div
+        out.y = sumY / div
+        return if (pointerUp) count - 1 else count
     }
 
     @Suppress("unused")
@@ -265,7 +312,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     }
 
     override fun toString(): String {
-        return javaClass.simpleName + "[state: " + state + ", tag:" + tag + "]"
+        return javaClass.simpleName + "[state: " + state + ", tag:" + tag + "], touches: $numberOfTouches"
     }
 
     protected fun logMessage(level: Int, fmt: String) {
@@ -304,28 +351,5 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             set(value) {
                 sDebug = value
             }
-
-        fun computeFocusPoint(event: MotionEvent, outPoint: PointF) {
-            val action = event.action
-            val count = event.pointerCount
-            val pointerUp = action == MotionEvent.ACTION_POINTER_UP
-            val skipIndex = if (pointerUp) event.actionIndex else -1
-
-            // Determine focal point
-            var sumX = 0f
-            var sumY = 0f
-            for (i in 0 until count) {
-                if (skipIndex == i) {
-                    continue
-                }
-                sumX += event.getX(i)
-                sumY += event.getY(i)
-            }
-
-            val div = if (pointerUp) count - 1 else count
-            outPoint.x = sumX / div
-            outPoint.y = sumY / div
-        }
-
     }
 }
