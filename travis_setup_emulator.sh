@@ -12,9 +12,11 @@ if [ "$TEST_TYPE" == "unit" ]; then
 elif [ "$TEST_TYPE" == "instrumentation" ]; then
   echo "Waiting for emulator setup..."
   android-wait-for-emulator
+  adb devices
   adb shell input keyevent 82 &
   # Avoid having it lock itself again.
   adb shell svc power stayon true
+  adb logcat | grep -F "`adb shell ps | grep it.sephiroth.android.library.uigestures.test | cut -c10-15`" &
 else
   echo "Unknown test type"
   exit 1
