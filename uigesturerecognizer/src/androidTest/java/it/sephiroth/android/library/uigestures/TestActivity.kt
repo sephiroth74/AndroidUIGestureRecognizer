@@ -13,7 +13,7 @@ import timber.log.Timber
 class TestActivity : AppCompatActivity() {
 
     val delegate: UIGestureRecognizerDelegate = UIGestureRecognizerDelegate()
-    val timeSpan = System.currentTimeMillis()
+    private val timeSpan = System.currentTimeMillis()
 
     private lateinit var mTitleView: TextView
     private lateinit var mTextView: TextView

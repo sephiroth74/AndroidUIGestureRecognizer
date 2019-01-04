@@ -47,7 +47,7 @@ install:
   - ./gradlew clean build assemble --stacktrace
 
 before_script:
-  - sdkmanager --update  
+  - sdkmanager --update
   - ./travis_before_script.sh
 
 script:

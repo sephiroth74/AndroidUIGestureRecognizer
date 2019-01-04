@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -11,6 +12,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestScreenEdgeGesture : TestBaseClass() {
 
     private lateinit var latch: CountDownLatch

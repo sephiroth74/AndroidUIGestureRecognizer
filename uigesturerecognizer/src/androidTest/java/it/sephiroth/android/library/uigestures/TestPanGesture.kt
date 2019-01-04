@@ -2,6 +2,7 @@ package it.sephiroth.android.library.uigestures
 
 import android.view.MotionEvent
 import androidx.test.core.view.PointerCoordsBuilder
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.Interaction.Companion.SWIPE_MARGIN_LIMIT
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert
@@ -13,6 +14,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestPanGesture : TestBaseClass() {
 
     @Test
@@ -82,12 +84,14 @@ class TestPanGesture : TestBaseClass() {
                     }
                 }
                 State.Ended -> latch.countDown()
+                else -> {
+                }
             }
         }
 
         delegate.addGestureRecognizer(recognizer)
 
-        var rect = mainView.visibleBounds
+        val rect = mainView.visibleBounds
         rect.inset(50, 50)
 
         val distance = rect.bottom - rect.top

@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.*
 import org.junit.Test
@@ -9,6 +10,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestPinchGesture : TestBaseClass() {
 
     @Test

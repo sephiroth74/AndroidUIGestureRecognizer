@@ -7,6 +7,7 @@ import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -16,6 +17,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestLongPressGesture : TestBaseClass() {
 
     @Test
@@ -61,7 +63,6 @@ class TestLongPressGesture : TestBaseClass() {
         assertEquals(0L, latchChanged.count)
         assertEquals(0L, latchEnd.count)
     }
-
 
     @Test
     fun test_2fingers_longPressWithMotion() {

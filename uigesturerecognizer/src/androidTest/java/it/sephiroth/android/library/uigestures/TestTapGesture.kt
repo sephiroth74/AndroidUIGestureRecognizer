@@ -6,8 +6,8 @@ import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,6 +15,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestTapGesture : TestBaseClass() {
 
     @Test
@@ -171,7 +172,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "single-tap"
         recognizer.actionListener = {
             activityTestRule.activity.actionListener.invoke(it)
-            Assert.fail("no action expected!")
+            fail("no action expected!")
             latch.countDown()
         }
 
