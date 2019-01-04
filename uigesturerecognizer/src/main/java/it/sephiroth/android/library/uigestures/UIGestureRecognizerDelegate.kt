@@ -110,6 +110,7 @@ class UIGestureRecognizerDelegate {
     fun onTouchEvent(view: View, event: MotionEvent): Boolean {
         if (!isEnabled) return false
         var handled = false
+
         for (recognizer in mSet) {
             handled = handled or recognizer.onTouchEvent(event)
         }

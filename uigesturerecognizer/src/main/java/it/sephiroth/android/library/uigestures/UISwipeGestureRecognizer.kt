@@ -306,7 +306,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                                 } else {
                                     val direction =
                                             getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, xVelocity, yVelocity, 0f)
-                                    logMessage(Log.VERBOSE, "time: ${event.eventTime - downTime} or ${event.eventTime - event.downTime}")
+                                    logMessage(Log.VERBOSE, "direction: $direction")
                                     if (direction == -1 || (this.direction and direction) == 0) {
                                         mStarted = false
                                         setBeginFiringEvents(false)
@@ -409,6 +409,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             x1: Float, y1: Float, x2: Float, y2: Float, velocityX: Float, velocityY: Float, distanceThreshold: Float): Int {
         val diffY = y2 - y1
         val diffX = x2 - x1
+        logMessage(Log.INFO, "getTouchDirection")
         logMessage(Log.VERBOSE, "diff: $diffX, $diffY, distanceThreshold: $distanceThreshold")
         logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, mMinimumFlingVelocity: $mMinimumFlingVelocity")
 

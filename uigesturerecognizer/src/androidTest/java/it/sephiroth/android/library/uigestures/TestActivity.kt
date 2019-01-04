@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import timber.log.Timber
 
 
 class TestActivity : AppCompatActivity() {
@@ -27,12 +28,19 @@ class TestActivity : AppCompatActivity() {
         mMainView.setOnTouchListener { view, motionEvent ->
             val time = System.currentTimeMillis() - timeSpan
             val currentText = mTextView2.text
-            mTextView2.text = ("${timeSpan} ms, action: ${actionToString(motionEvent.actionMasked)}")
+            mTextView2.text = ("$time ms, action: ${actionToString(motionEvent.actionMasked)}")
             mTextView2.append("\n")
             mTextView2.append(currentText)
 
+            Timber.d("[$this] mainView onTouchEvent")
             delegate.onTouchEvent(view, motionEvent)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        delegate.clear()
+        mMainView.setOnTouchListener(null)
     }
 
     override fun onContentChanged() {
@@ -50,18 +58,18 @@ class TestActivity : AppCompatActivity() {
     }
 
     private fun actionToString(action: Int): String {
-        when (action) {
-            MotionEvent.ACTION_DOWN -> return "ACTION_DOWN"
-            MotionEvent.ACTION_UP -> return "ACTION_UP"
-            MotionEvent.ACTION_CANCEL -> return "ACTION_CANCEL"
-            MotionEvent.ACTION_MOVE -> return "ACTION_MOVE"
-            MotionEvent.ACTION_POINTER_DOWN -> return "ACTION_POINTER_DOWN"
-            MotionEvent.ACTION_POINTER_UP -> return "ACTION_POINTER_UP"
-            else -> return "ACTION_OTHER"
+        return when (action) {
+            MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
+            MotionEvent.ACTION_UP -> "ACTION_UP"
+            MotionEvent.ACTION_CANCEL -> "ACTION_CANCEL"
+            MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
+            MotionEvent.ACTION_POINTER_DOWN -> "ACTION_POINTER_DOWN"
+            MotionEvent.ACTION_POINTER_UP -> "ACTION_POINTER_UP"
+            else -> "ACTION_OTHER"
         }
     }
 
-    val actionListener: Function1<UIGestureRecognizer, Unit> = fun(recognizer: UIGestureRecognizer): Unit {
+    val actionListener: Function1<UIGestureRecognizer, Unit> = fun(recognizer: UIGestureRecognizer) {
         Log.i(javaClass.simpleName, "onGestureRecognized: $recognizer")
         mTextView.text = "${recognizer.tag.toString()} : ${recognizer.state?.name}"
         Log.v(javaClass.simpleName, mTextView.text.toString())

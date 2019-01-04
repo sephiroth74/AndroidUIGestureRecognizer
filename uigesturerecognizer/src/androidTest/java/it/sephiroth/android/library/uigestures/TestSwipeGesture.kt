@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import androidx.test.filters.LargeTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -10,6 +11,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@LargeTest
 class TestSwipeGesture : TestBaseClass() {
 
     private lateinit var latch: CountDownLatch
@@ -21,7 +23,7 @@ class TestSwipeGesture : TestBaseClass() {
         latch.countDown()
     }
 
-    //    @Test
+    @Test
     fun testSwipeRight() {
         setTitle("Swipe Right")
 
@@ -41,7 +43,7 @@ class TestSwipeGesture : TestBaseClass() {
         assertEquals(0L, latch.count)
     }
 
-    //    @Test
+    @Test
     fun testSwipeLeft() {
         setTitle("Swipe Left")
         latch = CountDownLatch(1)
