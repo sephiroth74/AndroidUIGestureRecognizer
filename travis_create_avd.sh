@@ -15,7 +15,7 @@ android-update-sdk --components="sys-img-$ABI-$EMULATOR_TAG-$EMULATOR_API" --acc
 
 echo "Running sdkmanager"
 
-if [[ "EMULATOR_TAG" == "google_apis" ]]; then
+if [[ "$EMULATOR_TAG" = "google_apis" ]]; then
     EMULATOR_SYS="system-images;android-$EMULATOR_API;$EMULATOR_TAG;$ABI"
 else
     EMULATOR_SYS="system-images;$EMULATOR_TAG-$EMULATOR_API;default;$ABI"
