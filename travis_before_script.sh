@@ -9,7 +9,7 @@ echo "EMULATOR_TAG=$EMULATOR_TAG"
 echo "EMULATOR_API=$EMULATOR_API"
 echo "ABI=$ABI"
 
-if [ "$TEST_TYPE" == "instrumentation" ] ; then
+if [[ "$TEST_TYPE" == "instrumentation" ]] ; then
   echo "Starting AVD for API $EMULATOR_API"
   ./travis_create_avd.sh &
 else

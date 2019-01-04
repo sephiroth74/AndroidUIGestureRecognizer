@@ -12,7 +12,7 @@ env:
     # components.
     # These CANNOT BE USED in the android > components section, only in before_script and script.
     - TEST_TYPE=unit
-    - TEST_TYPE=instrumentation EMULATOR_TAG=android EMULATOR_API=22 ABI=armeabi-v7a
+    - TEST_TYPE=instrumentation EMULATOR_TAG=google_apis EMULATOR_API=25 ABI=armeabi-v7a
   global:
     # install timeout in minutes (2 minutes by default)
     - ADB_INSTALL_TIMEOUT=15
@@ -48,9 +48,9 @@ install:
 before_script:
   - sdkmanager --update
   - ./travis_before_script.sh
+  - ./travis_setup_emulator.sh
 
 script:
   - ./gradlew assemble -PdisablePreDex;
   - ./travis_run_unit_tests.sh
-  - travis_wait ./travis_setup_emulator.sh
   - ./travis_run_instrumentation_tests.sh
