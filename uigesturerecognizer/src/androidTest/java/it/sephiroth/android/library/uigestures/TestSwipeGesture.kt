@@ -101,6 +101,26 @@ class TestSwipeGesture : TestBaseClass() {
     }
 
     @Test
+    fun testSwipeLeft2Fingers() {
+        setTitle("Swipe Left 2 Fingers")
+        latch = CountDownLatch(1)
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UISwipeGestureRecognizer(context)
+        recognizer.numberOfTouchesRequired = 2
+        recognizer.tag = "swipe-left2"
+        recognizer.direction = UISwipeGestureRecognizer.LEFT
+        recognizer.actionListener = actionListener
+        delegate.addGestureRecognizer(recognizer)
+
+        interaction.swipeLeftMultiTouch(mainView, 10, 2)
+
+        latch.await(10, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
+
+    @Test
     fun testFailSwipe() {
         setTitle("Fail Swipe")
         val latch = CountDownLatch(1)

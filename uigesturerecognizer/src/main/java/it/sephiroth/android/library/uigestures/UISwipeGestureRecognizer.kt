@@ -212,6 +212,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             MotionEvent.ACTION_POINTER_DOWN -> {
                 mLastFocusX = focusX
                 mLastFocusY = focusY
+                mDownFocusX = focusX
+                mDownFocusY = focusY
 
                 if (state === UIGestureRecognizer.State.Possible && !mStarted) {
                     if (count > numberOfTouchesRequired) {
@@ -224,6 +226,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             MotionEvent.ACTION_POINTER_UP -> {
                 mLastFocusX = focusX
                 mLastFocusY = focusY
+                mDownFocusX = focusX
+                mDownFocusY = focusY
 
                 mVelocityTracker!!.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
@@ -262,8 +266,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     mDown = true
 
                     mLastFocusX = focusX
-                    mDownFocusX = mLastFocusX
                     mLastFocusY = focusY
+                    mDownFocusX = mLastFocusX
                     mDownFocusY = mLastFocusY
                     downTime = event.eventTime
 

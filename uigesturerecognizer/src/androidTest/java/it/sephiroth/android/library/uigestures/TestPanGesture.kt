@@ -102,7 +102,7 @@ class TestPanGesture : TestBaseClass() {
                              ))
         }
 
-        interaction.performMultiPointerGesture(array.toTypedArray())
+        interaction.performMultiPointerGesture(array.toTypedArray(), 500)
         latch.await(10, TimeUnit.SECONDS)
         Assert.assertEquals(0L, latch.count)
     }

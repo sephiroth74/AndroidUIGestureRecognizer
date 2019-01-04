@@ -125,7 +125,7 @@ class TestLongPressGesture : TestBaseClass() {
                         .build()))
         }
 
-        interaction.performMultiPointerGesture(array.toTypedArray())
+        interaction.performMultiPointerGesture(array.toTypedArray(), 1000L)
 
         latchBegan.await(10, TimeUnit.SECONDS)
         latchChanged.await(10, TimeUnit.SECONDS)

@@ -1,6 +1,7 @@
 package it.sephiroth.android.library.uigestures
 
 import android.app.UiAutomation
+import android.graphics.Point
 import android.graphics.PointF
 import android.os.SystemClock
 import android.util.Log
@@ -14,7 +15,10 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.Configurator
+import androidx.test.uiautomator.Tracer
 import androidx.test.uiautomator.UiObject
+import androidx.test.uiautomator.UiObjectNotFoundException
+import timber.log.Timber
 import java.util.concurrent.TimeoutException
 import kotlin.math.min
 
@@ -63,6 +67,59 @@ class Interaction {
 
         return runAndWaitForEvents(longTapRunnable(x, y), WaitForAnyEventPredicate(
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or AccessibilityEvent.TYPE_VIEW_SELECTED), timeout) != null
+    }
+
+    @Throws(UiObjectNotFoundException::class)
+    fun swipeLeftMultiTouch(view: UiObject, steps: Int, fingers: Int = 1): Boolean {
+
+        if (steps < 2)
+            throw RuntimeException("at least 2 steps required")
+
+        if (fingers < 2)
+            throw RuntimeException("at least 2 fingers required")
+
+        Tracer.trace(steps)
+        Tracer.trace(fingers)
+
+        val rect = view.visibleBounds
+        rect.inset(SWIPE_MARGIN_LIMIT, SWIPE_MARGIN_LIMIT)
+
+        Timber.v("visibleBounds: $rect")
+
+        if (rect.width() <= SWIPE_MARGIN_LIMIT * 2) return false
+
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+        var pointArray = Array(fingers, init = { PointerCoords() })
+
+        val height = rect.height() / 2
+        val stepHeight = height / (fingers - 1)
+        val top = rect.top + (rect.height() - height) / 2
+        val width = rect.width()
+        val startPoint = Point(rect.right, top)
+
+        for (i in 0 until fingers) {
+            pointArray[i] =
+                    PointerCoordsBuilder.newBuilder()
+                        .setCoords(startPoint.x.toFloat(), startPoint.y + (stepHeight * i).toFloat())
+                        .setSize(1f)
+                        .build()
+        }
+
+        array.add(pointArray)
+
+        for (step in 1 until steps) {
+            pointArray = Array(fingers, init = { PointerCoords() })
+            for (i in 0 until fingers) {
+                pointArray[i] =
+                        PointerCoordsBuilder.newBuilder()
+                            .setCoords(startPoint.x.toFloat() - (width / steps) * step, startPoint.y + (stepHeight * i).toFloat())
+                            .setSize(1f)
+                            .build()
+            }
+            array.add(pointArray)
+        }
+
+        return performMultiPointerGesture(array.toTypedArray())
     }
 
     fun swipe(downX: Int, downY: Int, upX: Int, upY: Int, steps: Int, drag: Boolean = false,
@@ -150,18 +207,14 @@ class Interaction {
         return performMultiPointerGesture(array.toTypedArray())
     }
 
-    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>): Boolean {
+    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>, sleepBeforeMove: Long = 5): Boolean {
         Log.i(LOG_TAG, "performMultiPointerGesture, size: ${touches.size}")
         var ret = true
-//        if (touches.size < 2) {
-//            throw IllegalArgumentException("Must provide coordinates for at least 2 pointers")
-//        }
 
         // Get the pointer with the max steps to inject.
         val maxSteps = touches.size - 1
 
         Log.i(LOG_TAG, "ACTION_DOWN")
-
 
         // ACTION_DOWN
         var currentPointer = touches[0][0]
@@ -197,8 +250,7 @@ class Interaction {
 
         // ACTION_MOVE
         if (maxSteps > 1) {
-
-            SystemClock.sleep(1000)
+            SystemClock.sleep(sleepBeforeMove)
 
             // specify the properties for each pointer as finger touch
             for (step in 1..maxSteps) {
