@@ -3,6 +3,7 @@ package it.sephiroth.android.library.uigestures
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
+import android.graphics.PointF
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -10,7 +11,6 @@ import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -71,6 +71,8 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     private var mBeganFiringEvents: Boolean = false
 
+    val mFocusPointF = PointF()
+
     /**
      * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
      * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview'>cancelstouchesinview</a>
@@ -79,7 +81,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var cancelsTouchesInView: Boolean = false
 
-    var delegate: UIGestureRecognizerDelegate? = null
+    internal var delegate: UIGestureRecognizerDelegate? = null
 
     /**
      * custom object the instance should keep
@@ -110,8 +112,6 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         }
 
     private val mContextRef: WeakReference<Context>
-    private val logger = Timber.asTree()
-
     protected val mHandler: GestureHandler
 
     val context: Context?
@@ -226,8 +226,11 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return mStateListeners.contains(listener)
     }
 
+    @SuppressLint("Recycle")
     open fun onTouchEvent(event: MotionEvent): Boolean {
         lastEvent = MotionEvent.obtain(event)
+        computeFocusPoint(event, mFocusPointF)
+        logMessage(Log.VERBOSE, "focusPoint: $mFocusPointF")
         return false
     }
 
@@ -265,11 +268,11 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         return javaClass.simpleName + "[state: " + state + ", tag:" + tag + "]"
     }
 
-    protected fun logMessage(level: Int, fmt: String, vararg args: Any) {
+    protected fun logMessage(level: Int, fmt: String) {
         if (!sDebug) {
             return
         }
-        logger.log(level, fmt, args)
+        Log.println(level, LOG_TAG, "[${javaClass.simpleName}] $fmt")
     }
 
     @Suppress("unused")
@@ -277,12 +280,16 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     companion object {
 
         const val VERSION = BuildConfig.VERSION_NAME
+
+        val LOG_TAG = UIGestureRecognizer::class.java.simpleName
+
         /**
          * @return the instance id
          * @since 1.0.0
          */
         var id = 0
             private set
+
         protected var sDebug = false
 
         val LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout().toLong()
@@ -297,6 +304,28 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             set(value) {
                 sDebug = value
             }
+
+        fun computeFocusPoint(event: MotionEvent, outPoint: PointF) {
+            val action = event.action
+            val count = event.pointerCount
+            val pointerUp = action == MotionEvent.ACTION_POINTER_UP
+            val skipIndex = if (pointerUp) event.actionIndex else -1
+
+            // Determine focal point
+            var sumX = 0f
+            var sumY = 0f
+            for (i in 0 until count) {
+                if (skipIndex == i) {
+                    continue
+                }
+                sumX += event.getX(i)
+                sumY += event.getY(i)
+            }
+
+            val div = if (pointerUp) count - 1 else count
+            outPoint.x = sumX / div
+            outPoint.y = sumY / div
+        }
 
     }
 }

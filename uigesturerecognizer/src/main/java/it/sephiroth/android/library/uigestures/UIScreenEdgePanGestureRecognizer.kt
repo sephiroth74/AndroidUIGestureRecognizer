@@ -124,8 +124,8 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(%s, %s)", recognizer, recognizer.state?.name!!)
-        logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, state?.name!!)
+        logMessage(Log.VERBOSE, "onStateChanged($recognizer, ${recognizer.state?.name})")
+        logMessage(Log.VERBOSE, "started: $mStarted, state: ${state?.name}")
 
         if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
             stopListenForOtherStateChanges()

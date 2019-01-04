@@ -159,10 +159,8 @@ task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn:
 
 
 dependencies {
-    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'androidx.annotation:annotation:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
 
     testImplementation 'androidx.test:core:1.1.0'
     testImplementation 'androidx.test:runner:1.1.1'
@@ -171,6 +169,9 @@ dependencies {
     testImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     testImplementation 'org.robolectric:robolectric:4.1'
 
+    androidTestImplementation('com.jakewharton.timber:timber:4.7.1') {
+        exclude group:'org.jetbrains', module:'annotations'
+    }
     androidTestImplementation 'androidx.appcompat:appcompat:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.1'

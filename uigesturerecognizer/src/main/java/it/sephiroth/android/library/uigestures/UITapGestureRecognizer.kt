@@ -71,9 +71,11 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         mTouchSlopSquare = touchSlop * touchSlop
         mDoubleTapTouchSlopSquare = doubleTapTouchSlop * doubleTapTouchSlop
 
-        logMessage(Log.INFO, "tapTimeout: $tapTimeout")
-        logMessage(Log.INFO, "touchSlopSquare: $mTouchSlopSquare")
-        logMessage(Log.INFO, "doubleTapTouchSlopSquare: $mDoubleTapTouchSlopSquare")
+        if (logEnabled) {
+            logMessage(Log.INFO, "tapTimeout: $tapTimeout")
+            logMessage(Log.INFO, "touchSlopSquare: $mTouchSlopSquare")
+            logMessage(Log.INFO, "doubleTapTouchSlopSquare: $mDoubleTapTouchSlopSquare")
+        }
     }
 
     override fun handleMessage(msg: Message) {
@@ -132,25 +134,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         val action = event.action
         val count = event.pointerCount
 
-        val pointerUp = action == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
-
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-
-        mCurrentLocation.set(focusX, focusY)
+        mCurrentLocation.set(mFocusPointF)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
@@ -175,12 +159,11 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, tapTimeout)
 
                 mNumTaps++
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusX = mFocusPointF.x
+                mDownFocusY = mFocusPointF.y
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
-                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_POINTER_UP)
 
                 numberOfTouches = count
@@ -190,16 +173,15 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                         state = UIGestureRecognizer.State.Failed
                     }
                 }
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusX = mFocusPointF.x
+                mDownFocusY = mFocusPointF.y
             }
 
             MotionEvent.ACTION_POINTER_UP -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
-                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP)
 
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusX = mFocusPointF.x
+                mDownFocusY = mFocusPointF.y
 
                 val message = mHandler.obtainMessage(MESSAGE_POINTER_UP)
                 message.arg1 = numberOfTouches - 1
@@ -207,10 +189,9 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_MOVE -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
-                mCurrentLocation.set(focusX, focusY)
                 if (mAlwaysInTapRegion) {
-                    val deltaX = (focusX - mDownFocusX).toInt()
-                    val deltaY = (focusY - mDownFocusY).toInt()
+                    val deltaX = (mFocusPointF.x - mDownFocusX).toInt()
+                    val deltaY = (mFocusPointF.y - mDownFocusY).toInt()
                     val distance = deltaX * deltaX + deltaY * deltaY
 
                     val slop = if (tapsRequired > 1) mDoubleTapTouchSlopSquare else mTouchSlopSquare
@@ -224,7 +205,6 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             }
 
             MotionEvent.ACTION_UP -> {
-                mCurrentLocation.set(focusX, focusY)
                 removeMessages(MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
 
                 if (state === UIGestureRecognizer.State.Possible && mStarted) {
@@ -332,7 +312,5 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         private const val MESSAGE_POINTER_UP = 3
         // a long press will make this gesture to fail
         private const val MESSAGE_LONG_PRESS = 4
-
-        private val TAG = UITapGestureRecognizer::class.java.simpleName
     }
 }

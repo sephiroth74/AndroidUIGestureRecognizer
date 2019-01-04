@@ -23,16 +23,16 @@ fi
 
 echo "Emulator system image: $EMULATOR_SYS"
 
-$ANDROID_HOME/tools/bin/sdkmanager "$EMULATOR_SYS"
+${ANDROID_HOME}/tools/bin/sdkmanager "$EMULATOR_SYS"
 
 echo "Running android list target"
 android list target
 # echo no | android create avd --force -n test -k $EMULATOR_TAG-$EMULATOR_API --abi $ABI --skin QVGA
 
 echo "Creating the emulator"
-echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n test -k "$EMULATOR_SYS" -d pixel
+echo no | ${ANDROID_HOME}/tools/bin/avdmanager create avd --force -n test -k "$EMULATOR_SYS" -d pixel
 
 echo "Starting the emulator"
-$ANDROID_HOME/emulator/emulator -avd test -no-audio -netfast -no-window &
+${ANDROID_HOME}/emulator/emulator -avd test -no-audio -netfast -no-window &
 
 exit 0
