@@ -9,18 +9,21 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.*
+import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import timber.log.Timber
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SmallTest
 class TestTapGesture : TestBaseClass() {
 
     @Test
-    fun testTap() {
+    fun test01Tap() {
         setTitle("Tap")
         val latch = CountDownLatch(1)
 
@@ -31,6 +34,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
 
         recognizer.actionListener = { it ->
             activity.actionListener.invoke(it)
@@ -50,7 +54,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapNotEnabled() {
+    fun test02TapNotEnabled() {
         setTitle("Tap Disabled")
         delegate.clear()
 
@@ -59,6 +63,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
 
         recognizer.actionListener = { it ->
             activity.actionListener.invoke(it)
@@ -77,7 +82,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapDelegateNotEnabled() {
+    fun test03TapDelegateNotEnabled() {
         setTitle("Delegate Disabled")
 
         delegate.clear()
@@ -87,6 +92,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
 
         recognizer.actionListener = { it ->
             activity.actionListener.invoke(it)
@@ -105,12 +111,13 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testSingleTapFailUsing2Fingers() {
+    fun test04SingleTapFailUsing2Fingers() {
         setTitle("Tap")
         delegate.clear()
 
         val latch = CountDownLatch(1)
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 2
@@ -128,7 +135,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapMultiple() {
+    fun test05TapMultiple() {
         setTitle("Tap Tap")
         val latch = CountDownLatch(1)
 
@@ -136,9 +143,11 @@ class TestTapGesture : TestBaseClass() {
         assertEquals(0, delegate.size())
 
         val recognizer1 = UITapGestureRecognizer(context)
+        recognizer1.tapTimeout = TEST_TAP_TIMEOUT
         recognizer1.tag = "tap-1"
 
         val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tapTimeout = TEST_TAP_TIMEOUT
         recognizer2.tag = "tap-2"
 
         recognizer1.actionListener = { it ->
@@ -167,7 +176,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapMultiple2() {
+    fun test06TapMultiple2() {
         setTitle("Tap Tap")
         val latch = CountDownLatch(2)
 
@@ -175,9 +184,11 @@ class TestTapGesture : TestBaseClass() {
         assertEquals(0, delegate.size())
 
         val recognizer1 = UITapGestureRecognizer(context)
+        recognizer1.tapTimeout = TEST_TAP_TIMEOUT
         recognizer1.tag = "tap-1"
 
         val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tapTimeout = TEST_TAP_TIMEOUT
         recognizer2.tag = "tap-2"
 
         recognizer1.actionListener = { it ->
@@ -203,12 +214,13 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testSingleTapFailShouldNotBegin() {
+    fun test07SingleTapFailShouldNotBegin() {
         setTitle("Tap")
         delegate.clear()
 
         val latch = CountDownLatch(1)
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
@@ -229,7 +241,7 @@ class TestTapGesture : TestBaseClass() {
 
 
     @Test
-    fun testSingleTapFailShouldNotReceiveTouch() {
+    fun test08SingleTapFailShouldNotReceiveTouch() {
         setTitle("Tap")
         delegate.clear()
 
@@ -254,7 +266,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testDoubleTap() {
+    fun test09DoubleTap() {
         setTitle("Double Tap")
         val latch = CountDownLatch(1)
 
@@ -263,6 +275,7 @@ class TestTapGesture : TestBaseClass() {
 
         val recognizer = UITapGestureRecognizer(context)
         recognizer.tag = "double-tap"
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tapsRequired = 2
         recognizer.touchesRequired = 1
 
@@ -284,7 +297,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testDoubleTapTooLong() {
+    fun test10DoubleTapTooLong() {
         setTitle("Double Tap")
         val latch = CountDownLatch(1)
 
@@ -312,7 +325,7 @@ class TestTapGesture : TestBaseClass() {
         interaction.touchDown(bounds.centerX(), bounds.centerY())
         SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
         interaction.touchUp(bounds.centerX(), bounds.centerY())
-        SystemClock.sleep(recognizer.doubleTapTimeout)
+        SystemClock.sleep(recognizer.doubleTapTimeout * 2)
 
         interaction.touchDown(bounds.centerX(), bounds.centerY())
         SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
@@ -323,7 +336,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapCoordinates() {
+    fun test11TapCoordinates() {
         setTitle("Tap")
         val latch = CountDownLatch(1)
 
@@ -334,6 +347,7 @@ class TestTapGesture : TestBaseClass() {
 
         val recognizer = UITapGestureRecognizer(context)
         recognizer.tag = "tap"
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
 
@@ -358,7 +372,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapTooLong() {
+    fun test12TapTooLong() {
         setTitle("Tap Fail")
         val latch = CountDownLatch(1)
         delegate.clear()
@@ -366,6 +380,7 @@ class TestTapGesture : TestBaseClass() {
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
 
         recognizer.actionListener = { it ->
             activity.actionListener.invoke(it)
@@ -379,16 +394,18 @@ class TestTapGesture : TestBaseClass() {
 
         val bounds = mainView.visibleBounds
         interaction.clickNoSync(bounds.centerX(), bounds.centerY(), recognizer.tapTimeout * 2)
+
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(1, latch.count)
     }
 
     @Test
-    fun testTapMovedShouldFail() {
+    fun test13TapMovedShouldFail() {
         setTitle("Tap Fail Move")
         val latch = CountDownLatch(1)
         delegate.clear()
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
@@ -422,11 +439,12 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testTapMovedAccepted() {
+    fun test14TapMovedAccepted() {
         setTitle("Tap Fail Move")
         val latch = CountDownLatch(1)
         delegate.clear()
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
@@ -461,7 +479,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testSingleTap2Fingers() {
+    fun test15SingleTap2Fingers() {
         setTitle("Single Tap 2 fingers")
 
         delegate.clear()
@@ -469,6 +487,7 @@ class TestTapGesture : TestBaseClass() {
         val latch = CountDownLatch(1)
         val bounds = mainView.visibleBounds
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.touchesRequired = 2
         recognizer.tapsRequired = 1
@@ -501,7 +520,7 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testSingleTap2FingersShouldFaild() {
+    fun test16SingleTap2FingersShouldFaild() {
         setTitle("Single Tap 2 fingers")
 
         delegate.clear()
@@ -509,6 +528,7 @@ class TestTapGesture : TestBaseClass() {
         val latch = CountDownLatch(1)
         val bounds = mainView.visibleBounds
         val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
         recognizer.tag = "tap"
         recognizer.touchesRequired = 1
         recognizer.tapsRequired = 1
@@ -541,17 +561,19 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
-    fun testRequireFailure() {
+    fun test17RequireFailure() {
         setTitle("Tap Failure")
         val latch = CountDownLatch(1)
 
         delegate.clear()
 
         val recognizer1 = UITapGestureRecognizer(context)
+        recognizer1.tapTimeout = TEST_TAP_TIMEOUT
         recognizer1.tag = "tap-1"
         recognizer1.tapsRequired = 2
 
         val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tapTimeout = TEST_TAP_TIMEOUT
         recognizer2.tag = "tap-2"
         recognizer2.tapsRequired = 1
 

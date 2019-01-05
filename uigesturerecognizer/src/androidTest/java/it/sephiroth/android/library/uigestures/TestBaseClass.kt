@@ -6,6 +6,7 @@ import android.content.Context.POWER_SERVICE
 import android.graphics.Point
 import android.os.PowerManager
 import android.os.PowerManager.*
+import android.view.ViewConfiguration
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.*
@@ -80,6 +81,7 @@ open class TestBaseClass {
 
     companion object {
         internal val PACKAGE_NAME = "${TestBaseClass.javaClass.`package`.name}.test"
+        internal val TEST_TAP_TIMEOUT = (ViewConfiguration.getTapTimeout() * 2).toLong()
         internal const val LAUNCH_TIMEOUT = 5000
         internal const val TAG = "TestBaseClass"
     }
