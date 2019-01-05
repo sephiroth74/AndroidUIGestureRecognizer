@@ -75,10 +75,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var xVelocity: Float = 0.toFloat()
         private set
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    var downTime: Long = 0
-        private set
-
     private var mDown: Boolean = false
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -266,7 +262,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     mLastFocusY = focusY
                     mDownFocusX = mLastFocusX
                     mDownFocusY = mLastFocusY
-                    downTime = event.eventTime
 
                     mVelocityTracker!!.clear()
 

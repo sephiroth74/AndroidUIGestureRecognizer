@@ -17,6 +17,7 @@ import timber.log.Timber
 open class TestBaseClass {
 
     lateinit var instrumentation: Instrumentation
+    lateinit var activity: TestActivity
     lateinit var context: Context
     lateinit var device: UiDevice
     lateinit var wakeLock: PowerManager.WakeLock
@@ -65,6 +66,7 @@ open class TestBaseClass {
 
         interaction = Interaction()
 
+        activity = activityTestRule.activity
         delegate = activityTestRule.activity.delegate
 
         Timber.plant(Timber.DebugTree())

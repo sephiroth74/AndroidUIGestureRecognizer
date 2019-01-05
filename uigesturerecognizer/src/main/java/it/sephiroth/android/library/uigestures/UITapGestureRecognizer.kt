@@ -6,6 +6,7 @@ import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import kotlin.math.sqrt
 
 /**
  * UITapGestureRecognizer looks for single or multiple taps.
@@ -17,8 +18,6 @@ import android.view.ViewConfiguration
  */
 @Suppress("MemberVisibilityCanBePrivate")
 open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
-
-    private val mDoubleTapTouchSlopSquare: Int
 
     /**
      * Change the number of required touches for this recognizer to succeed.<br></br>
@@ -43,31 +42,39 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
     var doubleTapTimeout: Long = DOUBLE_TAP_TIMEOUT
 
+
     private var mAlwaysInTapRegion: Boolean = false
     private var mDownFocus = PointF()
     private val mTouchSlopSquare: Int
+    private val mDoubleTapTouchSlopSquare: Int
     private var mStarted: Boolean = false
-
     private var mNumTaps = 0
 
     init {
         mStarted = false
-
-        val touchSlop: Int
-        val doubleTapTouchSlop: Int = UIGestureRecognizer.DOUBLE_TAP_TOUCH_SLOP
-
         val configuration = ViewConfiguration.get(context)
-        touchSlop = configuration.scaledTouchSlop
+        val touchSlop: Int = configuration.scaledTouchSlop
+        val doubleTapTouchSlop: Int = configuration.scaledDoubleTapSlop
 
-        mTouchSlopSquare = touchSlop * touchSlop
-        mDoubleTapTouchSlopSquare = doubleTapTouchSlop * doubleTapTouchSlop
+        logMessage(Log.INFO, "touchSlop: $touchSlop")
+        logMessage(Log.INFO, "doubleTapTouchSlop: $doubleTapTouchSlop")
+
+        mTouchSlopSquare = touchSlop
+        mDoubleTapTouchSlopSquare = doubleTapTouchSlop
 
         if (logEnabled) {
             logMessage(Log.INFO, "tapTimeout: $tapTimeout")
+            logMessage(Log.INFO, "doubleTapTimeout: $doubleTapTimeout")
             logMessage(Log.INFO, "touchSlopSquare: $mTouchSlopSquare")
             logMessage(Log.INFO, "doubleTapTouchSlopSquare: $mDoubleTapTouchSlopSquare")
+            logMessage(Log.INFO, "touchSlop: $touchSlop")
         }
     }
+
+    /**
+     * Returns the maximum movement allowed before the recognizer fails
+     */
+    val touchSlop: Int get() = if (tapsRequired > 1) mDoubleTapTouchSlopSquare else mTouchSlopSquare
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
@@ -102,14 +109,14 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             logMessage(Log.VERBOSE, "mStarted: $mStarted")
         }
 
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Ended) {
+        if (recognizer.state === State.Failed && state === State.Ended) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
             postReset()
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && mStarted && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Ended)) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
             mStarted = false
         }
     }
@@ -134,7 +141,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mAlwaysInTapRegion = true
                 numberOfTouches = count
 
-                state = UIGestureRecognizer.State.Possible
+                state = State.Possible
                 setBeginFiringEvents(false)
 
                 if (!mStarted) {
@@ -143,26 +150,27 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     mStarted = true
                 }
 
-                mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, tapTimeout)
+                mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, tapTimeout + TIMEOUT_DELAY_MILLIS)
 
                 mNumTaps++
                 mDownFocus.set(mCurrentLocation)
             }
 
-            MotionEvent.ACTION_POINTER_DOWN -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_POINTER_DOWN -> if (state == State.Possible && mStarted) {
                 removeMessages(MESSAGE_POINTER_UP)
                 numberOfTouches = count
 
                 if (numberOfTouches > 1) {
                     if (numberOfTouches > touchesRequired) {
                         logMessage(Log.WARN, "too many touches: $numberOfTouches > $touchesRequired")
-                        state = UIGestureRecognizer.State.Failed
+                        state = State.Failed
                     }
                 }
+
                 mDownFocus.set(mCurrentLocation)
             }
 
-            MotionEvent.ACTION_POINTER_UP -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_POINTER_UP -> if (state == State.Possible && mStarted) {
                 removeMessages(MESSAGE_FAILED, MESSAGE_RESET, MESSAGE_POINTER_UP)
                 mDownFocus.set(mCurrentLocation)
 
@@ -171,21 +179,18 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 mHandler.sendMessageDelayed(message, UIGestureRecognizer.TAP_TIMEOUT)
             }
 
-            MotionEvent.ACTION_MOVE -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_MOVE -> if (state == State.Possible && mStarted) {
                 if (mAlwaysInTapRegion) {
-                    val deltaX = (mCurrentLocation.x - mDownFocus.x).toInt()
-                    val deltaY = (mCurrentLocation.y - mDownFocus.y).toInt()
-                    val distance = deltaX * deltaX + deltaY * deltaY
+                    val distance = sqrt((mCurrentLocation.y - mDownFocus.y) * (mCurrentLocation.y - mDownFocus.y) +
+                            (mCurrentLocation.x - mDownFocus.x) * (mCurrentLocation.x - mDownFocus.x))
 
-                    val slop = if (tapsRequired > 1) mDoubleTapTouchSlopSquare else mTouchSlopSquare
+                    logMessage(Log.VERBOSE, "distance: $distance, slop: $touchSlop")
 
-                    logMessage(Log.VERBOSE, "distance: $distance, slop: $slop")
-
-                    if (distance > slop) {
-                        logMessage(Log.WARN, "moved!")
+                    if (distance > touchSlop) {
+                        logMessage(Log.WARN, "moved too much")
                         mAlwaysInTapRegion = false
                         removeMessages()
-                        state = UIGestureRecognizer.State.Failed
+                        state = State.Failed
                     }
                 }
             }
@@ -193,7 +198,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             MotionEvent.ACTION_UP -> {
                 removeMessages(MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
 
-                if (state === UIGestureRecognizer.State.Possible && mStarted) {
+                if (state == State.Possible && mStarted) {
                     if (numberOfTouches != touchesRequired) {
                         logMessage(Log.WARN, "number touches not correct: $numberOfTouches != $touchesRequired")
                         handleFailed()
@@ -203,26 +208,26 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                         } else {
                             // nailed!
                             if (delegate?.shouldBegin?.invoke(this)!!) {
-                                state = UIGestureRecognizer.State.Ended
+                                state = State.Ended
 
                                 if (null == requireFailureOf) {
                                     fireActionEventIfCanRecognizeSimultaneously()
                                     postReset()
                                 } else {
                                     when {
-                                        requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> {
+                                        requireFailureOf!!.state === State.Failed -> {
                                             fireActionEventIfCanRecognizeSimultaneously()
                                             postReset()
                                         }
-                                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
-                                                UIGestureRecognizer.State.Failed
+                                        requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> state =
+                                                State.Failed
                                         else -> {
                                             listenForOtherStateChanges()
                                         }
                                     }
                                 }
                             } else {
-                                state = UIGestureRecognizer.State.Failed
+                                state = State.Failed
                             }
                             mStarted = false
                         }
@@ -235,7 +240,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             MotionEvent.ACTION_CANCEL -> {
                 removeMessages()
                 mStarted = false
-                state = UIGestureRecognizer.State.Cancelled
+                state = State.Cancelled
                 setBeginFiringEvents(false)
                 postReset()
             }
@@ -254,7 +259,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Ended)
+        return super.hasBeganFiringEvents() && inState(State.Ended)
     }
 
     override fun removeMessages() {
@@ -270,14 +275,14 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     }
 
     private fun handleFailed() {
-        state = UIGestureRecognizer.State.Failed
+        state = State.Failed
         setBeginFiringEvents(false)
         removeMessages()
         mStarted = false
     }
 
     private fun handleReset() {
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
         setBeginFiringEvents(false)
         mStarted = false
     }

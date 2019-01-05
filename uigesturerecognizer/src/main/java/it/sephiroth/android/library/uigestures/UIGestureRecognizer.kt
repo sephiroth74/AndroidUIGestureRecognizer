@@ -25,11 +25,41 @@ import java.util.*
  * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer'>uigesturerecognizer</a>
  */
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateChangeListener {
 
     private val mStateListeners = Collections.synchronizedList(ArrayList<OnGestureRecognizerStateChangeListener>())
 
+    private var mBeganFiringEvents: Boolean = false
+
+    private val mContextRef: WeakReference<Context> = WeakReference(context)
+
+    private var mNumberOfTouches: Int = 0
+
+    // original ACTION_DOWN location
+    protected val mDownLocation = PointF()
+
+    // original ACTION_DOWN time
+    protected var mDownTime: Long = 0L
+
+    // current event x,y location
+    protected val mCurrentLocation = PointF()
+
+    protected val mHandler: GestureHandler = GestureHandler(Looper.getMainLooper())
+
+    protected val isListeningForOtherStateChanges: Boolean get() = null != requireFailureOf && requireFailureOf!!.hasOnStateChangeListenerListener(this)
+
+    internal var delegate: UIGestureRecognizerDelegate? = null
+
+    /**
+     * UIGestureRecognizer callback
+     */
     var actionListener: ((UIGestureRecognizer) -> Any?)? = null
+
+    /**
+     * UIGestureRecognizer's state change callback
+     * @since 1.2.5
+     */
     var stateListener: ((UIGestureRecognizer, State?, State?) -> Unit)? = null
 
     /**
@@ -38,14 +68,14 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var state: State? = null
         protected set(value) {
-            logMessage(Log.INFO, "setState: ${value?.name} from ${this.state?.name}")
+            logMessage(Log.INFO, "setState: ${this.state?.name} --> ${value?.name}")
 
-            val old_value = field
+            val oldValue = field
             val changed = this.state != value || value == State.Changed
             field = value
 
             if (changed) {
-                stateListener?.invoke(this, old_value, value)
+                stateListener?.invoke(this, oldValue, value)
                 val iterator = mStateListeners.listIterator()
                 while (iterator.hasNext()) {
                     iterator.next().onStateChanged(this)
@@ -60,7 +90,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * to be intercepted by this recognizer
      * @since 1.0.0
      */
-    var isEnabled: Boolean = false
+    var isEnabled: Boolean = true
         set(value) {
             if (field != value) {
                 field = value
@@ -70,12 +100,11 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             }
         }
 
-    private var mBeganFiringEvents: Boolean = false
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val mDownLocation = PointF()
-
-    protected val mCurrentLocation = PointF()
+    /**
+     * Returns the time (in ms) when the user originally pressed down to start a stream of position events
+     * @since 1.2.5
+     */
+    val downTime: Long get() = mDownTime
 
     /**
      * @return Returns the X computed as the location of the original down event.
@@ -101,16 +130,13 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     open val currentLocationY: Float get() = mCurrentLocation.y
 
-
     /**
      * A Boolean value affecting whether touches are delivered to a view when a gesture is recognized
      * @see <a href='https://developer.apple.com/reference/uikit/uigesturerecognizer/1624218-cancelstouchesinview'>cancelstouchesinview</a>
      *
      * @since 1.0.0
      */
-    var cancelsTouchesInView: Boolean = false
-
-    internal var delegate: UIGestureRecognizerDelegate? = null
+    var cancelsTouchesInView: Boolean = true
 
     /**
      * custom object the instance should keep
@@ -118,7 +144,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      */
     var tag: Any? = null
 
-    var id: Long = 0
+    var id: Long = generateId()
         protected set
 
     /**
@@ -133,30 +159,23 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             field = other
         }
 
-
+    /**
+     * Returns the last recorded event
+     * @since 1.0.0
+     */
     var lastEvent: MotionEvent? = null
         protected set(mLastEvent) {
             mLastEvent?.recycle()
             field = mLastEvent
         }
 
-    private val mContextRef: WeakReference<Context>
-    protected val mHandler: GestureHandler
-
-    val context: Context?
-        get() = mContextRef.get()
-
-    private var mNumberOfTouches: Int = 0
+    val context: Context? get() = mContextRef.get()
 
     /**
      * @return Returns the number of touches involved in the gesture represented by the receiver.
      * @since 1.0.0
      */
     open val numberOfTouches: Int get() = mNumberOfTouches
-
-    @Suppress("unused")
-    protected val isListeningForOtherStateChanges: Boolean
-        get() = null != requireFailureOf && requireFailureOf!!.hasOnStateChangeListenerListener(this)
 
     enum class State {
         Possible,
@@ -167,21 +186,12 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         Ended
     }
 
-    init {
-        mHandler = GestureHandler(Looper.getMainLooper())
-        cancelsTouchesInView = true
-        isEnabled = true
-        id = generateId()
-        mContextRef = WeakReference(context)
-    }
-
     private fun generateId(): Long {
         return id++
     }
 
     @SuppressLint("HandlerLeak")
     protected inner class GestureHandler(mainLooper: Looper) : Handler(mainLooper) {
-
         override fun handleMessage(msg: Message) {
             this@UIGestureRecognizer.handleMessage(msg)
         }
@@ -250,12 +260,15 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         lastEvent = MotionEvent.obtain(event)
 
         // action down
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) mDownLocation.set(event.x, event.y)
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            mDownLocation.set(event.x, event.y)
+            mDownTime = event.downTime
+        }
 
         // compute current location
         mNumberOfTouches = computeFocusPoint(event, mCurrentLocation)
 
-        logMessage(Log.VERBOSE, "focusPoint: $mCurrentLocation")
+        logMessage(Log.VERBOSE, "event.action: ${event.action}, focusPoint: $mCurrentLocation")
         return false
     }
 
@@ -292,15 +305,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     protected abstract fun handleMessage(msg: Message)
 
     fun inState(vararg states: State): Boolean {
-        if (states.isEmpty()) {
-            return false
-        }
-        for (state in states) {
-            if (this.state == state) {
-                return true
-            }
-        }
-        return false
+        return states.contains(state)
     }
 
     protected fun stopListenForOtherStateChanges() {
@@ -328,7 +333,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         const val VERSION = BuildConfig.VERSION_NAME
 
-        val LOG_TAG = UIGestureRecognizer::class.java.simpleName
+        val LOG_TAG: String = UIGestureRecognizer::class.java.simpleName
 
         /**
          * @return the instance id
@@ -339,6 +344,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         protected var sDebug = false
 
+        const val TIMEOUT_DELAY_MILLIS = 5
         val LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout().toLong()
         val TAP_TIMEOUT = ViewConfiguration.getTapTimeout().toLong()
         val DOUBLE_TAP_TIMEOUT = ViewConfiguration.getDoubleTapTimeout().toLong()

@@ -26,11 +26,11 @@ import kotlin.math.min
 class Interaction {
     private var mDownTime: Long = 0
 
-    fun clickNoSync(x: Int, y: Int): Boolean {
+    fun clickNoSync(x: Int, y: Int, tapTimeout: Long = REGULAR_CLICK_LENGTH): Boolean {
         Log.d(LOG_TAG, "clickNoSync ($x, $y)")
 
         if (touchDown(x, y)) {
-            SystemClock.sleep(REGULAR_CLICK_LENGTH)
+            SystemClock.sleep(tapTimeout)
             if (touchUp(x, y))
                 return true
         }
@@ -100,9 +100,9 @@ class Interaction {
         for (i in 0 until fingers) {
             pointArray[i] =
                     PointerCoordsBuilder.newBuilder()
-                        .setCoords(startPoint.x.toFloat(), startPoint.y + (stepHeight * i).toFloat())
-                        .setSize(1f)
-                        .build()
+                            .setCoords(startPoint.x.toFloat(), startPoint.y + (stepHeight * i).toFloat())
+                            .setSize(1f)
+                            .build()
         }
 
         array.add(pointArray)
@@ -112,9 +112,9 @@ class Interaction {
             for (i in 0 until fingers) {
                 pointArray[i] =
                         PointerCoordsBuilder.newBuilder()
-                            .setCoords(startPoint.x.toFloat() - (width / steps) * step, startPoint.y + (stepHeight * i).toFloat())
-                            .setSize(1f)
-                            .build()
+                                .setCoords(startPoint.x.toFloat() - (width / steps) * step, startPoint.y + (stepHeight * i).toFloat())
+                                .setSize(1f)
+                                .build()
             }
             array.add(pointArray)
         }
