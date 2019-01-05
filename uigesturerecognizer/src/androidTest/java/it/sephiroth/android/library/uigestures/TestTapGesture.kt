@@ -40,6 +40,7 @@ class TestTapGesture : TestBaseClass() {
             activity.actionListener.invoke(it)
 
             assertEquals(State.Ended, it.state)
+            assertEquals(1, it.numberOfTouches)
             latch.countDown()
         }
 
@@ -496,6 +497,7 @@ class TestTapGesture : TestBaseClass() {
             activity.actionListener.invoke(it)
 
             assertEquals(State.Ended, it.state)
+            assertEquals(2, it.numberOfTouches)
             latch.countDown()
         }
 
@@ -599,4 +601,63 @@ class TestTapGesture : TestBaseClass() {
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
+
+
+    @Test
+    fun test18DoubleTap2Fingers() {
+        setTitle("Double Tap 2 fingers")
+
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val bounds = mainView.visibleBounds
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
+        recognizer.tag = "tap"
+        recognizer.touchesRequired = 2
+        recognizer.tapsRequired = 2
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            assertEquals(State.Ended, it.state)
+            assertEquals(2, it.numberOfTouches)
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        interaction.performMultiPointerGesture(array.toTypedArray())
+        SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
+
+        array.clear()
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        interaction.performMultiPointerGesture(array.toTypedArray())
+
+        latch.await(3, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
 }
