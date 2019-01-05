@@ -13,6 +13,9 @@ if [[ "$TEST_TYPE" == "unit" ]]; then
 elif [[ "$TEST_TYPE" == "instrumentation" ]]; then
   echo "Waiting for emulator setup..."
   android-wait-for-emulator
+  adb shell settings put global window_animation_scale 0 &
+  adb shell settings put global transition_animation_scale 0 &
+  adb shell settings put global animator_duration_scale 0 &  
   adb devices
   adb shell input keyevent 82 &
   # Avoid having it lock itself again.
