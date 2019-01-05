@@ -6,6 +6,7 @@ import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.*
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SmallTest
+@MediumTest
 class TestTapGesture : TestBaseClass() {
 
     @Test
@@ -293,7 +294,7 @@ class TestTapGesture : TestBaseClass() {
         assertTrue(delegate.isEnabled)
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
 
@@ -332,7 +333,7 @@ class TestTapGesture : TestBaseClass() {
         SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
         interaction.touchUp(bounds.centerX(), bounds.centerY())
 
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(1, latch.count)
     }
 
@@ -368,7 +369,7 @@ class TestTapGesture : TestBaseClass() {
         Timber.v("bounds center: ${bounds.centerX()}, ${bounds.centerY()}")
 
         interaction.clickNoSync(bounds.centerX(), bounds.centerY())
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
 
@@ -517,7 +518,7 @@ class TestTapGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
 
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
 
@@ -558,7 +559,7 @@ class TestTapGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
 
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(1, latch.count)
     }
 
@@ -656,7 +657,7 @@ class TestTapGesture : TestBaseClass() {
 
         interaction.performMultiPointerGesture(array.toTypedArray())
 
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
 

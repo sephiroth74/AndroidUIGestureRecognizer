@@ -104,7 +104,9 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
      * Returns the time (in ms) when the user originally pressed down to start a stream of position events
      * @since 1.2.5
      */
-    val downTime: Long get() = mDownTime
+    @Suppress("unused")
+    val downTime: Long
+        get() = mDownTime
 
     /**
      * @return Returns the X computed as the location of the original down event.
@@ -297,9 +299,6 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     @Suppress("unused")
     @Throws(Throwable::class)
     protected fun finalize() {
-        //        if (null != mLastEvent) {
-        //            mLastEvent.recycle();
-        //        }
     }
 
     protected abstract fun handleMessage(msg: Message)

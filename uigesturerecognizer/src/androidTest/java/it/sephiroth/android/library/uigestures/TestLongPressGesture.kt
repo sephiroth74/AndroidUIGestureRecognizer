@@ -1,24 +1,43 @@
-//package it.sephiroth.android.library.uigestures
-//
-//import android.util.Log
-//import android.view.MotionEvent
-//import android.view.ViewConfiguration
-//import androidx.test.core.view.PointerCoordsBuilder
-//import androidx.test.espresso.Espresso.onView
-//import androidx.test.espresso.action.ViewActions
-//import androidx.test.espresso.matcher.ViewMatchers
-//import androidx.test.filters.SmallTest
-//import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-//import org.junit.Assert.assertEquals
-//import org.junit.Assert.assertNotNull
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import java.util.concurrent.CountDownLatch
-//import java.util.concurrent.TimeUnit
-//
-//@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
-//@SmallTest
-//class TestLongPressGesture : TestBaseClass() {
+package it.sephiroth.android.library.uigestures
+
+import androidx.test.filters.MediumTest
+import org.junit.Assert.assertEquals
+import org.junit.FixMethodOrder
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@MediumTest
+class TestLongPressGesture : TestBaseClass() {
+
+    @Test
+    fun test01SingleTapLongPress() {
+        setTitle("Long Press 1")
+
+        val latch = CountDownLatch(2)
+
+        delegate.clear()
+
+        val recognizer = UILongPressGestureRecognizer(context)
+        recognizer.tag = "long-press"
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        mainView.longClick()
+
+        latch.await(3, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
 //
 //    @Test
 //    fun test_singleTap1Finger_longPressWithMotion() {
@@ -171,4 +190,4 @@
 //
 //        assertEquals(0L, latch.count)
 //    }
-//}
+}

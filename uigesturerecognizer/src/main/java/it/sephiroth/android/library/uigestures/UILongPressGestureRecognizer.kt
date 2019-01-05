@@ -6,6 +6,7 @@ import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import kotlin.math.max
 
 /**
  * UILongPressGestureRecognizer looks for long-press gestures. The user must
@@ -16,17 +17,20 @@ import android.view.ViewConfiguration
  * @see [
  * https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer](https://developer.apple.com/reference/uikit/uilongpressgesturerecognizer)
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
-    val tapTimeout = TAP_TIMEOUT
-
-    var longPressTimeout = LONG_PRESS_TIMEOUT
+    /**
+     * Maximum allowed timeout between consecutive taps (when tapsRequired > 1)
+     */
+    var doubleTapTimeout = DOUBLE_TAP_TIMEOUT
         set(value) {
             field = value
-            minimumPressDuration = tapTimeout + value
-        }
 
-    var doubleTapTimeout = DOUBLE_TAP_TIMEOUT
+            if (value > longPressTimeout) {
+                longPressTimeout = value + TIMEOUT_DELAY_MILLIS
+            }
+        }
 
     override var numberOfTouches: Int = 0
         internal set
@@ -36,7 +40,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
      * Value is in milliseconds
      * @since 1.0.0
      */
-    var minimumPressDuration = tapTimeout + longPressTimeout
+    private var longPressTimeout = max(LONG_PRESS_TIMEOUT, doubleTapTimeout)
 
     /**
      * The number of required touches for this recognizer to succeed.<br></br>
@@ -50,19 +54,14 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
      * Default value is 1
      * @since 1.0.0
      */
-    var tapsRequired = 0
+    var tapsRequired = 1
 
 
     private var mAlwaysInTapRegion: Boolean = false
-    private var mDownFocusX: Float = 0.toFloat()
-    private var mDownFocusY: Float = 0.toFloat()
-    private val mTouchSlopSquare: Float
-    private var mAllowableMovementSquare: Float = 0.toFloat()
     private var mStarted: Boolean = false
-    private var mStartLocation = PointF()
-
-    private var mNumTaps = 0
-
+    private val mStartLocation = PointF()
+    private val mDownFocusLocation = PointF()
+    private var mNumTaps = 1
     private var mBegan: Boolean = false
 
     val startLocationX: Float
@@ -76,20 +75,28 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
      * @since 1.0.0
      */
     var allowableMovement: Float
-        get() = mAllowableMovementSquare
-        set(value) {
-            mAllowableMovementSquare = value * value
-        }
+
+    /**
+     * Minimum movement before we start collecting movements
+     * @since 1.2.5
+     */
+    var touchSlop: Int
 
     init {
         mStarted = false
         mBegan = false
 
-        val touchSlop: Int
         val configuration = ViewConfiguration.get(context)
+
+        allowableMovement = configuration.scaledDoubleTapSlop.toFloat() / 2
         touchSlop = configuration.scaledTouchSlop
-        mTouchSlopSquare = (touchSlop * touchSlop).toFloat()
-        mAllowableMovementSquare = mTouchSlopSquare
+
+        if (logEnabled) {
+            logMessage(Log.INFO, "allowableMovement: $allowableMovement")
+            logMessage(Log.INFO, "touchSlop: $touchSlop")
+            logMessage(Log.INFO, "longPressTimeout: $longPressTimeout")
+            logMessage(Log.INFO, "doubleTapTimeout: $doubleTapTimeout")
+        }
     }
 
     override fun handleMessage(msg: Message) {
@@ -122,18 +129,18 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
         logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name}, started: $mStarted)")
 
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
+        if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
             if (mBegan && hasBeganFiringEvents()) {
-                state = UIGestureRecognizer.State.Changed
+                state = State.Changed
             }
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && mStarted && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Began)) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
             setBeginFiringEvents(false)
             mStarted = false
         }
@@ -146,28 +153,8 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
             return false
         }
 
-        val action = event.action
+        val action = event.actionMasked
         val count = event.pointerCount
-
-        val pointerUp = action == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
-
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-
-        mCurrentLocation.set(focusX, focusY)
 
         when (action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
@@ -183,66 +170,60 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 if (!mStarted) {
                     stopListenForOtherStateChanges()
-                    state = UIGestureRecognizer.State.Possible
+                    state = State.Possible
                     setBeginFiringEvents(false)
-                    mNumTaps = 0
+                    mNumTaps = 1
                     mStarted = true
                 } else {
                     mNumTaps++
                 }
 
+                logMessage(Log.VERBOSE, "num taps: $mNumTaps, tapsRequired: $tapsRequired")
+
                 if (mNumTaps == tapsRequired) {
-                    mHandler.sendEmptyMessageAtTime(MESSAGE_LONG_PRESS, event.downTime + minimumPressDuration)
+                    mHandler.sendEmptyMessageAtTime(MESSAGE_LONG_PRESS, event.downTime + longPressTimeout)
                 } else {
-                    var timeout = longPressTimeout
-                    if (timeout >= minimumPressDuration) {
-                        timeout = minimumPressDuration - 1
-                    }
-                    mHandler.sendEmptyMessageDelayed(MESSAGE_FAILED, timeout)
+                    delayedFail()
                 }
 
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusLocation.set(mCurrentLocation)
                 mStartLocation.set(mCurrentLocation)
             }
 
-            MotionEvent.ACTION_POINTER_DOWN -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_POINTER_DOWN -> if (state == State.Possible && mStarted) {
                 removeMessages(MESSAGE_POINTER_UP)
                 numberOfTouches = count
 
                 if (numberOfTouches > 1) {
                     if (numberOfTouches > touchesRequired) {
                         removeMessages()
-                        state = UIGestureRecognizer.State.Failed
+                        state = State.Failed
                     }
                 }
 
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusLocation.set(mCurrentLocation)
+                computeFocusPoint(event, mStartLocation)
 
-                updateStartLocation(event)
-
-            } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed) && mStarted) {
+            } else if (inState(State.Began, State.Changed) && mStarted) {
                 numberOfTouches = count
             }
 
-            MotionEvent.ACTION_POINTER_UP -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_POINTER_UP -> if (state == State.Possible && mStarted) {
                 removeMessages(MESSAGE_POINTER_UP)
 
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mDownFocusLocation.set(mCurrentLocation)
 
                 val message = mHandler.obtainMessage(MESSAGE_POINTER_UP)
                 message.arg1 = numberOfTouches - 1
-                mHandler.sendMessageDelayed(message, tapTimeout)
+                mHandler.sendMessageDelayed(message, UIGestureRecognizer.TAP_TIMEOUT)
 
-                updateStartLocation(event)
+                computeFocusPoint(event, mStartLocation)
 
 
-            } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+            } else if (inState(State.Began, State.Changed)) {
                 if (numberOfTouches - 1 < touchesRequired) {
                     val began = hasBeganFiringEvents()
-                    state = UIGestureRecognizer.State.Ended
+                    state = State.Ended
 
                     if (began) {
                         fireActionEvent()
@@ -252,37 +233,35 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                 }
             }
 
-            MotionEvent.ACTION_MOVE -> if (state === UIGestureRecognizer.State.Possible && mStarted) {
+            MotionEvent.ACTION_MOVE -> if (state == State.Possible && mStarted) {
 
                 if (mAlwaysInTapRegion) {
-                    val deltaX = focusX - mDownFocusX
-                    val deltaY = focusY - mDownFocusY
-                    val distance = deltaX * deltaX + deltaY * deltaY
+                    val distance = mCurrentLocation.distance(mDownFocusLocation)
+                    logMessage(Log.VERBOSE, "distance: $distance, allowableMovement: $allowableMovement")
 
-                    if (distance > mAllowableMovementSquare) {
-                        logMessage(Log.WARN, "moved too much!: $distance")
+                    if (distance > allowableMovement) {
+                        logMessage(Log.WARN, "moved too much!: $distance > $allowableMovement")
                         mAlwaysInTapRegion = false
                         removeMessages()
-                        state = UIGestureRecognizer.State.Failed
+                        state = State.Failed
                     }
                 }
-            } else if (state === UIGestureRecognizer.State.Began) {
+            } else if (state == State.Began) {
                 if (!mBegan) {
-                    val deltaX = focusX - mDownFocusX
-                    val deltaY = focusY - mDownFocusY
-                    val distance = deltaX * deltaX + deltaY * deltaY
+                    val distance = mCurrentLocation.distance(mDownFocusLocation)
+                    logMessage(Log.VERBOSE, "distance: $distance, allowableMovement: $touchSlop")
 
-                    if (distance > mTouchSlopSquare) {
+                    if (distance > touchSlop) {
                         mBegan = true
 
                         if (hasBeganFiringEvents()) {
-                            state = UIGestureRecognizer.State.Changed
+                            state = State.Changed
                             fireActionEvent()
                         }
                     }
                 }
-            } else if (state === UIGestureRecognizer.State.Changed) {
-                state = UIGestureRecognizer.State.Changed
+            } else if (state == State.Changed) {
+                state = State.Changed
                 if (hasBeganFiringEvents()) {
                     fireActionEvent()
                 }
@@ -291,28 +270,28 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
             MotionEvent.ACTION_UP -> {
                 removeMessages(MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
 
-                if (state === UIGestureRecognizer.State.Possible && mStarted) {
+                if (state === State.Possible && mStarted) {
                     if (numberOfTouches != touchesRequired) {
                         mStarted = false
                         removeMessages()
-                        state = UIGestureRecognizer.State.Failed
+                        state = State.Failed
                         postReset()
                     } else {
                         if (mNumTaps < tapsRequired) {
                             removeMessages(MESSAGE_FAILED)
                             delayedFail()
                         } else {
-                            mNumTaps = 0
+                            mNumTaps = 1
                             mStarted = false
                             removeMessages()
-                            state = UIGestureRecognizer.State.Failed
+                            state = State.Failed
                         }
                     }
-                } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
-                    mNumTaps = 0
+                } else if (inState(State.Began, State.Changed)) {
+                    mNumTaps = 1
                     mStarted = false
                     val began = hasBeganFiringEvents()
-                    state = UIGestureRecognizer.State.Ended
+                    state = State.Ended
                     if (began) {
                         fireActionEvent()
                     }
@@ -327,8 +306,8 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
             MotionEvent.ACTION_CANCEL -> {
                 removeMessages()
                 mStarted = false
-                mNumTaps = 0
-                state = UIGestureRecognizer.State.Cancelled
+                mNumTaps = 1
+                state = State.Cancelled
                 postReset()
             }
 
@@ -337,17 +316,6 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
         }
 
         return cancelsTouchesInView
-    }
-
-    private fun updateStartLocation(event: MotionEvent) {
-        var totalX = 0f
-        var totalY = 0f
-        for (i in 0 until event.pointerCount) {
-            totalX += event.getX(i)
-            totalY += event.getY(i)
-        }
-        mStartLocation.x = totalX / event.pointerCount
-        mStartLocation.y = totalY / event.pointerCount
     }
 
     override fun removeMessages() {
@@ -364,13 +332,13 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
     private fun handleFailed() {
         removeMessages()
-        state = UIGestureRecognizer.State.Failed
+        state = State.Failed
         setBeginFiringEvents(false)
         mStarted = false
     }
 
     private fun handleReset() {
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
         mStarted = false
     }
 
@@ -384,19 +352,19 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
         removeMessages(MESSAGE_FAILED)
 
-        if (state === UIGestureRecognizer.State.Possible && mStarted) {
+        if (state === State.Possible && mStarted) {
             if (numberOfTouches == touchesRequired && delegate?.shouldBegin?.invoke(this)!!) {
-                state = UIGestureRecognizer.State.Began
+                state = State.Began
                 if (null == requireFailureOf) {
                     fireActionEventIfCanRecognizeSimultaneously()
                 } else {
                     when {
-                        requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended) -> {
-                            state = UIGestureRecognizer.State.Failed
+                        requireFailureOf!!.state === State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                        requireFailureOf!!.inState(State.Began, State.Changed, State.Ended) -> {
+                            state = State.Failed
                             setBeginFiringEvents(false)
                             mStarted = false
-                            mNumTaps = 0
+                            mNumTaps = 1
                         }
                         else -> {
                             listenForOtherStateChanges()
@@ -406,16 +374,16 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                     }
                 }
             } else {
-                state = UIGestureRecognizer.State.Failed
+                state = State.Failed
                 setBeginFiringEvents(false)
                 mStarted = false
-                mNumTaps = 0
+                mNumTaps = 1
             }
         }
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (inState(UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended)) {
+        if (inState(State.Changed, State.Ended)) {
             setBeginFiringEvents(true)
             fireActionEvent()
         } else {
@@ -427,7 +395,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed)
     }
 
     companion object {
