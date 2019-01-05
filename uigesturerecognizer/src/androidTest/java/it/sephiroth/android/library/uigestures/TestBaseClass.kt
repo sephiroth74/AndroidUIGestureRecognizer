@@ -13,6 +13,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import timber.log.Timber
+import kotlin.reflect.KClass
 
 open class TestBaseClass {
 
@@ -78,7 +79,7 @@ open class TestBaseClass {
     }
 
     companion object {
-        internal const val PACKAGE_NAME = "it.sephiroth.android.library.uigestures.test"
+        internal val PACKAGE_NAME = "${TestBaseClass.javaClass.`package`.name}.test"
         internal const val LAUNCH_TIMEOUT = 5000
         internal const val TAG = "TestBaseClass"
     }

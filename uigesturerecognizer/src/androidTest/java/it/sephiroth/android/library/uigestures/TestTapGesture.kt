@@ -45,8 +45,137 @@ class TestTapGesture : TestBaseClass() {
         assertTrue(delegate.isEnabled)
 
         onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
+    }
+
+    @Test
+    fun testTapNotEnabled() {
+        setTitle("Tap Disabled")
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.tapsRequired = 1
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail()
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        recognizer.isEnabled = false
+        assertFalse(recognizer.isEnabled)
+
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+    @Test
+    fun testTapDelegateNotEnabled() {
+        setTitle("Delegate Disabled")
+
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.tapsRequired = 1
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail()
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        delegate.isEnabled = false
+        assertFalse(delegate.isEnabled)
+
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+    @Test
+    fun testSingleTapFailUsing2Fingers() {
+        setTitle("Tap")
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.tapsRequired = 1
+        recognizer.touchesRequired = 2
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail()
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+    @Test
+    fun testSingleTapFailShouldNotBegin() {
+        setTitle("Tap")
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.tapsRequired = 1
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail()
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.shouldBegin = { false }
+
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+
+    @Test
+    fun testSingleTapFailShouldNotReceiveTouch() {
+        setTitle("Tap")
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.tapsRequired = 1
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail()
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.shouldReceiveTouch = { false }
+
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.click())
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
     }
 
     @Test

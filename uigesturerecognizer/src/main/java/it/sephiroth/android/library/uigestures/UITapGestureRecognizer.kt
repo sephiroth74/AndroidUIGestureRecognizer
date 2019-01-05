@@ -181,8 +181,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
             MotionEvent.ACTION_MOVE -> if (state == State.Possible && mStarted) {
                 if (mAlwaysInTapRegion) {
-                    val distance = sqrt((mCurrentLocation.y - mDownFocus.y) * (mCurrentLocation.y - mDownFocus.y) +
-                            (mCurrentLocation.x - mDownFocus.x) * (mCurrentLocation.x - mDownFocus.x))
+                    val distance = mDownFocus.distance(mCurrentLocation)
 
                     logMessage(Log.VERBOSE, "distance: $distance, slop: $touchSlop")
 
