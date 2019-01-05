@@ -45,6 +45,12 @@ android {
         }
     }
 
+    sourceSets {
+        androidTest {
+            setRoot 'src/androidTest'
+        }
+    }
+
     lintOptions {
         htmlReport false
         xmlReport false
