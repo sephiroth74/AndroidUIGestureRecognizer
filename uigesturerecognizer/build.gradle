@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'org.jetbrains.dokka-android'
 
 coveralls {
     jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
@@ -68,6 +69,26 @@ android {
                     includeNoLocationClasses = true
                 }
             }
+        }
+    }
+
+    dokka {
+        skipEmptyPackages = true
+        includeNonPublic = false
+        skipDeprecated = true
+        reportUndocumented = true
+        outputFormat = 'gfm'
+        outputDirectory = "$rootDir/docs"
+
+        linkMapping {
+            // Source directory
+            dir = "src/main/java"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/sephiroth74/AndroidUIGestureRecognizer/tree/master/uigesturerecognizer/src/main/java"
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            suffix = "#L"
         }
     }
 
@@ -170,7 +191,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.1'
 
     androidTestImplementation('com.jakewharton.timber:timber:4.7.1') {
-        exclude group:'org.jetbrains', module:'annotations'
+        exclude group: 'org.jetbrains', module: 'annotations'
     }
     androidTestImplementation 'androidx.appcompat:appcompat:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
