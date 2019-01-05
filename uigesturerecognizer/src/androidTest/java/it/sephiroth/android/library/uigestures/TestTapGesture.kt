@@ -50,6 +50,75 @@ class TestTapGesture : TestBaseClass() {
     }
 
     @Test
+    fun testDoubleTap() {
+        setTitle("Double Tap")
+        val latch = CountDownLatch(1)
+
+        delegate.clear()
+        assertEquals(0, delegate.size())
+
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "double-tap"
+        recognizer.tapsRequired = 2
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            assertEquals(State.Ended, it.state)
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        assertEquals(1, delegate.size())
+        assertTrue(delegate.isEnabled)
+
+        onView(ViewMatchers.withId(R.id.activity_main)).perform(ViewActions.doubleClick())
+        latch.await(3, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
+    @Test
+    fun testDoubleTapTooLong() {
+        setTitle("Double Tap")
+        val latch = CountDownLatch(1)
+
+        delegate.clear()
+        assertEquals(0, delegate.size())
+
+        val bounds = mainView.visibleBounds
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "double-tap"
+        recognizer.tapsRequired = 2
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            fail("unexpected")
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        assertEquals(1, delegate.size())
+        assertTrue(delegate.isEnabled)
+
+        interaction.touchDown(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
+        interaction.touchUp(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(recognizer.doubleTapTimeout)
+
+        interaction.touchDown(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
+        interaction.touchUp(bounds.centerX(), bounds.centerY())
+
+        latch.await(3, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+    @Test
     fun testTapCoordinates() {
         setTitle("Tap")
         val latch = CountDownLatch(1)
@@ -225,6 +294,46 @@ class TestTapGesture : TestBaseClass() {
 
         latch.await(3, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
+    }
+
+    @Test
+    fun testSingleTap2FingersShouldFaild() {
+        setTitle("Single Tap 2 fingers")
+
+        delegate.clear()
+
+        val latch = CountDownLatch(1)
+        val bounds = mainView.visibleBounds
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tag = "tap"
+        recognizer.touchesRequired = 1
+        recognizer.tapsRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            fail("actionlistener not expected")
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        val array = arrayListOf<Array<MotionEvent.PointerCoords>>()
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        array.add(arrayOf(
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() - 10).toFloat(), (bounds.centerY() - 10).toFloat()).build(),
+                PointerCoordsBuilder.newBuilder().setCoords((bounds.centerX() + 10).toFloat(), (bounds.centerY() + 10).toFloat()).build()
+        ))
+
+        interaction.performMultiPointerGesture(array.toTypedArray())
+
+        latch.await(3, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
     }
 
 //

@@ -27,9 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         val recognizer1 = UITapGestureRecognizer(this)
         recognizer1.tapsRequired = 1
-        recognizer1.touchesRequired = 2
+        recognizer1.touchesRequired = 1
         recognizer1.tag = "single-tap"
-        recognizer1.tapTimeout = 200
         recognizer1.actionListener = actionListener
         recognizer1.stateListener = stateListener
 
@@ -61,18 +60,21 @@ class MainActivity : AppCompatActivity() {
 
     val runner = Runnable {
         text2.text = ""
+        text.text = ""
+        text3.text = ""
     }
 
     val stateListener =
             { recognizer: UIGestureRecognizer, oldState: UIGestureRecognizer.State?, newState: UIGestureRecognizer.State? ->
                 Timber.d("onStateChanged: $oldState --> $newState")
+                text3.text = "${recognizer.javaClass.simpleName}: $oldState --> $newState"
             }
 
     val actionListener = { recognizer: UIGestureRecognizer ->
         val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
         Timber.d("onGestureRecognized($recognizer)")
 
-        text.text = recognizer.state?.name
+        text.text = "${recognizer.javaClass.simpleName}: ${recognizer.state}"
         text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
         text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
 

@@ -12,7 +12,7 @@ env:
     # components.
     # These CANNOT BE USED in the android > components section, only in before_script and script.
     - TEST_TYPE=unit
-    - TEST_TYPE=instrumentation EMULATOR_TAG=google_apis EMULATOR_API=25 ABI=armeabi-v7a
+    - TEST_TYPE=instrumentation EMULATOR_TAG=android EMULATOR_API=24 ABI=armeabi-v7a
   global:
     # install timeout in minutes (2 minutes by default)
     - ADB_INSTALL_TIMEOUT=15
