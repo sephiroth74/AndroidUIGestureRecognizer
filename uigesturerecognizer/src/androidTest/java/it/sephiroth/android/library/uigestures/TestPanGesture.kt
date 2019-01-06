@@ -52,15 +52,6 @@ class TestPanGesture : TestBaseClass() {
                 UIGestureRecognizer.State.Ended -> {
                     assertEquals(1L, latch.count)
                     latch.countDown()
-
-                    Timber.v("bounds: $bounds")
-                    Timber.v("isFling: ${recognizer.isFling}")
-                    Timber.v("relative scroll: ${recognizer.relativeScrollX}, ${recognizer.relativeScrollY}")
-                    Timber.v("scroll: ${recognizer.scrollX}, ${recognizer.scrollY}")
-                    Timber.v("start: ${recognizer.startLocationX}, ${recognizer.startLocationY}")
-                    Timber.v("translation: ${recognizer.translationX}, ${recognizer.translationY}")
-                    Timber.v("velocity: ${recognizer.xVelocity}, ${recognizer.yVelocity}")
-                    Timber.v("current location: ${recognizer.currentLocationX}, ${recognizer.currentLocationY}")
                 }
             }
         }
@@ -73,15 +64,6 @@ class TestPanGesture : TestBaseClass() {
 
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
-
-        assertTrue(recognizer.translationX != 0F)
-        assertTrue(recognizer.xVelocity != 0F)
-
-        // must first verify the correct values
-
-        //assertEquals(rect.width(), abs(recognizer.translationX).toInt())
-        //assertEquals((rect.right - bounds.left).toFloat(), recognizer.startLocationX)
-        //assertEquals((rect.centerY() - bounds.top).toFloat(), recognizer.startLocationY)
     }
 
 

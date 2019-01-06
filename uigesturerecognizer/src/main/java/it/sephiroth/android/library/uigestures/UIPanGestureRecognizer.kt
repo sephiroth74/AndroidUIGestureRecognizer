@@ -328,7 +328,6 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
             MotionEvent.ACTION_UP -> {
                 if (inState(State.Began, State.Changed)) {
-
                     if (state == State.Changed) {
                         scrollX = mLastFocusLocation.x - mCurrentLocation.x
                         scrollY = mLastFocusLocation.y - mCurrentLocation.y
