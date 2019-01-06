@@ -2,8 +2,7 @@ package it.sephiroth.android.library.uigestures
 
 import android.graphics.Rect
 import androidx.test.filters.SmallTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
@@ -62,16 +61,48 @@ class TestPanGesture : TestBaseClass() {
                     Timber.v("translation: ${recognizer.translationX}, ${recognizer.translationY}")
                     Timber.v("velocity: ${recognizer.xVelocity}, ${recognizer.yVelocity}")
                     Timber.v("current location: ${recognizer.currentLocationX}, ${recognizer.currentLocationY}")
-
-                    assertTrue(recognizer.scrollX != 0F)
-                    assertTrue(recognizer.relativeScrollX != 0F)
-                    assertTrue(recognizer.xVelocity != 0F)
-
-                    assertEquals(rect.width(), abs(recognizer.translationX).toInt())
-                    assertEquals((rect.right - bounds.left).toFloat(), recognizer.startLocationX)
-                    assertEquals((rect.centerY() - bounds.top).toFloat(), recognizer.startLocationY)
                 }
             }
+        }
+
+
+        delegate.addGestureRecognizer(recognizer)
+
+        rect.inset(20, 40)
+        interaction.swipe(rect.right, rect.centerY(), rect.left, rect.centerY(), 6)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+
+        assertTrue(recognizer.scrollX != 0F)
+        assertTrue(recognizer.relativeScrollX != 0F)
+        assertTrue(recognizer.xVelocity != 0F)
+        assertEquals(rect.width(), abs(recognizer.translationX).toInt())
+        assertEquals((rect.right - bounds.left).toFloat(), recognizer.startLocationX)
+        assertEquals((rect.centerY() - bounds.top).toFloat(), recognizer.startLocationY)
+    }
+
+
+    @Test
+    fun testPanSingleFingerShouldFail() {
+        setTitle("Pan Single Finger")
+
+        delegate.clear()
+
+        val latch = CountDownLatch(3)
+
+        val bounds = mainView.visibleBounds
+        val rect = Rect(bounds)
+
+        val recognizer = UIPanGestureRecognizer(context)
+        recognizer.tag = "pan"
+        recognizer.minimumNumberOfTouches = 1
+        recognizer.maximumNumberOfTouches = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            fail("unexpected")
         }
 
 
