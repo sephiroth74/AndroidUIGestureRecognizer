@@ -6,7 +6,6 @@ import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import kotlin.math.sqrt
 
 /**
  * UITapGestureRecognizer looks for single or multiple taps.
@@ -38,43 +37,51 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
      */
     var tapsRequired = 1
 
+    /**
+     * the duration in milliseconds we will wait to see if a touch event is a tap or a scroll.
+     * If the user does not move within this interval, it is considered to be a tap.
+     * @since 1.2.5
+     */
     var tapTimeout: Long = TAP_TIMEOUT
 
+    /**
+     * the duration in milliseconds between the first tap's up event and the second tap's
+     * down event for an interaction to be considered a double-tap.
+     * @since 1.2.5
+     */
     var doubleTapTimeout: Long = DOUBLE_TAP_TIMEOUT
 
+    /**
+     * Distance in pixels a touch can wander before we think the user is scrolling
+     * @since 1.2.5
+     */
+    var scaledTouchSlop: Int
+
+    /**
+     * Distance in pixels between the first touch and second
+     * touch to still be considered a double tap
+     */
+    var scaledDoubleTapSlop: Int
 
     private var mAlwaysInTapRegion: Boolean = false
     private var mDownFocus = PointF()
-    private val mTouchSlopSquare: Int
-    private val mDoubleTapTouchSlopSquare: Int
     private var mStarted: Boolean = false
     private var mNumTaps = 0
 
     init {
         mStarted = false
         val configuration = ViewConfiguration.get(context)
-        val touchSlop: Int = configuration.scaledTouchSlop
-        val doubleTapTouchSlop: Int = configuration.scaledDoubleTapSlop
 
-        logMessage(Log.INFO, "touchSlop: $touchSlop")
-        logMessage(Log.INFO, "doubleTapTouchSlop: $doubleTapTouchSlop")
-
-        mTouchSlopSquare = touchSlop
-        mDoubleTapTouchSlopSquare = doubleTapTouchSlop
+        scaledTouchSlop = configuration.scaledTouchSlop
+        scaledDoubleTapSlop = configuration.scaledDoubleTapSlop
 
         if (logEnabled) {
             logMessage(Log.INFO, "tapTimeout: $tapTimeout")
             logMessage(Log.INFO, "doubleTapTimeout: $doubleTapTimeout")
-            logMessage(Log.INFO, "touchSlopSquare: $mTouchSlopSquare")
-            logMessage(Log.INFO, "doubleTapTouchSlopSquare: $mDoubleTapTouchSlopSquare")
-            logMessage(Log.INFO, "touchSlop: $touchSlop")
+            logMessage(Log.INFO, "scaledTouchSlop: $scaledTouchSlop")
+            logMessage(Log.INFO, "scaledDoubleTapSlop: $scaledDoubleTapSlop")
         }
     }
-
-    /**
-     * Returns the maximum movement allowed before the recognizer fails
-     */
-    val touchSlop: Int get() = if (tapsRequired > 1) mDoubleTapTouchSlopSquare else mTouchSlopSquare
 
     override fun handleMessage(msg: Message) {
         when (msg.what) {
@@ -148,6 +155,15 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     stopListenForOtherStateChanges()
                     mNumTaps = 0
                     mStarted = true
+                } else {
+                    // if second tap is too far wawy from the first
+                    val distance = mDownLocation.distance(mPreviousDownLocation)
+                    logMessage(Log.VERBOSE, "distance: $distance")
+                    if (distance > scaledDoubleTapSlop) {
+                        logMessage(Log.WARN, "second touch too far away ($distance > $scaledDoubleTapSlop)")
+                        handleFailed()
+                        return cancelsTouchesInView
+                    }
                 }
 
                 mHandler.sendEmptyMessageDelayed(MESSAGE_LONG_PRESS, tapTimeout + TIMEOUT_DELAY_MILLIS)
@@ -183,9 +199,9 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 if (mAlwaysInTapRegion) {
                     val distance = mDownFocus.distance(mCurrentLocation)
 
-                    logMessage(Log.VERBOSE, "distance: $distance, slop: $touchSlop")
+                    logMessage(Log.VERBOSE, "distance: $distance, slop: $scaledTouchSlop")
 
-                    if (distance > touchSlop) {
+                    if (distance > scaledTouchSlop) {
                         logMessage(Log.WARN, "moved too much")
                         mAlwaysInTapRegion = false
                         removeMessages()

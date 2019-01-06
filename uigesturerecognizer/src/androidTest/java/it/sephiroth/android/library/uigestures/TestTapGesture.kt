@@ -7,7 +7,6 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.filters.MediumTest
-import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.*
 import org.junit.FixMethodOrder
@@ -429,7 +428,7 @@ class TestTapGesture : TestBaseClass() {
         interaction.touchDown(x, y)
         SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
 
-        x += (recognizer.touchSlop * 1.5).toInt()
+        x += (recognizer.scaledTouchSlop * 1.5).toInt()
 
         interaction.touchMove(x, y)
         SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
@@ -442,7 +441,7 @@ class TestTapGesture : TestBaseClass() {
 
     @Test
     fun test14TapMovedAccepted() {
-        setTitle("Tap Fail Move")
+        setTitle("Tap Move")
         val latch = CountDownLatch(1)
         delegate.clear()
         val recognizer = UITapGestureRecognizer(context)
@@ -466,14 +465,11 @@ class TestTapGesture : TestBaseClass() {
         var y = bounds.centerY()
 
         interaction.touchDown(x, y)
-        SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
 
-        x += recognizer.touchSlop / 3
-        y += recognizer.touchSlop / 3
+        x += recognizer.scaledTouchSlop / 3
+        y += recognizer.scaledTouchSlop / 3
 
         interaction.touchMove(x, y)
-        SystemClock.sleep(Interaction.MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
-
         interaction.touchUp(x, y)
 
         latch.await(2, TimeUnit.SECONDS)
@@ -658,6 +654,76 @@ class TestTapGesture : TestBaseClass() {
         interaction.performMultiPointerGesture(array.toTypedArray())
 
         latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
+    @Test
+    fun test19DoubleTapTooFar() {
+        setTitle("Double Tap")
+
+        val latch = CountDownLatch(1)
+
+        delegate.clear()
+
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
+        recognizer.tag = "double-tap"
+        recognizer.tapsRequired = 2
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            fail("actionListener unexpected")
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+
+        val bounds = mainView.visibleBounds
+        val x = bounds.centerX()
+        val y = bounds.centerY()
+
+        interaction.clickNoSync(x, y)
+        interaction.clickNoSync(x + recognizer.scaledDoubleTapSlop, y + recognizer.scaledDoubleTapSlop)
+
+        latch.await(2, TimeUnit.SECONDS)
+
+        assertEquals(1, latch.count)
+    }
+
+    @Test
+    fun test20DoubleTapNotFarEnough() {
+        setTitle("Double Tap")
+
+        val latch = CountDownLatch(1)
+
+        delegate.clear()
+
+        val recognizer = UITapGestureRecognizer(context)
+        recognizer.tapTimeout = TEST_TAP_TIMEOUT
+        recognizer.tag = "double-tap"
+        recognizer.tapsRequired = 2
+        recognizer.touchesRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            assertEquals(State.Ended, it.state)
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+
+        val bounds = mainView.visibleBounds
+        val x = bounds.centerX()
+        val y = bounds.centerY()
+
+        interaction.clickNoSync(x, y)
+        interaction.clickNoSync(x + recognizer.scaledDoubleTapSlop / 2, y)
+
+        latch.await(2, TimeUnit.SECONDS)
+
         assertEquals(0, latch.count)
     }
 

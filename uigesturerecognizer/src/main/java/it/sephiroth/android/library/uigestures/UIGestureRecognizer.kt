@@ -36,11 +36,17 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
     private var mNumberOfTouches: Int = 0
 
-    // original ACTION_DOWN location
+    // current ACTION_DOWN location
     protected val mDownLocation = PointF()
 
-    // original ACTION_DOWN time
+    // previous ACTION_DOWN location
+    protected val mPreviousDownLocation = PointF()
+
+    // current ACTION_DOWN time
     protected var mDownTime: Long = 0L
+
+    // previous ACTION_DOWN time
+    protected var mPreviousDownTime: Long = 0L
 
     // current event x,y location
     protected val mCurrentLocation = PointF()
@@ -263,7 +269,9 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         // action down
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            mPreviousDownLocation.set(mDownLocation)
             mDownLocation.set(event.x, event.y)
+            mPreviousDownTime = mDownTime
             mDownTime = event.downTime
         }
 
