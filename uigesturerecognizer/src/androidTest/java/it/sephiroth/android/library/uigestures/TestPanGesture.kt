@@ -74,8 +74,7 @@ class TestPanGesture : TestBaseClass() {
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
 
-        assertTrue(recognizer.scrollX != 0F)
-        assertTrue(recognizer.relativeScrollX != 0F)
+        assertTrue(recognizer.translationX != 0F)
         assertTrue(recognizer.xVelocity != 0F)
 
         // must first verify the correct values
