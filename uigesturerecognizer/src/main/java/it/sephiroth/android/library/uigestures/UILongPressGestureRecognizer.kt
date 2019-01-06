@@ -40,7 +40,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
      * Value is in milliseconds
      * @since 1.0.0
      */
-    private var longPressTimeout = max(LONG_PRESS_TIMEOUT, doubleTapTimeout)
+    var longPressTimeout = max(LONG_PRESS_TIMEOUT, doubleTapTimeout)
 
     /**
      * The number of required touches for this recognizer to succeed.<br></br>
@@ -270,7 +270,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
             MotionEvent.ACTION_UP -> {
                 removeMessages(MESSAGE_RESET, MESSAGE_POINTER_UP, MESSAGE_LONG_PRESS)
 
-                if (state === State.Possible && mStarted) {
+                if (state == State.Possible && mStarted) {
                     if (numberOfTouches != touchesRequired) {
                         mStarted = false
                         removeMessages()

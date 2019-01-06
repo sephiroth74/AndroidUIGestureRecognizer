@@ -1,7 +1,9 @@
 package it.sephiroth.android.library.uigestures
 
+import android.os.SystemClock
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +36,110 @@ class TestLongPressGesture : TestBaseClass() {
 
         mainView.longClick()
 
-        latch.await(3, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
+    @Test
+    fun test02SingleTapLongPressFail() {
+        setTitle("Long Press 1")
+
+        val latch = CountDownLatch(1)
+
+        delegate.clear()
+
+        val recognizer = UILongPressGestureRecognizer(context)
+        recognizer.tag = "long-press"
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            fail("not expected")
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        mainView.click()
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(1, latch.count)
+    }
+
+    @Test
+    fun test03DoubleTapLongPress() {
+        setTitle("Long Press Double Tap")
+
+        val latch = CountDownLatch(2)
+        val bounds = mainView.visibleBounds
+
+        delegate.clear()
+
+        val recognizer = UILongPressGestureRecognizer(context)
+        recognizer.tag = "long-press"
+        recognizer.tapsRequired = 2
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+            latch.countDown()
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        interaction.touchDown(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(Interaction.REGULAR_CLICK_LENGTH)
+
+        interaction.touchUp(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(Interaction.REGULAR_CLICK_LENGTH)
+
+        interaction.longTapNoSync(bounds.centerX(), bounds.centerY(), recognizer.longPressTimeout * 2)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0, latch.count)
+    }
+
+
+    @Test
+    fun test04LongPressAndMove() {
+        setTitle("Long Press Move")
+
+        val latch = CountDownLatch(3)
+        val bounds = mainView.visibleBounds
+
+        delegate.clear()
+
+        val recognizer = UILongPressGestureRecognizer(context)
+        recognizer.tag = "long-press"
+        recognizer.tapsRequired = 1
+
+        recognizer.actionListener = { it ->
+            activity.actionListener.invoke(it)
+
+            when (it.state) {
+                UIGestureRecognizer.State.Began -> {
+                    assertEquals(3L, latch.count)
+                    latch.countDown()
+                }
+                UIGestureRecognizer.State.Changed -> {
+                    if (latch.count == 2L) {
+                        latch.countDown()
+                    }
+                }
+                UIGestureRecognizer.State.Ended -> {
+                    assertEquals(1L, latch.count)
+                    latch.countDown()
+                }
+            }
+
+        }
+
+        delegate.addGestureRecognizer(recognizer)
+
+        interaction.touchDown(bounds.centerX(), bounds.centerY())
+        SystemClock.sleep(recognizer.longPressTimeout * 2)
+
+        interaction.touchMove(bounds.left + Interaction.SWIPE_MARGIN_LIMIT, bounds.centerY())
+        interaction.touchUp(bounds.centerX(), bounds.centerY())
+
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0, latch.count)
     }
 
