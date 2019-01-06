@@ -339,7 +339,7 @@ class Interaction {
 
     }
 
-    private fun injectEventSync(event: InputEvent): Boolean {
+    fun injectEventSync(event: InputEvent): Boolean {
         return getUiAutomation().injectInputEvent(event, true)
     }
 
@@ -376,27 +376,6 @@ class Interaction {
 
             return MotionEvent.obtain(downTime, eventTime, action, 1,
                     arrayOf(properties), arrayOf(coords),
-                    0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0)
-        }
-
-        fun getMotionEvents(downTime: Long, eventTime: Long, action: Int, pointerCount: Int,
-                            x: Array<Float>, y: Array<Float>, pressure: Array<Float>, size: Array<Float>): MotionEvent {
-
-            val properties = Array(x.size) { MotionEvent.PointerProperties() }
-            val coords = Array(x.size) { PointerCoords() }
-
-            for (i in 0 until x.size) {
-                properties[i].id = i + 1
-                properties[i].toolType = Configurator.getInstance().toolType
-
-                coords[i].pressure = pressure[i]
-                coords[i].size = size[i]
-                coords[i].x = x[i]
-                coords[i].y = y[i]
-            }
-
-            return MotionEvent.obtain(downTime, eventTime, action, pointerCount,
-                    properties, coords,
                     0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0)
         }
 

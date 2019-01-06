@@ -31,7 +31,15 @@ class MainActivity : AppCompatActivity() {
         recognizer1.actionListener = actionListener
         recognizer1.stateListener = stateListener
 
+        val recognizer2 = UIPanGestureRecognizer(this)
+        recognizer2.tag = "pan"
+        recognizer2.requireFailureOf = recognizer1
+
+        recognizer2.actionListener = actionListener
+        recognizer2.stateListener = stateListener
+
         mDelegate.addGestureRecognizer(recognizer1)
+        mDelegate.addGestureRecognizer(recognizer2)
 
         mRoot.setGestureDelegate(mDelegate)
 
@@ -40,13 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other ->
             Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer: ${recognizer.tag}, ${other.tag}")
-            when (other.tag) {
-                "single-tap" -> false
-                "double-tap" -> false
-                else -> {
-                    true
-                }
-            }
+            true
         }
     }
 

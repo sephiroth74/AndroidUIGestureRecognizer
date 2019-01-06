@@ -211,11 +211,10 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
                 tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
-
                 val id1 = event.getPointerId(upIndex)
                 val x1 = tracker.getXVelocity(id1)
                 val y1 = tracker.getYVelocity(id1)
-                for (i in 0 until numberOfTouches) {
+                for (i in 0 until event.pointerCount) {
                     if (i == upIndex) {
                         continue
                     }
@@ -234,7 +233,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
                 if (mDown && state == State.Possible) {
                     computeFocusPoint(event, mStartLocation)
-                    if (numberOfTouches - 1 < minimumNumberOfTouches) {
+                    if (numberOfTouches < minimumNumberOfTouches) {
                         state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
