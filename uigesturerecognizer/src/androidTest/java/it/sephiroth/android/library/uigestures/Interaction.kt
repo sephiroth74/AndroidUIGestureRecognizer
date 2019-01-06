@@ -218,11 +218,11 @@ class Interaction {
         // Get the pointer with the max steps to inject.
         val maxSteps = touches.size - 1
 
-        Log.i(LOG_TAG, "ACTION_DOWN")
 
         // ACTION_DOWN
         val currentPointer = touches[0][0]
         val downTime = SystemClock.uptimeMillis()
+        Log.i(LOG_TAG, "ACTION_DOWN (${currentPointer.x}, ${currentPointer.y})")
         var event: MotionEvent
         event =
                 getMotionEvent(downTime, ACTION_DOWN, currentPointer.x, currentPointer.y, currentPointer.pressure, currentPointer.size)
@@ -343,10 +343,6 @@ class Interaction {
         return getUiAutomation().injectInputEvent(event, true)
     }
 
-    private fun getPointerAction(motionEnvent: Int, index: Int): Int {
-        return motionEnvent + (index shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
-    }
-
     internal inner class WaitForAnyEventPredicate(private var mMask: Int) : UiAutomation.AccessibilityEventFilter {
         override fun accept(t: AccessibilityEvent): Boolean {
             return t.eventType and mMask != 0
@@ -362,7 +358,7 @@ class Interaction {
         val LOG_TAG: String = Interaction::class.java.name
 
         fun getMotionEvent(downTime: Long, eventTime: Long, action: Int,
-                           x: Float, y: Float, pressure: Float = 1f, size: Float = 1f): MotionEvent {
+                           x: Float, y: Float, pressure: Float = 1f, size: Float = 1f, pointerCount: Int = 1): MotionEvent {
 
             val properties = MotionEvent.PointerProperties()
             properties.id = 0
@@ -374,15 +370,18 @@ class Interaction {
             coords.x = x
             coords.y = y
 
-            return MotionEvent.obtain(downTime, eventTime, action, 1,
+            return MotionEvent.obtain(downTime, eventTime, action, pointerCount,
                     arrayOf(properties), arrayOf(coords),
                     0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0)
         }
 
-        fun getMotionEvent(downTime: Long, action: Int, x: Float, y: Float, pressure: Float = 1f, size: Float = 1f): MotionEvent {
-            return getMotionEvent(downTime, SystemClock.uptimeMillis(), action, x, y, pressure, size)
+        fun getMotionEvent(downTime: Long, action: Int, x: Float, y: Float, pressure: Float = 1f, size: Float = 1f, pointerCount: Int = 1): MotionEvent {
+            return getMotionEvent(downTime, SystemClock.uptimeMillis(), action, x, y, pressure, size, pointerCount)
         }
 
+        fun getPointerAction(motionEnvent: Int, index: Int): Int {
+            return motionEnvent + (index shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
+        }
     }
 }
 
