@@ -189,6 +189,9 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
+    debugImplementation 'com.google.android.material:material:1.0.0-rc01'
+    debugImplementation 'androidx.appcompat:appcompat:1.0.2'
+
     testImplementation 'androidx.test:core:1.1.0'
     testImplementation 'androidx.test:runner:1.1.1'
     testImplementation 'androidx.test:rules:1.1.1'
