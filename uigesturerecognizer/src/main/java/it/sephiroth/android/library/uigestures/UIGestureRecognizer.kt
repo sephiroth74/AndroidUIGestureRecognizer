@@ -278,7 +278,10 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         // compute current location
         mNumberOfTouches = computeFocusPoint(event, mCurrentLocation)
 
-        logMessage(Log.VERBOSE, "event.action: ${event.action}, focusPoint: $mCurrentLocation")
+        if (logEnabled) {
+            logMessage(Log.VERBOSE, "event.action: ${eventActionToString(event.actionMasked)}, focusPoint:$mCurrentLocation, " +
+                    "eventPoint:${PointF(event.x, event.y)}")
+        }
         return false
     }
 
@@ -364,5 +367,17 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
             set(value) {
                 sDebug = value
             }
+
+        fun eventActionToString(action: Int): String {
+            return when (action) {
+                MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
+                MotionEvent.ACTION_UP -> "ACTION_UP"
+                MotionEvent.ACTION_CANCEL -> "ACTION_CANCEL"
+                MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
+                MotionEvent.ACTION_POINTER_DOWN -> "ACTION_POINTER_DOWN"
+                MotionEvent.ACTION_POINTER_UP -> "ACTION_POINTER_UP"
+                else -> "ACTION_OTHER"
+            }
+        }
     }
 }

@@ -128,6 +128,8 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         }
     }
 
+    private val mPreviousTapLocation = PointF()
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         super.onTouchEvent(event)
 
@@ -156,13 +158,17 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     mNumTaps = 0
                     mStarted = true
                 } else {
+
                     // if second tap is too far wawy from the first
-                    val distance = mDownLocation.distance(mPreviousDownLocation)
-                    logMessage(Log.VERBOSE, "distance: $distance")
-                    if (distance > scaledDoubleTapSlop) {
-                        logMessage(Log.WARN, "second touch too far away ($distance > $scaledDoubleTapSlop)")
-                        handleFailed()
-                        return cancelsTouchesInView
+                    // and only 1 finger is required
+                    if (touchesRequired == 1 && tapsRequired > 1) {
+                        val distance = mDownLocation.distance(mPreviousDownLocation)
+                        logMessage(Log.VERBOSE, "distance: $distance")
+                        if (distance > scaledDoubleTapSlop) {
+                            logMessage(Log.WARN, "second touch too far away ($distance > $scaledDoubleTapSlop)")
+                            handleFailed()
+                            return cancelsTouchesInView
+                        }
                     }
                 }
 
@@ -180,6 +186,22 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     if (numberOfTouches > touchesRequired) {
                         logMessage(Log.WARN, "too many touches: $numberOfTouches > $touchesRequired")
                         state = State.Failed
+
+                    } else if (numberOfTouches == touchesRequired && tapsRequired > 1) {
+                        // let's check if the current tap is too far away from the previous
+                        if (mNumTaps < tapsRequired) {
+                            mPreviousTapLocation.set(mCurrentLocation)
+                        } else if (mNumTaps == tapsRequired) {
+                            val distance = mCurrentLocation.distance(mPreviousTapLocation)
+
+                            // moved too much from the previous tap
+                            if (distance > scaledDoubleTapSlop) {
+                                logMessage(Log.WARN, "distance is $distance > $scaledDoubleTapSlop")
+                                handleFailed()
+                                return cancelsTouchesInView
+                            }
+                        }
+
                     }
                 }
 
@@ -199,9 +221,11 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 if (mAlwaysInTapRegion) {
                     val distance = mDownFocus.distance(mCurrentLocation)
 
-                    logMessage(Log.VERBOSE, "distance: $distance, slop: $scaledTouchSlop")
+                    // if taps and touches > 1 then we need to be less strict
+                    val slop = if (touchesRequired > 1 && tapsRequired > 1) scaledDoubleTapSlop else scaledTouchSlop
 
-                    if (distance > scaledTouchSlop) {
+                    if (distance > slop) {
+                        logMessage(Log.WARN, "distance: $distance, slop: $slop")
                         logMessage(Log.WARN, "moved too much")
                         mAlwaysInTapRegion = false
                         removeMessages()

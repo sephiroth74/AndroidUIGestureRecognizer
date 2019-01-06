@@ -26,9 +26,8 @@ class MainActivity : AppCompatActivity() {
         mDelegate = UIGestureRecognizerDelegate()
 
         val recognizer1 = UITapGestureRecognizer(this)
-        recognizer1.tapsRequired = 1
-        recognizer1.touchesRequired = 1
-        recognizer1.tag = "single-tap"
+        recognizer1.tapsRequired = 2
+        recognizer1.touchesRequired = 2
         recognizer1.actionListener = actionListener
         recognizer1.stateListener = stateListener
 
@@ -37,7 +36,6 @@ class MainActivity : AppCompatActivity() {
         mRoot.setGestureDelegate(mDelegate)
 
         mDelegate.shouldReceiveTouch = { true }
-
         mDelegate.shouldBegin = { true }
 
         mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other ->
@@ -58,21 +56,22 @@ class MainActivity : AppCompatActivity() {
         mRoot = findViewById(R.id.activity_main)
     }
 
-    val runner = Runnable {
+    private val runner = Runnable {
         text2.text = ""
         text.text = ""
         text3.text = ""
     }
 
-    val stateListener =
+    private val stateListener =
             { recognizer: UIGestureRecognizer, oldState: UIGestureRecognizer.State?, newState: UIGestureRecognizer.State? ->
-                Timber.d("onStateChanged: $oldState --> $newState")
                 text3.text = "${recognizer.javaClass.simpleName}: $oldState --> $newState"
             }
 
-    val actionListener = { recognizer: UIGestureRecognizer ->
+    private val actionListener = { recognizer: UIGestureRecognizer ->
         val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
+        Timber.d("**********************************************")
         Timber.d("onGestureRecognized($recognizer)")
+        Timber.d("**********************************************")
 
         text.text = "${recognizer.javaClass.simpleName}: ${recognizer.state}"
         text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")

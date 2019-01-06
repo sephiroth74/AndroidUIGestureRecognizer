@@ -52,7 +52,6 @@ class TestLongPressGesture : TestBaseClass() {
         recognizer.tag = "long-press"
         recognizer.actionListener = { it ->
             activity.actionListener.invoke(it)
-
             fail("not expected")
         }
 
