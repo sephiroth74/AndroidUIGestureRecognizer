@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.ViewConfiguration
-import kotlin.math.sqrt
 
 /**
  * UIPanGestureRecognizer is a subclass of UIGestureRecognizer that looks for panning (dragging) gestures. The user must
@@ -18,29 +17,22 @@ import kotlin.math.sqrt
  * @see [
  * https://developer.apple.com/reference/uikit/uipangesturerecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
     /**
      * Minimum finger movement before the touch can be considered a pan
+     * @since 1.2.5
      */
-    var minimumTouchDistance: Int
+    var scaledTouchSlop: Int
 
+    /**
+     * Minimum fling velocity when calling {#isFling}
+     */
     val minimumFlingVelocity: Int
-    val maximumFlingVelocity: Int
 
-    private var mStarted: Boolean = false
+    private val maximumFlingVelocity: Int
 
-    override var numberOfTouches: Int = 0
-        internal set
-
-    private var mLastFocusX: Float = 0.toFloat()
-    private var mLastFocusY: Float = 0.toFloat()
-    private var mDownFocusX: Float = 0.toFloat()
-    private var mDownFocusY: Float = 0.toFloat()
-
-    private var mStartLocation = PointF()
-
-    private var mVelocityTracker: VelocityTracker? = null
     /**
      * The minimum number of fingers that can be touching the view for this gesture to be recognized.
      * The default value is 1
@@ -106,22 +98,45 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     var xVelocity: Float = 0.toFloat()
         private set
 
+    /**
+     * Once the gesture completes (State.Ended) this can be called
+     * to know if the gesture was a fling gesture
+     * @since 1.0.0
+     */
     @Suppress("unused")
     val isFling: Boolean
-        get() = state === UIGestureRecognizer.State.Ended && (Math.abs(xVelocity) > minimumFlingVelocity || Math.abs(yVelocity) > minimumFlingVelocity)
+        get() = state == State.Ended && (Math.abs(xVelocity) > minimumFlingVelocity || Math.abs(yVelocity) > minimumFlingVelocity)
 
-    val startLocationX: Float
-        get() = mStartLocation.x
+    /**
+     * Returns focus x value that originates the gesture
+     * @since 1.0.0
+     */
+    val startLocationX: Float get() = mStartLocation.x
 
-    val startLocationY: Float
-        get() = mStartLocation.y
+    /**
+     * Returns focus y value that originates the gesture
+     * @since 1.0.0
+     */
+    val startLocationY: Float get() = mStartLocation.y
+
+    private var mVelocityTracker: VelocityTracker? = null
+    private var mDown: Boolean = false
+    private var mStarted: Boolean = false
+    private var mLastFocusLocation = PointF()
+    private var mDownFocusLocation = PointF()
+    private var mStartLocation = PointF()
 
     init {
         val configuration = ViewConfiguration.get(context)
         minimumFlingVelocity = configuration.scaledMinimumFlingVelocity
         maximumFlingVelocity = configuration.scaledMaximumFlingVelocity
-        minimumTouchDistance = configuration.scaledTouchSlop
-        logMessage(Log.VERBOSE, "minimumTouchDistance: $minimumTouchDistance")
+        scaledTouchSlop = configuration.scaledTouchSlop
+
+        if (logEnabled) {
+            logMessage(Log.INFO, "scaledTouchSlop: $scaledTouchSlop")
+            logMessage(Log.INFO, "minimumFlingVelocity: $minimumFlingVelocity")
+            logMessage(Log.INFO, "maximumFlingVelocity: $maximumFlingVelocity")
+        }
     }
 
     override fun handleMessage(msg: Message) {
@@ -136,7 +151,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         mStarted = false
         mDown = false
         setBeginFiringEvents(false)
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
     }
 
     override fun reset() {
@@ -145,23 +160,18 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name})")
-        logMessage(Log.VERBOSE, "started: $mStarted")
-
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
+        if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && mStarted && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Began)) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
             setBeginFiringEvents(false)
             mStarted = false
         }
     }
-
-    private var mDown: Boolean = false
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         super.onTouchEvent(event)
@@ -170,61 +180,34 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             return false
         }
 
-        val action = event.action
+        val action = event.actionMasked
 
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain()
         }
 
         val tracker = mVelocityTracker!!
-        val pointerUp = action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
 
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        val count = event.pointerCount
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-
-        mCurrentLocation.x = focusX
-        mCurrentLocation.y = focusY
-
-        numberOfTouches = count
-
-        when (action and MotionEvent.ACTION_MASK) {
+        when (action) {
 
             MotionEvent.ACTION_POINTER_DOWN -> {
-                mLastFocusX = focusX
-                mDownFocusX = mLastFocusX
-                mLastFocusY = focusY
-                mDownFocusY = mLastFocusY
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mLastFocusLocation)
 
-                if (mDown && state === UIGestureRecognizer.State.Possible) {
-                    if (count in minimumNumberOfTouches..maximumNumberOfTouches) {
-                        updateStartLocartion(event)
+                if (mDown && state == State.Possible) {
+                    if (numberOfTouches in minimumNumberOfTouches..maximumNumberOfTouches) {
+                        computeFocusPoint(event, mStartLocation)
                     } else
-                        if (count > maximumNumberOfTouches) {
-                            state = UIGestureRecognizer.State.Failed
+                        if (numberOfTouches > maximumNumberOfTouches) {
+                            state = State.Failed
                             removeMessages(MESSAGE_RESET)
                         }
                 }
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
-                mLastFocusX = focusX
-                mDownFocusX = mLastFocusX
-                mLastFocusY = focusY
-                mDownFocusY = mLastFocusY
-                numberOfTouches = count - 1
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mLastFocusLocation)
 
                 tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
@@ -232,7 +215,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 val id1 = event.getPointerId(upIndex)
                 val x1 = tracker.getXVelocity(id1)
                 val y1 = tracker.getYVelocity(id1)
-                for (i in 0 until count) {
+                for (i in 0 until numberOfTouches) {
                     if (i == upIndex) {
                         continue
                     }
@@ -250,10 +233,9 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 }
 
                 if (mDown && state == State.Possible) {
-                    updateStartLocartion(event)
-//                } else if (mDown && state === State.Possible) {
-                    if (count - 1 < minimumNumberOfTouches) {
-                        state = UIGestureRecognizer.State.Failed
+                    computeFocusPoint(event, mStartLocation)
+                    if (numberOfTouches - 1 < minimumNumberOfTouches) {
+                        state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
                 }
@@ -266,10 +248,8 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     return cancelsTouchesInView
                 }
 
-                mLastFocusX = focusX
-                mDownFocusX = mLastFocusX
-                mLastFocusY = focusY
-                mDownFocusY = mLastFocusY
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mLastFocusLocation)
                 mStartLocation.set(mCurrentLocation)
 
                 tracker.clear()
@@ -280,23 +260,21 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
                 stopListenForOtherStateChanges()
                 removeMessages(MESSAGE_RESET)
-                state = UIGestureRecognizer.State.Possible
+                state = State.Possible
                 setBeginFiringEvents(false)
             }
 
             MotionEvent.ACTION_MOVE -> {
-                scrollX = mLastFocusX - focusX
-                scrollY = mLastFocusY - focusY
-
+                scrollX = mLastFocusLocation.x - mCurrentLocation.x
+                scrollY = mLastFocusLocation.y - mCurrentLocation.y
                 tracker.addMovement(event)
 
-                if (state === UIGestureRecognizer.State.Possible && !mStarted && mDown) {
-                    val deltaX = (focusX - mDownFocusX).toDouble()
-                    val deltaY = (focusY - mDownFocusY).toDouble()
+                if (state == State.Possible && !mStarted && mDown) {
+                    val distance = mCurrentLocation.distance(mDownFocusLocation)
 
-                    val distance = sqrt(Math.pow(deltaX, 2.0) + Math.pow(deltaY, 2.0))
-                    if (distance > minimumTouchDistance) {
+                    logMessage(Log.VERBOSE, "distance: $distance > $scaledTouchSlop")
 
+                    if (distance > scaledTouchSlop) {
                         tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
                         yVelocity = tracker.yVelocity
                         xVelocity = tracker.xVelocity
@@ -304,20 +282,21 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                         translationX -= scrollX
                         translationY -= scrollY
 
-                        mLastFocusX = focusX
-                        mLastFocusY = focusY
+                        mLastFocusLocation.set(mCurrentLocation)
                         mStarted = true
 
-                        if (count in minimumNumberOfTouches..maximumNumberOfTouches && delegate?.shouldBegin?.invoke(this)!!) {
-                            state = UIGestureRecognizer.State.Began
+                        logMessage(Log.VERBOSE, "touches: $numberOfTouches in $minimumNumberOfTouches .. $maximumNumberOfTouches")
+
+                        if (numberOfTouches in minimumNumberOfTouches..maximumNumberOfTouches && delegate?.shouldBegin?.invoke(this)!!) {
+                            state = State.Began
 
                             if (null == requireFailureOf) {
                                 fireActionEventIfCanRecognizeSimultaneously()
                             } else {
                                 when {
-                                    requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                                    requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
-                                            UIGestureRecognizer.State.Failed
+                                    requireFailureOf!!.state == State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                                    requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> state =
+                                            State.Failed
                                     else -> {
                                         listenForOtherStateChanges()
                                         setBeginFiringEvents(false)
@@ -326,11 +305,10 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                                 }
                             }
                         } else {
-                            state = UIGestureRecognizer.State.Failed
+                            state = State.Failed
                         }
                     }
-                } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed) && mDown) {
-                    //if ((Math.abs(scrollX) >= 1 || Math.abs(scrollY) >= 1)) {
+                } else if (inState(State.Began, State.Changed) && mDown) {
                     translationX -= scrollX
                     translationY -= scrollY
 
@@ -340,29 +318,36 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     xVelocity = tracker.getXVelocity(pointerId)
 
                     if (hasBeganFiringEvents()) {
-                        state = UIGestureRecognizer.State.Changed
+                        state = State.Changed
                         fireActionEvent()
                     }
 
-                    mLastFocusX = focusX
-                    mLastFocusY = focusY
+                    mLastFocusLocation.set(mCurrentLocation)
                 }
             }
 
             MotionEvent.ACTION_UP -> {
-                if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+                if (inState(State.Began, State.Changed)) {
+
+                    if (state == State.Changed) {
+                        scrollX = mLastFocusLocation.x - mCurrentLocation.x
+                        scrollY = mLastFocusLocation.y - mCurrentLocation.y
+                        translationX -= scrollX
+                        translationY -= scrollY
+                    }
+
                     val began = hasBeganFiringEvents()
-                    state = UIGestureRecognizer.State.Ended
+                    state = State.Ended
                     if (began) {
                         fireActionEvent()
                     }
                 }
 
-                if (state === UIGestureRecognizer.State.Possible || !mStarted) {
+                if (state == State.Possible || !mStarted) {
                     yVelocity = 0f
                     xVelocity = yVelocity
                 } else {
-                    // TODO: verify this. it seems to send random values here
+                    // TODO: verify this. VelocityTracker seems to send random values
                     // VelocityTracker velocityTracker = mVelocityTracker;
                     // final int pointerId = ev.getPointerId(0);
                     // velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
@@ -380,7 +365,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
             MotionEvent.ACTION_CANCEL -> {
                 removeMessages(MESSAGE_RESET)
-                state = UIGestureRecognizer.State.Cancelled
+                state = State.Cancelled
                 setBeginFiringEvents(false)
                 mHandler.sendEmptyMessage(MESSAGE_RESET)
             }
@@ -392,19 +377,8 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
         return cancelsTouchesInView
     }
 
-    private fun updateStartLocartion(event: MotionEvent) {
-        var totalX = 0f
-        var totalY = 0f
-        for (i in 0 until event.pointerCount) {
-            totalX += event.getX(i)
-            totalY += event.getY(i)
-        }
-        mStartLocation.x = totalX / event.pointerCount
-        mStartLocation.y = totalY / event.pointerCount
-    }
-
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (inState(UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended)) {
+        if (inState(State.Changed, State.Ended)) {
             setBeginFiringEvents(true)
             fireActionEvent()
         } else {
@@ -416,7 +390,7 @@ open class UIPanGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed)
     }
 
     override fun removeMessages() {
