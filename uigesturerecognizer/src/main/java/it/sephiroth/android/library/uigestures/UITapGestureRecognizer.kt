@@ -67,6 +67,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     private var mDownFocus = PointF()
     private var mStarted: Boolean = false
     private var mNumTaps = 0
+    private val mPreviousTapLocation = PointF()
 
     init {
         mStarted = false
@@ -127,8 +128,6 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             mStarted = false
         }
     }
-
-    private val mPreviousTapLocation = PointF()
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         super.onTouchEvent(event)
@@ -201,7 +200,6 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                                 return cancelsTouchesInView
                             }
                         }
-
                     }
                 }
 

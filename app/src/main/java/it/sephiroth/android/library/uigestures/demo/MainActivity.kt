@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity() {
         mDelegate = UIGestureRecognizerDelegate()
 
         val recognizer1 = UITapGestureRecognizer(this)
-        recognizer1.tapsRequired = 2
-        recognizer1.touchesRequired = 2
+        recognizer1.tapsRequired = 1
+        recognizer1.touchesRequired = 1
         recognizer1.actionListener = actionListener
         recognizer1.stateListener = stateListener
 

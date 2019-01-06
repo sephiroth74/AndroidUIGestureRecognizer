@@ -63,6 +63,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     private val mDownFocusLocation = PointF()
     private var mNumTaps = 1
     private var mBegan: Boolean = false
+    private val mPreviousTapLocation = PointF()
 
     val startLocationX: Float
         get() = mStartLocation.x
@@ -83,8 +84,7 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
     var scaledTouchSlop: Int
 
     /**
-     * the duration in milliseconds between the first tap's up event and the second tap's down
-     * event for an interaction to be considered a double-tap
+     * Maximum allowed distance betwee 2 consecutive taps before the gesture fails
      * @since 1.2.5
      */
     var scaledDoubleTapSlop: Int
@@ -187,12 +187,15 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                     mNumTaps++
 
                     // if second tap is too far wawy from the first
-                    val distance = mDownLocation.distance(mPreviousDownLocation)
-                    logMessage(Log.VERBOSE, "distance: $distance")
-                    if (distance > scaledDoubleTapSlop) {
-                        logMessage(Log.WARN, "second touch too far away ($distance > $scaledDoubleTapSlop)")
-                        handleFailed()
-                        return cancelsTouchesInView
+                    // and only 1 finger is required
+                    if (touchesRequired == 1 && tapsRequired > 1) {
+                        val distance = mDownLocation.distance(mPreviousDownLocation)
+                        if (distance > scaledDoubleTapSlop) {
+                            logMessage(Log.VERBOSE, "distance: $distance")
+                            logMessage(Log.WARN, "second touch too far away ($distance > $scaledDoubleTapSlop)")
+                            handleFailed()
+                            return cancelsTouchesInView
+                        }
                     }
                 }
 
@@ -216,6 +219,20 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
                     if (numberOfTouches > touchesRequired) {
                         removeMessages()
                         state = State.Failed
+                    } else if (numberOfTouches == touchesRequired && tapsRequired > 1) {
+                        // let's check if the current tap is too far away from the previous
+                        if (mNumTaps < tapsRequired) {
+                            mPreviousTapLocation.set(mCurrentLocation)
+                        } else if (mNumTaps == tapsRequired) {
+                            val distance = mCurrentLocation.distance(mPreviousTapLocation)
+
+                            // moved too much from the previous tap
+                            if (distance > scaledDoubleTapSlop) {
+                                logMessage(Log.WARN, "distance is $distance > $scaledDoubleTapSlop")
+                                handleFailed()
+                                return cancelsTouchesInView
+                            }
+                        }
                     }
                 }
 
@@ -255,9 +272,9 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
 
                 if (mAlwaysInTapRegion) {
                     val distance = mCurrentLocation.distance(mDownFocusLocation)
-                    logMessage(Log.VERBOSE, "distance: $distance, allowableMovement: $allowableMovement")
 
                     if (distance > allowableMovement) {
+                        logMessage(Log.WARN, "distance: $distance, allowableMovement: $allowableMovement")
                         logMessage(Log.WARN, "moved too much!: $distance > $allowableMovement")
                         mAlwaysInTapRegion = false
                         removeMessages()
@@ -267,9 +284,9 @@ open class UILongPressGestureRecognizer(context: Context) : UIGestureRecognizer(
             } else if (state == State.Began) {
                 if (!mBegan) {
                     val distance = mCurrentLocation.distance(mDownFocusLocation)
-                    logMessage(Log.VERBOSE, "distance: $distance, allowableMovement: $scaledTouchSlop")
 
                     if (distance > scaledTouchSlop) {
+                        logMessage(Log.WARN, "distance: $distance, allowableMovement: $scaledTouchSlop")
                         mBegan = true
 
                         if (hasBeganFiringEvents()) {

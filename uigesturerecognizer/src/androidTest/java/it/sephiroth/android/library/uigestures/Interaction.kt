@@ -122,6 +122,7 @@ class Interaction {
         return performMultiPointerGesture(array.toTypedArray())
     }
 
+
     fun swipe(downX: Int, downY: Int, upX: Int, upY: Int, steps: Int, drag: Boolean = false,
               timeout: Long = ViewConfiguration.getLongPressTimeout().toLong()): Boolean {
         var ret: Boolean
@@ -207,7 +208,10 @@ class Interaction {
         return performMultiPointerGesture(array.toTypedArray())
     }
 
-    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>, sleepBeforeMove: Long = 5): Boolean {
+    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>,
+                                   sleepBeforeMove: Long = MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong(),
+                                   sleepBeforeUp: Long = MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong()):
+            Boolean {
         Log.i(LOG_TAG, "performMultiPointerGesture, size: ${touches.size}")
         var ret = true
 
@@ -217,7 +221,7 @@ class Interaction {
         Log.i(LOG_TAG, "ACTION_DOWN")
 
         // ACTION_DOWN
-        var currentPointer = touches[0][0]
+        val currentPointer = touches[0][0]
         val downTime = SystemClock.uptimeMillis()
         var event: MotionEvent
         event =
@@ -276,7 +280,7 @@ class Interaction {
             }
         }
 
-        SystemClock.sleep(MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
+        SystemClock.sleep(sleepBeforeUp)
 
         // ACTION_POINTER_UP
         Log.i(LOG_TAG, "ACTION_POINTER_UP")
