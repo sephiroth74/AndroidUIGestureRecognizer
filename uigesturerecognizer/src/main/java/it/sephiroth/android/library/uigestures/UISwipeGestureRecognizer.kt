@@ -1,12 +1,12 @@
 package it.sephiroth.android.library.uigestures
 
 import android.content.Context
+import android.graphics.PointF
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.ViewConfiguration
-import kotlin.math.sqrt
 
 /**
  * UISwipeGestureRecognizer is a subclass of UIGestureRecognizer that looks for swiping gestures in one or more
@@ -17,94 +17,94 @@ import kotlin.math.sqrt
  * https://developer.apple.com/reference/uikit/uiswipegesturerecognizer](https://developer.apple.com/reference/uikit/uiswipegesturerecognizer)
  */
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
-    private val mMaximumFlingVelocity: Int
-    private val mMinimumFlingVelocity: Int
-
-    override var numberOfTouches: Int = 0
-        internal set
-
-    private var mStarted: Boolean = false
+    var scaledMinimumFlingVelocity: Int
 
     /**
+     * Direction of the swipe gesture. Can be one of RIGHT, LEFT, UP, DOWN
      * @since 1.0.0
      */
-    var direction: Int = 0
+    var direction: Int = RIGHT
 
     /**
+     * Number of touches required for the gesture to be accepted
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var numberOfTouchesRequired: Int = 1
 
-    private var mLastFocusX: Float = 0.toFloat()
-    private var mLastFocusY: Float = 0.toFloat()
-    private var mDownFocusX: Float = 0.toFloat()
-    private var mDownFocusY: Float = 0.toFloat()
 
-    private var mVelocityTracker: VelocityTracker? = null
-    private var scrollX: Float = 0.toFloat()
-    private var scrollY: Float = 0.toFloat()
+    var scrollX: Float = 0.toFloat()
+        private set
+
+    var scrollY: Float = 0.toFloat()
+        private set
+
+    /**
+     * @since 1.1.2
+     */
+    val relativeScrollX: Float get() = -scrollX
+
+    /**
+     * @since 1.1.2
+     */
+    val relativeScrollY: Float get() = -scrollY
 
     /**
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var translationX: Float = 0.toFloat()
         internal set
 
     /**
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var translationY: Float = 0.toFloat()
         internal set
 
     /**
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var yVelocity: Float = 0.toFloat()
         private set
 
     /**
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var xVelocity: Float = 0.toFloat()
         private set
 
-    private var mDown: Boolean = false
+    var scaledTouchSlop: Int
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    var minimumTouchDistance: Int
-
-    @Suppress("MemberVisibilityCanBePrivate")
     var minimumSwipeDistance: Int = 0
 
-    @Suppress("MemberVisibilityCanBePrivate")
     var maximumTouchSlopTime = MAXIMUM_TOUCH_SLOP_TIME
 
-    @Suppress("MemberVisibilityCanBePrivate")
     var maximumTouchFlingTime = MAXIMUM_TOUCH_FLING_TIME
 
+    private var mDown: Boolean = false
+    private var mStarted: Boolean = false
+    private val scaledMaximumFlingVelocity: Int
+    private val mLastFocusLocation = PointF()
+    private val mDownFocusLocation = PointF()
+    private var mVelocityTracker: VelocityTracker? = null
+
     init {
-        direction = RIGHT
         mStarted = false
 
         val configuration = ViewConfiguration.get(context)
 
-        minimumTouchDistance = configuration.scaledTouchSlop
-        mMaximumFlingVelocity = configuration.scaledMaximumFlingVelocity
-        mMinimumFlingVelocity = configuration.scaledMinimumFlingVelocity
-        minimumSwipeDistance = (minimumTouchDistance * 3f).toInt()
+        scaledTouchSlop = configuration.scaledTouchSlop
+        scaledMaximumFlingVelocity = configuration.scaledMaximumFlingVelocity
+        scaledMinimumFlingVelocity = configuration.scaledMinimumFlingVelocity
+        minimumSwipeDistance = (scaledTouchSlop * 3f).toInt()
 
         if (logEnabled) {
-            logMessage(Log.INFO, "scaledTouchSlop: $minimumTouchDistance")
+            logMessage(Log.INFO, "scaledTouchSlop: $scaledTouchSlop")
             logMessage(Log.INFO, "minimumSwipeDistance: $minimumSwipeDistance")
-            logMessage(Log.INFO, "mMinimumFlingVelocity: $mMinimumFlingVelocity")
-            logMessage(Log.INFO, "mMaximumFlingVelocity: $mMaximumFlingVelocity")
+            logMessage(Log.INFO, "scaledMinimumFlingVelocity: $scaledMinimumFlingVelocity")
+            logMessage(Log.INFO, "scaledMaximumFlingVelocity: $scaledMaximumFlingVelocity")
         }
 
     }
@@ -125,7 +125,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     private fun handleReset() {
         mStarted = false
         setBeginFiringEvents(false)
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
 
     }
 
@@ -136,22 +136,22 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
         logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name}, $mStarted)")
 
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Ended) {
+        if (recognizer.state == State.Failed && state == State.Ended) {
             removeMessages()
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
             if (!mDown) {
                 mStarted = false
-                state = UIGestureRecognizer.State.Possible
+                state = State.Possible
             }
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && mStarted && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Ended)) {
+        } else if (recognizer.inState(State.Began, State.Ended) && mStarted && inState(State.Possible, State.Ended)) {
             mStarted = false
             setBeginFiringEvents(false)
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
         }
     }
 
@@ -169,7 +169,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             return false
         }
 
-        val action = event.action
+        val action = event.actionMasked
 
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain()
@@ -177,58 +177,30 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
         mVelocityTracker!!.addMovement(event)
 
-        val pointerUp = action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
-
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        val count = event.pointerCount
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-
-        mCurrentLocation.x = focusX
-        mCurrentLocation.y = focusY
-
-        numberOfTouches = if (pointerUp) count - 1 else count
-
-        when (action and MotionEvent.ACTION_MASK) {
-
+        when (action) {
             MotionEvent.ACTION_POINTER_DOWN -> {
-                mLastFocusX = focusX
-                mLastFocusY = focusY
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mCurrentLocation)
 
-                if (state === UIGestureRecognizer.State.Possible && !mStarted) {
-                    if (count > numberOfTouchesRequired) {
-                        state = UIGestureRecognizer.State.Failed
+                if (state == State.Possible && !mStarted) {
+                    if (numberOfTouches > numberOfTouchesRequired) {
+                        state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
                 }
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
-                mLastFocusX = focusX
-                mLastFocusY = focusY
-                mDownFocusX = focusX
-                mDownFocusY = focusY
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mCurrentLocation)
 
-                mVelocityTracker!!.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
+                mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
 
                 val id1 = event.getPointerId(upIndex)
                 val x1 = mVelocityTracker!!.getXVelocity(id1)
                 val y1 = mVelocityTracker!!.getYVelocity(id1)
-                for (i in 0 until count) {
+                for (i in 0 until numberOfTouches) {
                     if (i == upIndex) {
                         continue
                     }
@@ -245,9 +217,9 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     }
                 }
 
-                if (state === UIGestureRecognizer.State.Possible && !mStarted) {
-                    if (count - 1 < numberOfTouchesRequired) {
-                        state = UIGestureRecognizer.State.Failed
+                if (state == State.Possible && !mStarted) {
+                    if (numberOfTouches < numberOfTouchesRequired) {
+                        state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
                 }
@@ -258,55 +230,53 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     mStarted = false
                     mDown = true
 
-                    mLastFocusX = focusX
-                    mLastFocusY = focusY
-                    mDownFocusX = mLastFocusX
-                    mDownFocusY = mLastFocusY
+                    mLastFocusLocation.set(mCurrentLocation)
+                    mDownFocusLocation.set(mCurrentLocation)
 
                     mVelocityTracker!!.clear()
 
                     setBeginFiringEvents(false)
                     removeMessages(MESSAGE_RESET)
-                    state = UIGestureRecognizer.State.Possible
+                    state = State.Possible
                 }
             }
 
             MotionEvent.ACTION_MOVE -> {
-                scrollX = mLastFocusX - focusX
-                scrollY = mLastFocusY - focusY
+                scrollX = mLastFocusLocation.x - mCurrentLocation.x
+                scrollY = mLastFocusLocation.y - mCurrentLocation.y
 
-                if (state === UIGestureRecognizer.State.Possible) {
-                    val deltaX = (focusX - mDownFocusX).toDouble()
-                    val deltaY = (focusY - mDownFocusY).toDouble()
-                    val distance = sqrt(Math.pow(deltaX, 2.0) + Math.pow(deltaY, 2.0))
+                if (state == State.Possible) {
+                    val distance = mCurrentLocation.distance(mDownFocusLocation)
                     if (!mStarted) {
-                        if (distance > minimumTouchDistance) {
-                            mVelocityTracker!!.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
+                        if (distance > scaledTouchSlop) {
+                            mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
                             yVelocity = mVelocityTracker!!.yVelocity
                             xVelocity = mVelocityTracker!!.xVelocity
 
                             translationX -= scrollX
                             translationY -= scrollY
 
-                            mLastFocusX = focusX
-                            mLastFocusY = focusY
+                            mLastFocusLocation.set(mCurrentLocation)
                             mStarted = true
 
-                            if (count == numberOfTouchesRequired) {
+                            if (numberOfTouches == numberOfTouchesRequired) {
                                 val time = event.eventTime - event.downTime
                                 if (time > maximumTouchSlopTime) {
                                     logMessage(Log.WARN, "passed too much time")
                                     mStarted = false
                                     setBeginFiringEvents(false)
-                                    state = UIGestureRecognizer.State.Failed
+                                    state = State.Failed
                                 } else {
                                     val direction =
-                                            getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, xVelocity, yVelocity, 0f)
+                                            getTouchDirection(mDownFocusLocation.x, mDownFocusLocation.y, mCurrentLocation.x,
+                                                    mCurrentLocation.y, xVelocity, yVelocity, 0f)
+
                                     logMessage(Log.VERBOSE, "direction: $direction")
+
                                     if (direction == -1 || (this.direction and direction) == 0) {
                                         mStarted = false
                                         setBeginFiringEvents(false)
-                                        state = UIGestureRecognizer.State.Failed
+                                        state = State.Failed
                                     } else {
                                         logMessage(Log.DEBUG, "direction accepted: ${(this.direction and direction)}")
                                         mStarted = true
@@ -315,36 +285,37 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                             } else {
                                 mStarted = false
                                 setBeginFiringEvents(false)
-                                state = UIGestureRecognizer.State.Failed
+                                state = State.Failed
                             }
                         }
                     } else {
                         // touch has been recognized. now let's track the movement
-                        mVelocityTracker!!.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
+                        mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
                         yVelocity = mVelocityTracker!!.yVelocity
                         xVelocity = mVelocityTracker!!.xVelocity
                         val time = event.eventTime - event.downTime
 
                         if (time > maximumTouchFlingTime) {
                             mStarted = false
-                            state = UIGestureRecognizer.State.Failed
+                            state = State.Failed
                         } else {
                             val direction = getTouchDirection(
-                                    mDownFocusX, mDownFocusY, focusX, focusY, xVelocity, yVelocity, minimumSwipeDistance.toFloat())
+                                    mDownFocusLocation.x, mDownFocusLocation.y, mCurrentLocation.x, mCurrentLocation.y, xVelocity,
+                                    yVelocity, minimumSwipeDistance.toFloat())
 
                             if (direction != -1) {
                                 if (this.direction and direction != 0) {
                                     if (delegate?.shouldBegin?.invoke(this)!!) {
-                                        state = UIGestureRecognizer.State.Ended
+                                        state = State.Ended
                                         if (null == requireFailureOf) {
                                             fireActionEventIfCanRecognizeSimultaneously()
                                         } else {
                                             when {
-                                                requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                                                requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> {
+                                                requireFailureOf!!.state == State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                                                requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> {
                                                     mStarted = false
                                                     setBeginFiringEvents(false)
-                                                    state = UIGestureRecognizer.State.Failed
+                                                    state = State.Failed
                                                 }
                                                 else -> {
                                                     logMessage(Log.DEBUG, "waiting...")
@@ -354,14 +325,14 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                                             }
                                         }
                                     } else {
-                                        state = UIGestureRecognizer.State.Failed
+                                        state = State.Failed
                                         mStarted = false
                                         setBeginFiringEvents(false)
                                     }
                                 } else {
                                     mStarted = false
                                     setBeginFiringEvents(false)
-                                    state = UIGestureRecognizer.State.Failed
+                                    state = State.Failed
                                 }
                             }
                         }
@@ -390,7 +361,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                 mDown = false
                 removeMessages(MESSAGE_RESET)
-                state = UIGestureRecognizer.State.Cancelled
+                state = State.Cancelled
                 mHandler.sendEmptyMessage(MESSAGE_RESET)
             }
 
@@ -405,19 +376,22 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             x1: Float, y1: Float, x2: Float, y2: Float, velocityX: Float, velocityY: Float, distanceThreshold: Float): Int {
         val diffY = y2 - y1
         val diffX = x2 - x1
-        logMessage(Log.INFO, "getTouchDirection")
-        logMessage(Log.VERBOSE, "diff: $diffX, $diffY, distanceThreshold: $distanceThreshold")
-        logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, mMinimumFlingVelocity: $mMinimumFlingVelocity")
+
+        if (logEnabled) {
+            logMessage(Log.INFO, "getTouchDirection")
+            logMessage(Log.VERBOSE, "diff: $diffX, $diffY, distanceThreshold: $distanceThreshold")
+            logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, scaledMinimumFlingVelocity: $scaledMinimumFlingVelocity")
+        }
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
-            if (Math.abs(diffX) > distanceThreshold && Math.abs(velocityX) > mMinimumFlingVelocity) {
+            if (Math.abs(diffX) > distanceThreshold && Math.abs(velocityX) > scaledMinimumFlingVelocity) {
                 return if (diffX > 0) {
                     RIGHT
                 } else {
                     LEFT
                 }
             }
-        } else if (Math.abs(diffY) > distanceThreshold && Math.abs(velocityY) > mMinimumFlingVelocity) {
+        } else if (Math.abs(diffY) > distanceThreshold && Math.abs(velocityY) > scaledMinimumFlingVelocity) {
             return if (diffY > 0) {
                 DOWN
             } else {
@@ -426,20 +400,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         }
         return -1
     }
-
-    /**
-     * @since 1.1.2
-     */
-    @Suppress("unused")
-    val relativeScrollX: Float
-        get() = -scrollX
-
-    /**
-     * @since 1.1.2
-     */
-    @Suppress("unused")
-    val relativeScrollY: Float
-        get() = -scrollY
 
     companion object {
         private const val MESSAGE_RESET = 4
