@@ -69,7 +69,7 @@
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toTopOf="@+id/numberPicker2" />
 
-        <TextView
+        <it.sephiroth.android.library.uigestures.demo.MotionView
             android:id="@+id/testView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -77,13 +77,12 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:focusable="false"
             android:background="@drawable/ripple_background"
+            android:clickable="false"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="center"
             android:inputType="none"
-            android:text="Test Me"
-            android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -11,7 +11,6 @@ import it.sephiroth.android.library.uigestures.UIGestureRecognizer
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
-import it.sephiroth.android.library.uigestures.setGestureDelegate
 import kotlinx.android.synthetic.main.activity_tap.*
 import timber.log.Timber
 
@@ -68,10 +67,10 @@ class TapActivity : AppCompatActivity() {
         recognizer.tapTimeout = 200
 
         recognizer.actionListener = {
-            testView.drawableHotspotChanged(it.currentLocationX, it.currentLocationY)
-            testView.isPressed = true
-            testView.performClick()
-            testView.isPressed = false
+//            testView.drawableHotspotChanged(it.currentLocationX, it.currentLocationY)
+//            testView.isPressed = true
+//            testView.performClick()
+//            testView.isPressed = false
             Unit
         }
 
@@ -96,7 +95,11 @@ class TapActivity : AppCompatActivity() {
                 }
 
         delegate.addGestureRecognizer(recognizer)
-        testView.setGestureDelegate(delegate)
+
+        testView.setOnTouchListener { v, event ->
+            v.onTouchEvent(event)
+            delegate.onTouchEvent(v, event)
+        }
     }
 
 }
