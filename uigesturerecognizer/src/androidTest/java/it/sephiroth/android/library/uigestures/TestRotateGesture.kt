@@ -36,7 +36,6 @@ class TestRotateGesture : TestBaseClass() {
                     if (latch.count == 2L) {
                         latch.countDown()
                     }
-
                     Timber.v("rotation: ${recognizer.rotationInRadians}")
                     Timber.v("velocity: ${recognizer.velocity}")
 

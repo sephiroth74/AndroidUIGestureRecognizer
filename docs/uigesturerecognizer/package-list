@@ -1,0 +1,8 @@
+$dokka.format:gfm
+$dokka.linkExtension:md
+$dokka.location:it.sephiroth.android.library.uigestures$distance(android.graphics.Point, android.graphics.Point)it.sephiroth.android.library.uigestures/android.graphics.-point/distance.md
+$dokka.location:it.sephiroth.android.library.uigestures$distance(android.graphics.Point, android.graphics.PointF)it.sephiroth.android.library.uigestures/android.graphics.-point/distance.md
+$dokka.location:it.sephiroth.android.library.uigestures$distance(android.graphics.PointF, android.graphics.Point)it.sephiroth.android.library.uigestures/android.graphics.-point-f/distance.md
+$dokka.location:it.sephiroth.android.library.uigestures$distance(android.graphics.PointF, android.graphics.PointF)it.sephiroth.android.library.uigestures/android.graphics.-point-f/distance.md
+$dokka.location:it.sephiroth.android.library.uigestures$setGestureDelegate(android.view.View, it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate)it.sephiroth.android.library.uigestures/android.view.-view/set-gesture-delegate.md
+it.sephiroth.android.library.uigestures
