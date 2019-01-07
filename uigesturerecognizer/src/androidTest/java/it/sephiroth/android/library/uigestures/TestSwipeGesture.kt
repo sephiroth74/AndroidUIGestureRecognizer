@@ -76,6 +76,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.LEFT
         recognizer.actionListener = actionListener
         recognizer.maximumTouchSlopTime *= 5 // test only
+        recognizer.maximumTouchFlingTime *= 2 // test only
 
         delegate.addGestureRecognizer(recognizer)
 
