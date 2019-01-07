@@ -75,6 +75,8 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.numberOfTouchesRequired = 2
         recognizer.direction = UISwipeGestureRecognizer.LEFT
         recognizer.actionListener = actionListener
+        recognizer.maximumTouchSlopTime *= 2 // test only
+
         delegate.addGestureRecognizer(recognizer)
 
         interaction.swipeLeftMultiTouch(mainView, 5, 2)
