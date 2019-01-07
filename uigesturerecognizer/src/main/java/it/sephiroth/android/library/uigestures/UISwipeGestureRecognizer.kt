@@ -17,9 +17,13 @@ import android.view.ViewConfiguration
  * https://developer.apple.com/reference/uikit/uiswipegesturerecognizer](https://developer.apple.com/reference/uikit/uiswipegesturerecognizer)
  */
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
+    /**
+     * Minimum fling velocity before the touch can be accepted
+     * @since 1.0.0
+     */
     var scaledMinimumFlingVelocity: Int
 
     /**
@@ -33,7 +37,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
      * @since 1.0.0
      */
     var numberOfTouchesRequired: Int = 1
-
 
     var scrollX: Float = 0.toFloat()
         private set
@@ -75,12 +78,30 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var xVelocity: Float = 0.toFloat()
         private set
 
+    /**
+     * Minimum distance in pixel before the touch can be considered
+     * as a scroll
+     */
     var scaledTouchSlop: Int
 
+    /**
+     * Minimum total distance before the gesture will begin
+     * @since 1.0.0
+     */
     var minimumSwipeDistance: Int = 0
 
+    /**
+     * Maximum amount of time allowed between a touch down and a touch move
+     * before the gesture will fail
+     * @since 1.0.0
+     */
     var maximumTouchSlopTime = MAXIMUM_TOUCH_SLOP_TIME
 
+    /**
+     * During a move event, the maximum time between touches before
+     * the gesture will fail
+     * @since 1.0.0
+     */
     var maximumTouchFlingTime = MAXIMUM_TOUCH_FLING_TIME
 
     private var mDown: Boolean = false
@@ -126,7 +147,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         mStarted = false
         setBeginFiringEvents(false)
         state = State.Possible
-
     }
 
     override fun removeMessages() {
@@ -134,8 +154,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name}, $mStarted)")
-
         if (recognizer.state == State.Failed && state == State.Ended) {
             removeMessages()
             stopListenForOtherStateChanges()
@@ -247,6 +265,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                 if (state == State.Possible) {
                     val distance = mCurrentLocation.distance(mDownFocusLocation)
+                    logMessage(Log.INFO, "started: $mStarted, distance: $distance, slop: $scaledTouchSlop")
                     if (!mStarted) {
                         if (distance > scaledTouchSlop) {
                             mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
@@ -262,7 +281,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                             if (numberOfTouches == numberOfTouchesRequired) {
                                 val time = event.eventTime - event.downTime
                                 if (time > maximumTouchSlopTime) {
-                                    logMessage(Log.WARN, "passed too much time")
+                                    logMessage(Log.WARN, "passed too much time 1 ($time > $maximumTouchSlopTime)")
                                     mStarted = false
                                     setBeginFiringEvents(false)
                                     state = State.Failed
@@ -274,6 +293,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                                     logMessage(Log.VERBOSE, "direction: $direction")
 
                                     if (direction == -1 || (this.direction and direction) == 0) {
+                                        logMessage(Log.WARN, "invalid direction: $direction")
                                         mStarted = false
                                         setBeginFiringEvents(false)
                                         state = State.Failed
@@ -283,6 +303,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                                     }
                                 }
                             } else {
+                                logMessage(Log.WARN, "invalid number of touches ($numberOfTouches != $numberOfTouchesRequired)")
                                 mStarted = false
                                 setBeginFiringEvents(false)
                                 state = State.Failed
@@ -296,6 +317,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                         val time = event.eventTime - event.downTime
 
                         if (time > maximumTouchFlingTime) {
+                            logMessage(Log.WARN, "passed too much time 2 ($time > $maximumTouchFlingTime)")
                             mStarted = false
                             state = State.Failed
                         } else {
@@ -348,7 +370,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                 }
 
                 // TODO: should we fail if the gesture didn't actually start?
-
                 mDown = false
                 removeMessages(MESSAGE_RESET)
             }
