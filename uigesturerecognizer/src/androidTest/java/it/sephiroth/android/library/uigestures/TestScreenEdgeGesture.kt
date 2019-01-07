@@ -2,8 +2,7 @@ package it.sephiroth.android.library.uigestures
 
 import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -173,5 +172,34 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(3L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeftWithFailure() {
+        setTitle("Edge Right With Failure")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+
+        val recognizer2 = UIScreenEdgePanGestureRecognizer(context)
+        recognizer2.tag = "edge-left"
+        recognizer2.edge = UIRectEdge.LEFT
+
+        recognizer.actionListener = actionListener
+        recognizer2.actionListener = { it ->
+            fail("unexpected")
+        }
+
+        recognizer.requireFailureOf = recognizer2
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.addGestureRecognizer(recognizer2)
+        mainView.swipeLeft(5)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
     }
 }
