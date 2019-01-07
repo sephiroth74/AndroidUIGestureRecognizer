@@ -202,4 +202,32 @@ class TestScreenEdgeGesture : TestBaseClass() {
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
+
+    @Test
+    fun testSwipeLeftWithFailure2() {
+        setTitle("Edge Right With Failure")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.actionListener = actionListener
+
+        val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tag = "edge-left"
+
+        recognizer2.actionListener = { it ->
+            fail("unexpected")
+        }
+
+        recognizer.requireFailureOf = recognizer2
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.addGestureRecognizer(recognizer2)
+        mainView.swipeLeft(5)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
 }
