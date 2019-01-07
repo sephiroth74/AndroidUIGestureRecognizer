@@ -119,3 +119,7 @@ Add the library dependency:
         }
 
 ```
+
+# JavaDoc
+
+https://sephiroth74.github.io/AndroidUIGestureRecognizer/
