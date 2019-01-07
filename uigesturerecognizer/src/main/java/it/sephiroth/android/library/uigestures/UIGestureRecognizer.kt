@@ -280,7 +280,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         if (logEnabled) {
             logMessage(Log.VERBOSE, "event.action: ${eventActionToString(event.actionMasked)}, focusPoint:$mCurrentLocation, " +
-                    "eventPoint:${PointF(event.x, event.y)}")
+                    "eventPoint:${PointF(event.x, event.y)}, eventTime:${event.eventTime}")
         }
         return false
     }
