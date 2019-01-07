@@ -44,6 +44,26 @@ class TestSwipeGesture : TestBaseClass() {
     }
 
     @Test
+    fun testSwipeUp() {
+        setTitle("Swipe Up")
+
+        latch = CountDownLatch(1)
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UISwipeGestureRecognizer(context)
+        recognizer.tag = "swipe-up"
+        recognizer.numberOfTouchesRequired = 1
+        recognizer.direction = UISwipeGestureRecognizer.UP
+        recognizer.actionListener = actionListener
+        delegate.addGestureRecognizer(recognizer)
+        mainView.swipeUp(5)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
+
+    @Test
     fun testSwipeLeft2Fingers() {
         setTitle("Swipe Left 2 Fingers")
 
@@ -168,4 +188,34 @@ class TestSwipeGesture : TestBaseClass() {
         assertEquals(0L, latch.count)
     }
 
+
+    @Test
+    fun testSwipeRightRequireFailure() {
+        setTitle("Swipe Right Require Failure")
+
+        latch = CountDownLatch(1)
+        delegate.clear()
+
+        val recognizer = UISwipeGestureRecognizer(context)
+        recognizer.tag = "swipe-right"
+        recognizer.direction = UISwipeGestureRecognizer.RIGHT
+        recognizer.actionListener = actionListener
+
+        val recognizer2 = UISwipeGestureRecognizer(context)
+        recognizer2.tag = "swipe-up"
+        recognizer2.direction = UISwipeGestureRecognizer.UP
+        recognizer2.actionListener = {
+            fail("unexpected")
+        }
+
+        recognizer.requireFailureOf = recognizer2
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.addGestureRecognizer(recognizer2)
+
+        mainView.swipeRight(5)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
 }
