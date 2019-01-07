@@ -23,6 +23,7 @@ import android.view.MotionEvent
 open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context),
         UIContinuousRecognizer,
         ScaleGestureDetector.OnScaleGestureListener {
+
     private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this, Handler(Looper.getMainLooper()))
 
     /**
@@ -143,7 +144,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         }
 
     init {
-        isQuickScaleEnabled = false
+        isQuickScaleEnabled = Build.VERSION.SDK_INT >= 19
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -157,8 +158,6 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name})")
-
         if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
