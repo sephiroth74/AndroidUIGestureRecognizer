@@ -280,6 +280,9 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                             if (numberOfTouches == numberOfTouchesRequired) {
                                 val time = event.eventTime - event.downTime
+
+                                logMessage(Log.VERBOSE, "time: $time, maximumTouchSlopTime: $maximumTouchSlopTime")
+
                                 if (time > maximumTouchSlopTime) {
                                     logMessage(Log.WARN, "passed too much time 1 ($time > $maximumTouchSlopTime)")
                                     mStarted = false
@@ -290,7 +293,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                                             getTouchDirection(mDownFocusLocation.x, mDownFocusLocation.y, mCurrentLocation.x,
                                                     mCurrentLocation.y, xVelocity, yVelocity, 0f)
 
-                                    logMessage(Log.VERBOSE, "direction: $direction")
+                                    logMessage(Log.VERBOSE, "(1) direction: $direction")
 
                                     if (direction == -1 || (this.direction and direction) == 0) {
                                         logMessage(Log.WARN, "invalid direction: $direction")
