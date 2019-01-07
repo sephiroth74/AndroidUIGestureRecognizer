@@ -13,33 +13,63 @@ import timber.log.Timber
 class MotionView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var pointerDrawable: PointerDrawable = PointerDrawable()
+    var pointersMap = hashMapOf<Int, PointerDrawable>()
 
     init {
-        pointerDrawable.drawCallback = {
-            postInvalidateOnAnimation()
-        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        Timber.i("onTouchEvent")
 
         val action = event.actionMasked
+        val pointerIndex = event.actionIndex
+        val pointerId = event.getPointerId(pointerIndex)
 
         when (action) {
             MotionEvent.ACTION_DOWN -> {
-                pointerDrawable.reset()
-                pointerDrawable.moveTo(event.x, event.y)
+                if (!pointersMap.containsKey(pointerId)) {
+                    val pointerDrawable = PointerDrawable(pointerId)
+                    pointerDrawable.drawCallback = { postInvalidateOnAnimation() }
+                    pointersMap[pointerId] = pointerDrawable
+                }
+
+                val pointerDrawable = pointersMap[pointerId]
+                pointerDrawable?.let {
+                    it.reset()
+                    it.moveTo(event.x, event.y)
+                }
+            }
+
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (!pointersMap.containsKey(pointerId)) {
+                    val pointerDrawable = PointerDrawable(pointerId)
+                    pointerDrawable.drawCallback = { postInvalidateOnAnimation() }
+                    pointersMap[pointerId] = pointerDrawable
+                }
+
+                val pointerDrawable = pointersMap[pointerId]
+                pointerDrawable?.let {
+                    it.reset()
+                    it.moveTo(event.getX(pointerIndex), event.getY(pointerIndex))
+                }
+            }
+
+            MotionEvent.ACTION_POINTER_UP -> {
+                val pointerDrawable = pointersMap[pointerId]
+                pointerDrawable?.fadeout()
             }
 
             MotionEvent.ACTION_MOVE -> {
-                pointerDrawable.lineTo(event.x, event.y)
+                for (i in 0 until event.pointerCount) {
+                    val id = event.getPointerId(i)
+                    val pointerDrawable = pointersMap[id]
+                    pointerDrawable?.lineTo(event.getX(i), event.getY(i))
+                }
             }
 
             MotionEvent.ACTION_CANCEL,
             MotionEvent.ACTION_UP -> {
-                pointerDrawable.lineTo(event.x, event.y)
-                pointerDrawable.fadeout()
+                for (item in pointersMap.values)
+                    item.fadeout()
             }
         }
 
@@ -49,18 +79,15 @@ class MotionView @JvmOverloads constructor(
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
 
-        if (pointerDrawable.enabled) {
-            pointerDrawable.draw(canvas)
-        }
+        pointersMap.filter { it.value.enabled }.map { it.value }.forEach { it.draw(canvas) }
     }
 
 }
 
-class PointerDrawable {
+class PointerDrawable(val pointerIndex: Int) {
     var enabled = false
         private set
 
-    var pointerIndex: Int = 0
     var drawCallback: ((p: PointerDrawable) -> Unit)? = null
 
     private var x: Float = 0f
@@ -68,6 +95,10 @@ class PointerDrawable {
     private val path = Path()
     private var isFadingOut: Boolean = false
     private var alpha = 1f
+
+    override fun toString(): String {
+        return "PointerDrawable($pointerIndex)"
+    }
 
     fun reset() {
         path.reset()
@@ -89,7 +120,6 @@ class PointerDrawable {
         this.x = x
         this.y = y
         path.lineTo(x, y)
-
         drawCallback?.invoke(this)
     }
 
@@ -130,7 +160,6 @@ class PointerDrawable {
         pointerPaint.color = Color.BLACK
         pointerPaint.alpha = (alpha * POINTER_FILL_MAX).toInt()
         canvas.drawCircle(x, y, radius, pointerPaint)
-
     }
 
     companion object {

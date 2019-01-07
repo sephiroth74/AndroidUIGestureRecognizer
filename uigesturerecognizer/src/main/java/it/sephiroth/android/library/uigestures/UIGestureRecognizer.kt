@@ -277,11 +277,6 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         // compute current location
         mNumberOfTouches = computeFocusPoint(event, mCurrentLocation)
-
-        if (logEnabled) {
-            logMessage(Log.VERBOSE, "event.action: ${eventActionToString(event.actionMasked)}, focusPoint:$mCurrentLocation, " +
-                    "eventPoint:${PointF(event.x, event.y)}, eventTime:${event.eventTime}")
-        }
         return false
     }
 

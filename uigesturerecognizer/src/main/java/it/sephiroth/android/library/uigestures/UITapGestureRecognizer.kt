@@ -117,7 +117,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             logMessage(Log.VERBOSE, "mStarted: $mStarted")
         }
 
-        if (recognizer.state === State.Failed && state === State.Ended) {
+        if (recognizer.state == State.Failed && state == State.Ended) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
             postReset()
