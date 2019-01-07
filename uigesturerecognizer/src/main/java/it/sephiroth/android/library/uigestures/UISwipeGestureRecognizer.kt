@@ -101,7 +101,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         minimumSwipeDistance = (minimumTouchDistance * 3f).toInt()
 
         if (logEnabled) {
-            logMessage(Log.INFO, "minimumTouchDistance: $minimumTouchDistance")
+            logMessage(Log.INFO, "scaledTouchSlop: $minimumTouchDistance")
             logMessage(Log.INFO, "minimumSwipeDistance: $minimumSwipeDistance")
             logMessage(Log.INFO, "mMinimumFlingVelocity: $mMinimumFlingVelocity")
             logMessage(Log.INFO, "mMaximumFlingVelocity: $mMaximumFlingVelocity")
