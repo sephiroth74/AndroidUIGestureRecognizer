@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.os.Build
 import android.os.Handler
@@ -22,6 +23,7 @@ import android.view.MotionEvent
 open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(context),
         UIContinuousRecognizer,
         ScaleGestureDetector.OnScaleGestureListener {
+
     private val mScaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, this, Handler(Looper.getMainLooper()))
 
     /**
@@ -30,7 +32,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     var scale: Float = 0.toFloat()
         private set
 
-    override val numberOfTouches: Int
+    override var numberOfTouches: Int = 0
         get() = mScaleGestureDetector.numberOfTouches
 
     /**
@@ -42,11 +44,8 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     val scaleFactor: Float
         get() = mScaleGestureDetector.scaleFactor
 
-    override val currentLocationX: Float
-        get() = mScaleGestureDetector.focusX
-
-    override val currentLocationY: Float
-        get() = mScaleGestureDetector.focusY
+    override val currentLocationX: Float get() = mScaleGestureDetector.focusX
+    override val currentLocationY: Float get() = mScaleGestureDetector.focusY
 
     /**
      * @see ScaleGestureDetector.currentSpan
@@ -106,7 +105,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     private fun handleReset() {
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
     }
 
     override fun reset() {
@@ -145,7 +144,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         }
 
     init {
-        isQuickScaleEnabled = false
+        isQuickScaleEnabled = Build.VERSION.SDK_INT >= 19
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -159,29 +158,27 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name})")
-
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
+        if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Began)) {
+        } else if (recognizer.inState(State.Began, State.Ended) && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
         }
     }
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {
-        if (isEnabled && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+        if (isEnabled && inState(State.Began, State.Changed)) {
             scale += detector.scaleFactor - 1
-            if (state === UIGestureRecognizer.State.Began) {
+            if (state === State.Began) {
                 if (hasBeganFiringEvents()) {
-                    state = UIGestureRecognizer.State.Changed
+                    state = State.Changed
                     fireActionEvent()
                 }
-            } else if (state === UIGestureRecognizer.State.Changed) {
-                state = UIGestureRecognizer.State.Changed
+            } else if (state === State.Changed) {
+                state = State.Changed
                 fireActionEvent()
             }
         }
@@ -189,22 +186,22 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
 
-        if (isEnabled && state === UIGestureRecognizer.State.Possible && delegate?.shouldReceiveTouch?.invoke(this)!!) {
+        if (isEnabled && state == State.Possible && delegate?.shouldReceiveTouch?.invoke(this)!!) {
             scale = detector.scaleFactor
             removeMessages(MESSAGE_RESET)
 
             if (delegate?.shouldBegin?.invoke(this)!!) {
-                state = UIGestureRecognizer.State.Began
+                state = State.Began
 
                 if (null == requireFailureOf) {
                     fireActionEventIfCanRecognizeSimultaneously()
                 } else {
                     when {
-                        requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                        requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
-                                UIGestureRecognizer.State.Failed
+                        requireFailureOf!!.state == State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                        requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> state =
+                                State.Failed
                         else -> {
                             listenForOtherStateChanges()
                             setBeginFiringEvents(false)
@@ -213,17 +210,17 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     }
                 }
             } else {
-                state = UIGestureRecognizer.State.Failed
+                state = State.Failed
             }
-            return true
+            return cancelsTouchesInView
         }
-        return true
+        return cancelsTouchesInView
     }
 
     override fun onScaleEnd(detector: ScaleGestureDetector) {
-        if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+        if (inState(State.Began, State.Changed)) {
             val began = hasBeganFiringEvents()
-            state = UIGestureRecognizer.State.Ended
+            state = State.Ended
             if (began) {
                 fireActionEvent()
             }
@@ -232,7 +229,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (inState(UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended)) {
+        if (inState(State.Changed, State.Ended)) {
             setBeginFiringEvents(true)
             fireActionEvent()
         } else {
@@ -244,7 +241,7 @@ open class UIPinchGestureRecognizer(context: Context) : UIGestureRecognizer(cont
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed)
     }
 
     override fun removeMessages() {

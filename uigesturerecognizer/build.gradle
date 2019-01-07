@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'org.jetbrains.dokka-android'
 
 coveralls {
     jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
@@ -28,7 +29,7 @@ android {
         versionName VERSION_NAME
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -41,6 +42,12 @@ android {
 
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    sourceSets {
+        androidTest {
+            setRoot 'src/androidTest'
         }
     }
 
@@ -68,6 +75,26 @@ android {
                     includeNoLocationClasses = true
                 }
             }
+        }
+    }
+
+    dokka {
+        skipEmptyPackages = true
+        includeNonPublic = false
+        skipDeprecated = true
+        reportUndocumented = true
+        outputFormat = 'gfm'
+        outputDirectory = "$rootDir/docs"
+
+        linkMapping {
+            // Source directory
+            dir = "src/main/java"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/sephiroth74/AndroidUIGestureRecognizer/tree/master/uigesturerecognizer/src/main/java"
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            suffix = "#L"
         }
     }
 
@@ -159,18 +186,24 @@ task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn:
 
 
 dependencies {
-    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'androidx.annotation:annotation:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
+    debugImplementation 'com.google.android.material:material:1.0.0-rc01'
+    debugImplementation 'androidx.appcompat:appcompat:1.0.2'
 
     testImplementation 'androidx.test:core:1.1.0'
     testImplementation 'androidx.test:runner:1.1.1'
     testImplementation 'androidx.test:rules:1.1.1'
     testImplementation 'androidx.test.ext:junit:1.1.0'
-    testImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    testImplementation 'org.robolectric:robolectric:4.0.2'
+    testImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation 'org.robolectric:robolectric:4.1'
 
+    androidTestImplementation('com.jakewharton.timber:timber:4.7.1') {
+        exclude group: 'org.jetbrains', module: 'annotations'
+    }
+
+    androidTestImplementation 'com.google.android.material:material:1.0.0-rc01'
     androidTestImplementation 'androidx.appcompat:appcompat:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.1'

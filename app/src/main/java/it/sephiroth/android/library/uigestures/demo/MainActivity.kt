@@ -28,85 +28,28 @@ class MainActivity : AppCompatActivity() {
         val recognizer1 = UITapGestureRecognizer(this)
         recognizer1.tapsRequired = 1
         recognizer1.touchesRequired = 1
-        recognizer1.tag = "single-tap"
-        recognizer1.tapTimeout = 200
         recognizer1.actionListener = actionListener
+        recognizer1.stateListener = stateListener
 
-        val recognizer2 = UITapGestureRecognizer(this)
-        recognizer2.tag = "double-tap"
-        recognizer2.tapsRequired = 2
-        recognizer2.touchesRequired = 1
+        val recognizer2 = UIPanGestureRecognizer(this)
+        recognizer2.tag = "pan"
+        recognizer2.requireFailureOf = recognizer1
+
         recognizer2.actionListener = actionListener
+        recognizer2.stateListener = stateListener
 
-        val recognizer3 = UILongPressGestureRecognizer(this)
-        recognizer3.tag = "long-press"
-        recognizer3.tapsRequired = 0
-        recognizer3.touchesRequired = 1
-        recognizer3.actionListener = actionListener
-
-        val recognizer4 = UILongPressGestureRecognizer(this)
-        recognizer4.tag = "long-press-2"
-        recognizer4.tapsRequired = 0
-        recognizer4.minimumPressDuration = 4000
-        recognizer4.allowableMovement = 500f
-        recognizer4.actionListener = actionListener
-
-        val recognizer5 = UIPanGestureRecognizer(this)
-        recognizer5.tag = "pan"
-        recognizer5.actionListener = actionListener
-        recognizer5.minimumNumberOfTouches = 1
-        recognizer5.maximumNumberOfTouches = 1
-
-        val recognizer6 = UIPinchGestureRecognizer(this)
-        recognizer6.tag = "pinch"
-        recognizer6.actionListener = actionListener
-
-        val recognizer7 = UIRotateGestureRecognizer(this)
-        recognizer7.tag = "rotation"
-        recognizer7.actionListener = actionListener
-
-        val recognizer8 = UISwipeGestureRecognizer(this)
-        recognizer8.tag = "swipe"
-        recognizer8.actionListener = actionListener
-        recognizer8.direction = UISwipeGestureRecognizer.UP or UISwipeGestureRecognizer.RIGHT
-
-        val recognizer9 = UIScreenEdgePanGestureRecognizer(this)
-        recognizer9.tag = "screenEdges"
-        recognizer9.actionListener = actionListener
-
-        //recognizer3.requireFailureOf(recognizer4);
-
-        mDelegate.addGestureRecognizer(recognizer3)
-//        mDelegate.addGestureRecognizer(recognizer2)
-//        mDelegate.addGestureRecognizer(recognizer3)
-//        mDelegate.addGestureRecognizer(recognizer5)
-        //        mDelegate.addGestureRecognizer(recognizer3);
-        //        mDelegate.addGestureRecognizer(recognizer5);
-        //        mDelegate.addGestureRecognizer(recognizer6);
-        //        mDelegate.addGestureRecognizer(recognizer8);
-        //        mDelegate.addGestureRecognizer(recognizer9);
-
-        // start listening for MotionEvent
-
-//        mDelegate.startListeningView(mRoot)
+        mDelegate.addGestureRecognizer(recognizer1)
+        mDelegate.addGestureRecognizer(recognizer2)
 
         mRoot.setGestureDelegate(mDelegate)
 
         mDelegate.shouldReceiveTouch = { true }
-
         mDelegate.shouldBegin = { true }
 
         mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other ->
             Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer: ${recognizer.tag}, ${other.tag}")
-            when (other.tag) {
-                "single-tap" -> false
-                "double-tap" -> false
-                else -> {
-                    true
-                }
-            }
+            true
         }
-
     }
 
     override fun onContentChanged() {
@@ -115,15 +58,24 @@ class MainActivity : AppCompatActivity() {
         mRoot = findViewById(R.id.activity_main)
     }
 
-    val runner = Runnable {
+    private val runner = Runnable {
         text2.text = ""
+        text.text = ""
+        text3.text = ""
     }
 
-    val actionListener = { recognizer: UIGestureRecognizer ->
-        val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
-        Timber.d("onGestureRecognized($recognizer)")
+    private val stateListener =
+            { recognizer: UIGestureRecognizer, oldState: UIGestureRecognizer.State?, newState: UIGestureRecognizer.State? ->
+                text3.text = "${recognizer.javaClass.simpleName}: $oldState --> $newState"
+            }
 
-        text.text = recognizer.state?.name
+    private val actionListener = { recognizer: UIGestureRecognizer ->
+        val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
+        Timber.d("**********************************************")
+        Timber.d("onGestureRecognized($recognizer)")
+        Timber.d("**********************************************")
+
+        text.text = "${recognizer.javaClass.simpleName}: ${recognizer.state}"
         text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
         text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
 

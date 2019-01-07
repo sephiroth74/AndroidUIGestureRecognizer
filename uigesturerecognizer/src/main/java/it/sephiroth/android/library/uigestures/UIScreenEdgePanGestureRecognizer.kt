@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.ViewConfiguration
-import kotlin.math.sqrt
 
 /**
  * UIPanGestureRecognizer is a subclass of UIGestureRecognizer that looks for panning (dragging) gestures. The user must
@@ -18,18 +17,8 @@ import kotlin.math.sqrt
  * @see [
  * https://developer.apple.com/reference/uikit/uipangesturerecognizer](https://developer.apple.com/reference/uikit/uipangesturerecognizer)
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
-    private val mEdgeLimit: Float
-
-    private var mStarted: Boolean = false
-    private var mDown: Boolean = false
-
-    private var mLastFocusX: Float = 0.toFloat()
-    private var mLastFocusY: Float = 0.toFloat()
-    private var mDownFocusX: Float = 0.toFloat()
-    private var mDownFocusY: Float = 0.toFloat()
-
-    private var mVelocityTracker: VelocityTracker? = null
 
     /**
      * The minimum number of fingers that can be touching the view for this gesture to be recognized.
@@ -37,15 +26,13 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
      *
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    var minimumNumberOfTouches: Int = 0
+    var minimumNumberOfTouches: Int = 1
 
     /**
-     * @param touches The maximum number of fingers that can be touching the view for this gesture to be recognized.
+     * @ The maximum number of fingers that can be touching the view for this gesture to be recognized.
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    var maximumNumberOfTouches: Int = 0
+    var maximumNumberOfTouches: Int = Integer.MAX_VALUE
 
     var scrollX: Float = 0.toFloat()
         private set
@@ -77,29 +64,41 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     var xVelocity: Float = 0.toFloat()
         private set
 
-    private val mCurrentLocation: PointF
+    /**
+     * @return the relative scroll x between gestures
+     * @since 1.1.2
+     */
+    val relativeScrollX: Float get() = -scrollX
 
-    override var numberOfTouches: Int = 0
-        internal set
+    /**
+     * @return the relative scroll y between gestures
+     * @since 1.0.0
+     */
+    val relativeScrollY: Float get() = -scrollY
 
+    /**
+     * Screen sdge to be considered for this gesture to be recognized
+     * @since 1.0.0
+     */
     var edge = UIRectEdge.LEFT
 
-    override val currentLocationX: Float
-        get() = mCurrentLocation.x
+    /**
+     * Minimum finger movement before the touch can be considered a pan
+     * @since 1.2.5
+     */
+    var scaledTouchSlop: Int
 
-    override val currentLocationY: Float
-        get() = mCurrentLocation.y
+    private val mEdgeLimit: Float
+    private var mStarted: Boolean = false
+    private var mDown: Boolean = false
+    private var mVelocityTracker: VelocityTracker? = null
+    private var mLastFocusLocation = PointF()
+    private var mDownFocusLocation = PointF()
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    var minimumTouchDistance: Int
 
     init {
-        minimumNumberOfTouches = 1
-        maximumNumberOfTouches = Integer.MAX_VALUE
-
         val configuration = ViewConfiguration.get(context)
-        minimumTouchDistance = configuration.scaledTouchSlop
-        mCurrentLocation = PointF()
+        scaledTouchSlop = configuration.scaledTouchSlop
         mEdgeLimit = context.resources.getDimension(R.dimen.gestures_screen_edge_limit)
     }
 
@@ -120,22 +119,19 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
         mStarted = false
         mDown = false
         setBeginFiringEvents(false)
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(%s, %s)", recognizer, recognizer.state?.name!!)
-        logMessage(Log.VERBOSE, "started: %b, state: %s", mStarted, state?.name!!)
-
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
+        if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) &&
-                   mStarted && mDown && inState(UIGestureRecognizer.State.Possible, UIGestureRecognizer.State.Began)) {
+        } else if (recognizer.inState(State.Began, State.Ended) &&
+                mStarted && mDown && inState(State.Possible, State.Began)) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
             setBeginFiringEvents(false)
             mStarted = false
             mDown = false
@@ -149,60 +145,33 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
             return false
         }
 
-        val action = event.action
+        val action = event.actionMasked
 
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain()
         }
 
-        val pointerUp = action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
-
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        val count = event.pointerCount
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-
-        mCurrentLocation.x = focusX
-        mCurrentLocation.y = focusY
 
         val rawX = event.rawX
         val rawY = event.rawY
 
-        numberOfTouches = count
-
-        when (action and MotionEvent.ACTION_MASK) {
+        when (action) {
 
             MotionEvent.ACTION_POINTER_DOWN -> {
-                mLastFocusX = focusX
-                mDownFocusX = mLastFocusX
-                mLastFocusY = focusY
-                mDownFocusY = mLastFocusY
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mCurrentLocation)
 
-                if (state === UIGestureRecognizer.State.Possible) {
-                    if (count > maximumNumberOfTouches) {
-                        state = UIGestureRecognizer.State.Failed
+                if (state == State.Possible) {
+                    if (numberOfTouches > maximumNumberOfTouches) {
+                        state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
                 }
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
-                mLastFocusX = focusX
-                mDownFocusX = mLastFocusX
-                mLastFocusY = focusY
-                mDownFocusY = mLastFocusY
-                numberOfTouches = count - 1
+                mLastFocusLocation.set(mCurrentLocation)
+                mDownFocusLocation.set(mCurrentLocation)
 
                 mVelocityTracker!!.computeCurrentVelocity(1000, 0f)
                 val upIndex = event.actionIndex
@@ -210,7 +179,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                 val id1 = event.getPointerId(upIndex)
                 val x1 = mVelocityTracker!!.getXVelocity(id1)
                 val y1 = mVelocityTracker!!.getYVelocity(id1)
-                for (i in 0 until count) {
+                for (i in 0 until event.pointerCount) {
                     if (i == upIndex) {
                         continue
                     }
@@ -227,9 +196,9 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                     }
                 }
 
-                if (state === UIGestureRecognizer.State.Possible) {
-                    if (count - 1 < minimumNumberOfTouches) {
-                        state = UIGestureRecognizer.State.Failed
+                if (state == State.Possible) {
+                    if (numberOfTouches < minimumNumberOfTouches) {
+                        state = State.Failed
                         removeMessages(MESSAGE_RESET)
                     }
                 }
@@ -237,10 +206,8 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
             MotionEvent.ACTION_DOWN -> {
                 if (delegate?.shouldReceiveTouch?.invoke(this)!!) {
-                    mLastFocusX = focusX
-                    mDownFocusX = mLastFocusX
-                    mLastFocusY = focusY
-                    mDownFocusY = mLastFocusY
+                    mLastFocusLocation.set(mCurrentLocation)
+                    mDownFocusLocation.set(mCurrentLocation)
 
                     mVelocityTracker!!.clear()
                     mVelocityTracker!!.addMovement(event)
@@ -252,9 +219,9 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                     removeMessages(MESSAGE_RESET)
 
                     state = if (!computeState(rawX, rawY)) {
-                        UIGestureRecognizer.State.Failed
+                        State.Failed
                     } else {
-                        UIGestureRecognizer.State.Possible
+                        State.Possible
                     }
 
                     setBeginFiringEvents(false)
@@ -262,16 +229,15 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
             }
 
             MotionEvent.ACTION_MOVE -> {
-                scrollX = mLastFocusX - focusX
-                scrollY = mLastFocusY - focusY
+                scrollX = mLastFocusLocation.x - mCurrentLocation.x
+                scrollY = mLastFocusLocation.y - mCurrentLocation.y
 
                 mVelocityTracker!!.addMovement(event)
 
-                if (mDown && state === UIGestureRecognizer.State.Possible && !mStarted) {
-                    val deltaX = (focusX - mDownFocusX).toDouble()
-                    val deltaY = (focusY - mDownFocusY).toDouble()
-                    val distance = sqrt(Math.pow(deltaX, 2.0) + Math.pow(deltaY, 2.0))
-                    if (distance > minimumTouchDistance) {
+                if (mDown && state == State.Possible && !mStarted) {
+                    val distance = mCurrentLocation.distance(mDownFocusLocation)
+
+                    if (distance > scaledTouchSlop) {
 
                         mVelocityTracker!!.computeCurrentVelocity(1000, java.lang.Float.MAX_VALUE)
                         yVelocity = mVelocityTracker!!.yVelocity
@@ -280,23 +246,23 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                         translationX -= scrollX
                         translationY -= scrollY
 
-                        mLastFocusX = focusX
-                        mLastFocusY = focusY
+                        mLastFocusLocation.set(mCurrentLocation)
                         mStarted = true
 
-                        if (count in minimumNumberOfTouches..maximumNumberOfTouches
-                            && delegate?.shouldBegin?.invoke(this)!!
-                            && getTouchDirection(mDownFocusX, mDownFocusY, focusX, focusY, xVelocity, yVelocity) === edge) {
+                        if (numberOfTouches in minimumNumberOfTouches..maximumNumberOfTouches
+                                && delegate?.shouldBegin?.invoke(this)!!
+                                && getTouchDirection(mDownFocusLocation.x, mDownFocusLocation.y,
+                                        mCurrentLocation.x, mCurrentLocation.y, xVelocity, yVelocity) == edge) {
 
-                            state = UIGestureRecognizer.State.Began
+                            state = State.Began
 
                             if (null == requireFailureOf) {
                                 fireActionEventIfCanRecognizeSimultaneously()
                             } else {
                                 when {
-                                    requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                                    requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
-                                            UIGestureRecognizer.State.Failed
+                                    requireFailureOf!!.state === State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                                    requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) ->
+                                        state = State.Failed
                                     else -> {
                                         listenForOtherStateChanges()
                                         setBeginFiringEvents(false)
@@ -305,10 +271,10 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                                 }
                             }
                         } else {
-                            state = UIGestureRecognizer.State.Failed
+                            state = State.Failed
                         }
                     }
-                } else if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+                } else if (inState(State.Began, State.Changed)) {
                     translationX -= scrollX
                     translationY -= scrollY
 
@@ -318,27 +284,33 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                     xVelocity = mVelocityTracker!!.getXVelocity(pointerId)
 
                     if (hasBeganFiringEvents()) {
-                        state = UIGestureRecognizer.State.Changed
+                        state = State.Changed
                         fireActionEvent()
                     }
 
-                    mLastFocusX = focusX
-                    mLastFocusY = focusY
+                    mLastFocusLocation.set(mCurrentLocation)
                 }
             }
 
             MotionEvent.ACTION_UP -> {
                 mDown = false
 
-                if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+                if (inState(State.Began, State.Changed)) {
+                    if (state == State.Changed) {
+                        scrollX = mLastFocusLocation.x - mCurrentLocation.x
+                        scrollY = mLastFocusLocation.y - mCurrentLocation.y
+                        translationX -= scrollX
+                        translationY -= scrollY
+                    }
+
                     val began = hasBeganFiringEvents()
-                    state = UIGestureRecognizer.State.Ended
+                    state = State.Ended
                     if (began) {
                         fireActionEvent()
                     }
                 }
 
-                if (state === UIGestureRecognizer.State.Possible || !mStarted) {
+                if (state == State.Possible || !mStarted) {
                     yVelocity = 0f
                     xVelocity = yVelocity
                 } else {
@@ -360,7 +332,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
             MotionEvent.ACTION_CANCEL -> {
                 removeMessages(MESSAGE_RESET)
-                state = UIGestureRecognizer.State.Cancelled
+                state = State.Cancelled
                 setBeginFiringEvents(false)
                 mHandler.sendEmptyMessage(MESSAGE_RESET)
             }
@@ -373,7 +345,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (inState(UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended)) {
+        if (inState(State.Changed, State.Ended)) {
             setBeginFiringEvents(true)
             fireActionEvent()
         } else {
@@ -385,22 +357,8 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed)
     }
-
-    /**
-     * @return the relative scroll x between gestures
-     * @since 1.1.2
-     */
-    val relativeScrollX: Float
-        get() = -scrollX
-
-    /**
-     * @return the relative scroll y between gestures
-     * @since 1.0.0
-     */
-    val relativeScrollY: Float
-        get() = -scrollY
 
     override fun removeMessages() {
         removeMessages(MESSAGE_RESET)

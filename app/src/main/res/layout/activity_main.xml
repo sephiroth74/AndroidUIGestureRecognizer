@@ -12,7 +12,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:background="@null"
@@ -24,15 +24,29 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/text2"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/text3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/text"
+        android:layout_marginBottom="8dp"
+        android:background="?attr/colorControlHighlight"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="None"
+        android:textAppearance="?textAppearanceListItemSmall"
+        android:textSize="11sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/text3"
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:gravity="bottom"
         android:text=""
-        android:textSize="11sp"
-        android:textAppearance="?textAppearanceListItemSmall" />
+        android:textAppearance="?textAppearanceListItemSmall"
+        android:textSize="11sp" />
 </RelativeLayout>

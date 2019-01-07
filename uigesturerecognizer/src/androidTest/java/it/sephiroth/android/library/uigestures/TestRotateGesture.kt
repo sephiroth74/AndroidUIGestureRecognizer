@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures
 
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
 import org.junit.Assert.*
 import org.junit.Test
@@ -9,6 +10,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestRotateGesture : TestBaseClass() {
 
     @Test
@@ -22,8 +24,7 @@ class TestRotateGesture : TestBaseClass() {
         recognizer.tag = "rotate"
 
         recognizer.actionListener = {
-            Timber.v("actionListener: $it")
-            activityTestRule.activity.actionListener.invoke(it)
+            activity.actionListener.invoke(it)
 
             when (it.state) {
                 State.Began -> {
@@ -35,7 +36,6 @@ class TestRotateGesture : TestBaseClass() {
                     if (latch.count == 2L) {
                         latch.countDown()
                     }
-
                     Timber.v("rotation: ${recognizer.rotationInRadians}")
                     Timber.v("velocity: ${recognizer.velocity}")
 
@@ -54,7 +54,8 @@ class TestRotateGesture : TestBaseClass() {
 
         interaction.rotate(mainView, 90F, 7)
 
-        latch.await(10, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
+
         assertEquals(0L, latch.count)
     }
 }

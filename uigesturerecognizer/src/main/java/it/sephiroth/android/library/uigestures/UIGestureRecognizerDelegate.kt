@@ -2,7 +2,6 @@ package it.sephiroth.android.library.uigestures
 
 import android.view.MotionEvent
 import android.view.View
-import timber.log.Timber
 import java.util.*
 
 /**
@@ -131,7 +130,6 @@ class UIGestureRecognizerDelegate {
                 }
             }
         }
-        Timber.v("result: $result")
         return result
     }
 }

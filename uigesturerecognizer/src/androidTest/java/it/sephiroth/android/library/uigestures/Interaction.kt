@@ -26,11 +26,11 @@ import kotlin.math.min
 class Interaction {
     private var mDownTime: Long = 0
 
-    fun clickNoSync(x: Int, y: Int): Boolean {
+    fun clickNoSync(x: Int, y: Int, tapTimeout: Long = REGULAR_CLICK_LENGTH): Boolean {
         Log.d(LOG_TAG, "clickNoSync ($x, $y)")
 
         if (touchDown(x, y)) {
-            SystemClock.sleep(REGULAR_CLICK_LENGTH)
+            SystemClock.sleep(tapTimeout)
             if (touchUp(x, y))
                 return true
         }
@@ -100,9 +100,9 @@ class Interaction {
         for (i in 0 until fingers) {
             pointArray[i] =
                     PointerCoordsBuilder.newBuilder()
-                        .setCoords(startPoint.x.toFloat(), startPoint.y + (stepHeight * i).toFloat())
-                        .setSize(1f)
-                        .build()
+                            .setCoords(startPoint.x.toFloat(), startPoint.y + (stepHeight * i).toFloat())
+                            .setSize(1f)
+                            .build()
         }
 
         array.add(pointArray)
@@ -112,15 +112,16 @@ class Interaction {
             for (i in 0 until fingers) {
                 pointArray[i] =
                         PointerCoordsBuilder.newBuilder()
-                            .setCoords(startPoint.x.toFloat() - (width / steps) * step, startPoint.y + (stepHeight * i).toFloat())
-                            .setSize(1f)
-                            .build()
+                                .setCoords(startPoint.x.toFloat() - (width / steps) * step, startPoint.y + (stepHeight * i).toFloat())
+                                .setSize(1f)
+                                .build()
             }
             array.add(pointArray)
         }
 
         return performMultiPointerGesture(array.toTypedArray())
     }
+
 
     fun swipe(downX: Int, downY: Int, upX: Int, upY: Int, steps: Int, drag: Boolean = false,
               timeout: Long = ViewConfiguration.getLongPressTimeout().toLong()): Boolean {
@@ -207,18 +208,21 @@ class Interaction {
         return performMultiPointerGesture(array.toTypedArray())
     }
 
-    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>, sleepBeforeMove: Long = 5): Boolean {
+    fun performMultiPointerGesture(touches: Array<Array<PointerCoords>>,
+                                   sleepBeforeMove: Long = MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong(),
+                                   sleepBeforeUp: Long = MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong()):
+            Boolean {
         Log.i(LOG_TAG, "performMultiPointerGesture, size: ${touches.size}")
         var ret = true
 
         // Get the pointer with the max steps to inject.
         val maxSteps = touches.size - 1
 
-        Log.i(LOG_TAG, "ACTION_DOWN")
 
         // ACTION_DOWN
-        var currentPointer = touches[0][0]
+        val currentPointer = touches[0][0]
         val downTime = SystemClock.uptimeMillis()
+        Log.i(LOG_TAG, "ACTION_DOWN (${currentPointer.x}, ${currentPointer.y})")
         var event: MotionEvent
         event =
                 getMotionEvent(downTime, ACTION_DOWN, currentPointer.x, currentPointer.y, currentPointer.pressure, currentPointer.size)
@@ -276,7 +280,7 @@ class Interaction {
             }
         }
 
-        SystemClock.sleep(MOTION_EVENT_INJECTION_DELAY_MILLIS.toLong())
+        SystemClock.sleep(sleepBeforeUp)
 
         // ACTION_POINTER_UP
         Log.i(LOG_TAG, "ACTION_POINTER_UP")
@@ -335,12 +339,8 @@ class Interaction {
 
     }
 
-    private fun injectEventSync(event: InputEvent): Boolean {
+    fun injectEventSync(event: InputEvent): Boolean {
         return getUiAutomation().injectInputEvent(event, true)
-    }
-
-    private fun getPointerAction(motionEnvent: Int, index: Int): Int {
-        return motionEnvent + (index shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
     }
 
     internal inner class WaitForAnyEventPredicate(private var mMask: Int) : UiAutomation.AccessibilityEventFilter {
@@ -358,7 +358,7 @@ class Interaction {
         val LOG_TAG: String = Interaction::class.java.name
 
         fun getMotionEvent(downTime: Long, eventTime: Long, action: Int,
-                           x: Float, y: Float, pressure: Float = 1f, size: Float = 1f): MotionEvent {
+                           x: Float, y: Float, pressure: Float = 1f, size: Float = 1f, pointerCount: Int = 1): MotionEvent {
 
             val properties = MotionEvent.PointerProperties()
             properties.id = 0
@@ -370,36 +370,18 @@ class Interaction {
             coords.x = x
             coords.y = y
 
-            return MotionEvent.obtain(downTime, eventTime, action, 1,
+            return MotionEvent.obtain(downTime, eventTime, action, pointerCount,
                     arrayOf(properties), arrayOf(coords),
                     0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0)
         }
 
-        fun getMotionEvents(downTime: Long, eventTime: Long, action: Int, pointerCount: Int,
-                            x: Array<Float>, y: Array<Float>, pressure: Array<Float>, size: Array<Float>): MotionEvent {
-
-            val properties = Array(x.size) { MotionEvent.PointerProperties() }
-            val coords = Array(x.size) { PointerCoords() }
-
-            for (i in 0 until x.size) {
-                properties[i].id = i + 1
-                properties[i].toolType = Configurator.getInstance().toolType
-
-                coords[i].pressure = pressure[i]
-                coords[i].size = size[i]
-                coords[i].x = x[i]
-                coords[i].y = y[i]
-            }
-
-            return MotionEvent.obtain(downTime, eventTime, action, pointerCount,
-                    properties, coords,
-                    0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0)
+        fun getMotionEvent(downTime: Long, action: Int, x: Float, y: Float, pressure: Float = 1f, size: Float = 1f, pointerCount: Int = 1): MotionEvent {
+            return getMotionEvent(downTime, SystemClock.uptimeMillis(), action, x, y, pressure, size, pointerCount)
         }
 
-        fun getMotionEvent(downTime: Long, action: Int, x: Float, y: Float, pressure: Float = 1f, size: Float = 1f): MotionEvent {
-            return getMotionEvent(downTime, SystemClock.uptimeMillis(), action, x, y, pressure, size)
+        fun getPointerAction(motionEnvent: Int, index: Int): Int {
+            return motionEnvent + (index shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
         }
-
     }
 }
 

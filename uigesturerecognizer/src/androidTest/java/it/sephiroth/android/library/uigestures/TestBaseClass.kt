@@ -6,6 +6,7 @@ import android.content.Context.POWER_SERVICE
 import android.graphics.Point
 import android.os.PowerManager
 import android.os.PowerManager.*
+import android.view.ViewConfiguration
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.*
@@ -13,10 +14,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import timber.log.Timber
+import kotlin.reflect.KClass
 
 open class TestBaseClass {
 
     lateinit var instrumentation: Instrumentation
+    lateinit var activity: TestActivity
     lateinit var context: Context
     lateinit var device: UiDevice
     lateinit var wakeLock: PowerManager.WakeLock
@@ -65,6 +68,7 @@ open class TestBaseClass {
 
         interaction = Interaction()
 
+        activity = activityTestRule.activity
         delegate = activityTestRule.activity.delegate
 
         Timber.plant(Timber.DebugTree())
@@ -76,7 +80,8 @@ open class TestBaseClass {
     }
 
     companion object {
-        internal const val PACKAGE_NAME = "it.sephiroth.android.library.uigestures.test"
+        internal val PACKAGE_NAME = "${TestBaseClass.javaClass.`package`.name}.test"
+        internal val TEST_TAP_TIMEOUT = (ViewConfiguration.getTapTimeout() * 2).toLong()
         internal const val LAUNCH_TIMEOUT = 5000
         internal const val TAG = "TestBaseClass"
     }

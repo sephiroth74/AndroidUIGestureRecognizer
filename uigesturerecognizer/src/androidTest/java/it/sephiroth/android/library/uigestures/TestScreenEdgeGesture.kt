@@ -1,8 +1,8 @@
 package it.sephiroth.android.library.uigestures
 
+import androidx.test.filters.SmallTest
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@SmallTest
 class TestScreenEdgeGesture : TestBaseClass() {
 
     private lateinit var latch: CountDownLatch
@@ -64,7 +65,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeRight(5)
 
-        latch.await(10, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
 
@@ -83,7 +84,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeLeft(5)
 
-        latch.await(10, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
 
@@ -102,7 +103,131 @@ class TestScreenEdgeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         mainView.swipeUp(5)
 
-        latch.await(10, TimeUnit.SECONDS)
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeft2Fingers() {
+        setTitle("Edge Right 2")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.maximumNumberOfTouches = 2
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+
+        recognizer.actionListener = actionListener
+
+        delegate.addGestureRecognizer(recognizer)
+
+        interaction.swipeLeftMultiTouch(mainView, 6, 2)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeft2FingersFails() {
+        setTitle("Edge Right 2 Fails")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.maximumNumberOfTouches = 1
+        recognizer.minimumNumberOfTouches = 1
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+
+        recognizer.actionListener = actionListener
+
+        delegate.addGestureRecognizer(recognizer)
+
+        interaction.swipeLeftMultiTouch(mainView, 6, 2)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(3L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeftFailNotEdge() {
+        setTitle("Edge Right")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val bounds = mainView.visibleBounds
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+
+        recognizer.actionListener = actionListener
+
+        delegate.addGestureRecognizer(recognizer)
+
+        bounds.inset(bounds.width() / 4, bounds.height() / 4)
+
+        interaction.swipe(bounds.right, bounds.centerY(),
+                bounds.left, bounds.centerY(), 4, false)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(3L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeftWithFailure() {
+        setTitle("Edge Right With Failure")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+
+        val recognizer2 = UIScreenEdgePanGestureRecognizer(context)
+        recognizer2.tag = "edge-left"
+        recognizer2.edge = UIRectEdge.LEFT
+
+        recognizer.actionListener = actionListener
+        recognizer2.actionListener = { it ->
+            fail("unexpected")
+        }
+
+        recognizer.requireFailureOf = recognizer2
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.addGestureRecognizer(recognizer2)
+        mainView.swipeLeft(5)
+
+        latch.await(2, TimeUnit.SECONDS)
+        assertEquals(0L, latch.count)
+    }
+
+    @Test
+    fun testSwipeLeftWithFailure2() {
+        setTitle("Edge Right With Failure")
+        assertNotNull(delegate)
+        delegate.clear()
+
+        val recognizer = UIScreenEdgePanGestureRecognizer(context)
+        recognizer.tag = "edge-right"
+        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.actionListener = actionListener
+
+        val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tag = "edge-left"
+
+        recognizer2.actionListener = { it ->
+            fail("unexpected")
+        }
+
+        recognizer.requireFailureOf = recognizer2
+
+        delegate.addGestureRecognizer(recognizer)
+        delegate.addGestureRecognizer(recognizer2)
+        mainView.swipeLeft(5)
+
+        latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
     }
 }
