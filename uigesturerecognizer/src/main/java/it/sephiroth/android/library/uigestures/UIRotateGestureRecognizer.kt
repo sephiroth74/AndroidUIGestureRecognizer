@@ -16,27 +16,23 @@ import kotlin.math.atan2
  * https://developer.apple.com/reference/uikit/uirotationgesturerecognizer](https://developer.apple.com/reference/uikit/uirotationgesturerecognizer)
  */
 
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
-    override var numberOfTouches: Int = 0
-        internal set
-
     /**
-     * Change the minimum rotation threshold (in radians)
-     *
+     * The minimum rotation threshold (in radians) before the
+     * gesture can be accepted
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var rotationThreshold: Double = 0.toDouble()
 
     /**
      * Returns the rotation in radians
      *
      * @return the current rotation in radians
-     * @see .getRotationInDegrees
+     * @see #rotationInDegrees
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var rotationInRadians: Double = 0.0
         private set
 
@@ -46,14 +42,12 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
     private var y1: Float = 0.toFloat()
     private var x2: Float = 0.toFloat()
     private var y2: Float = 0.toFloat()
-
     private var mPreviousAngle: Double = 0.toDouble()
 
     /**
      * @return The velocity of the rotation gesture in radians per second.
      * @since 1.0.0
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     var velocity: Double = 0.toDouble()
         private set
 
@@ -71,7 +65,6 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
      * @see .getRotationInRadians
      * @since 1.0.0
      */
-    @Suppress("unused")
     val rotationInDegrees: Double
         get() {
             var angle = Math.toDegrees(rotationInRadians) % 360
@@ -98,7 +91,7 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
     }
 
     private fun handleReset() {
-        state = UIGestureRecognizer.State.Possible
+        state = State.Possible
         mInitialRotation = 0.0
         setBeginFiringEvents(false)
     }
@@ -108,25 +101,22 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
         mPtrID1 = INVALID_POINTER_ID
         mPtrID2 = INVALID_POINTER_ID
         velocity = 0.toDouble()
-        numberOfTouches = 0
     }
 
     override fun onStateChanged(recognizer: UIGestureRecognizer) {
-        logMessage(Log.VERBOSE, "onStateChanged(${recognizer.state?.name})")
-
-        if (recognizer.state === UIGestureRecognizer.State.Failed && state === UIGestureRecognizer.State.Began) {
+        if (recognizer.state === State.Failed && state === State.Began) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
 
-        } else if (recognizer.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended) && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Possible) && mStarted) {
+        } else if (recognizer.inState(State.Began, State.Ended) && inState(State.Began, State.Possible) && mStarted) {
             stopListenForOtherStateChanges()
             removeMessages()
-            state = UIGestureRecognizer.State.Failed
+            state = State.Failed
         }
     }
 
     private fun fireActionEventIfCanRecognizeSimultaneously() {
-        if (inState(UIGestureRecognizer.State.Changed, UIGestureRecognizer.State.Ended)) {
+        if (inState(State.Changed, State.Ended)) {
             setBeginFiringEvents(true)
             fireActionEvent()
         } else {
@@ -138,7 +128,7 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
     }
 
     override fun hasBeganFiringEvents(): Boolean {
-        return super.hasBeganFiringEvents() && inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)
+        return super.hasBeganFiringEvents() && inState(State.Began, State.Changed)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -148,30 +138,9 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
             return false
         }
 
-        val action = event.action
-        var count = event.pointerCount
+        val action = event.actionMasked
 
-        val pointerUp = action == MotionEvent.ACTION_POINTER_UP
-        val skipIndex = if (pointerUp) event.actionIndex else -1
-
-        // Determine focal point
-        var sumX = 0f
-        var sumY = 0f
-        for (i in 0 until count) {
-            if (skipIndex == i) {
-                continue
-            }
-            sumX += event.getX(i)
-            sumY += event.getY(i)
-        }
-
-        val div = if (pointerUp) count - 1 else count
-        val focusX = sumX / div
-        val focusY = sumY / div
-        numberOfTouches = if (pointerUp) count - 1 else count
-        mCurrentLocation.set(focusX, focusY)
-
-        when (action and MotionEvent.ACTION_MASK) {
+        when (action) {
             MotionEvent.ACTION_DOWN -> {
                 if (!delegate?.shouldReceiveTouch?.invoke(this)!!) {
                     return cancelsTouchesInView
@@ -181,12 +150,12 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                 mDown = true
                 mInitialRotation = 0.toDouble()
                 stopListenForOtherStateChanges()
-                state = UIGestureRecognizer.State.Possible
+                state = State.Possible
                 setBeginFiringEvents(false)
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> {
-                if (mDown && count == 2 && state != UIGestureRecognizer.State.Failed) {
+                if (mDown && numberOfTouches == 2 && state != State.Failed) {
                     mPtrID1 = event.getPointerId(0)
                     mPtrID2 = event.getPointerId(1)
 
@@ -204,10 +173,9 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
-                count -= 1
-
-                if (mDown && count == 2 && state !== UIGestureRecognizer.State.Failed) {
-                    val pointerIndex = action and MotionEvent.ACTION_POINTER_INDEX_MASK shr MotionEvent.ACTION_POINTER_INDEX_SHIFT
+                if (mDown && numberOfTouches == 2 && state != State.Failed) {
+                    val pointerIndex =
+                            event.action and MotionEvent.ACTION_POINTER_INDEX_MASK shr MotionEvent.ACTION_POINTER_INDEX_SHIFT
                     val pointerId = event.getPointerId(pointerIndex)
 
                     var found = false
@@ -250,9 +218,9 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                     mPreviousEvent = null
                 }
 
-                if (inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Changed)) {
+                if (inState(State.Began, State.Changed)) {
                     val began = hasBeganFiringEvents()
-                    state = UIGestureRecognizer.State.Ended
+                    state = State.Ended
                     if (began) {
                         fireActionEvent()
                     }
@@ -260,12 +228,11 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                 }
             }
 
-            MotionEvent.ACTION_MOVE -> if (mValid && state !== UIGestureRecognizer.State.Failed) {
+            MotionEvent.ACTION_MOVE -> if (mValid && state != State.Failed) {
                 val nx1 = event.getX(event.findPointerIndex(mPtrID1))
                 val ny1 = event.getY(event.findPointerIndex(mPtrID1))
                 val nx2 = event.getX(event.findPointerIndex(mPtrID2))
                 val ny2 = event.getY(event.findPointerIndex(mPtrID2))
-
 
                 if (!mStarted && mDown) {
                     mInitialRotation += angleBetweenLines(x2, y2, x1, y1, nx2, ny2, nx1, ny1)
@@ -275,15 +242,15 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                         mStarted = true
 
                         if (delegate?.shouldBegin?.invoke(this)!!) {
-                            state = UIGestureRecognizer.State.Began
+                            state = State.Began
 
                             if (null == requireFailureOf) {
                                 fireActionEventIfCanRecognizeSimultaneously()
                             } else {
                                 when {
-                                    requireFailureOf!!.state === UIGestureRecognizer.State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
-                                    requireFailureOf!!.inState(UIGestureRecognizer.State.Began, UIGestureRecognizer.State.Ended, UIGestureRecognizer.State.Changed) -> state =
-                                            UIGestureRecognizer.State.Failed
+                                    requireFailureOf!!.state == State.Failed -> fireActionEventIfCanRecognizeSimultaneously()
+                                    requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> state =
+                                            State.Failed
                                     else -> {
                                         listenForOtherStateChanges()
                                         setBeginFiringEvents(false)
@@ -292,19 +259,19 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                                 }
                             }
                         } else {
-                            state = UIGestureRecognizer.State.Failed
+                            state = State.Failed
                         }
                     }
                 } else if (mStarted && mDown) {
                     rotationInRadians = angleBetweenLines(x2, y2, x1, y1, nx2, ny2, nx1, ny1)
 
-                    if (state == UIGestureRecognizer.State.Began) {
+                    if (state == State.Began) {
                         if (hasBeganFiringEvents()) {
-                            state = UIGestureRecognizer.State.Changed
+                            state = State.Changed
                             fireActionEvent()
                         }
-                    } else if (state == UIGestureRecognizer.State.Changed) {
-                        state = UIGestureRecognizer.State.Changed
+                    } else if (state == State.Changed) {
+                        state = State.Changed
                         fireActionEvent()
                     }
                 }
@@ -344,7 +311,7 @@ open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(con
                     mPreviousEvent = null
                 }
 
-                state = UIGestureRecognizer.State.Cancelled
+                state = State.Cancelled
                 setBeginFiringEvents(false)
                 mHandler.sendEmptyMessage(MESSAGE_RESET)
             }
