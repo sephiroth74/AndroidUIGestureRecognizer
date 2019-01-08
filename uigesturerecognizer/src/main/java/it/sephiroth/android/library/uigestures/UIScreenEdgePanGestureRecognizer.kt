@@ -375,7 +375,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                 return if (diffX > 0) {
                     UIRectEdge.LEFT
                 } else {
-                    UIRectEdge.RIGTH
+                    UIRectEdge.RIGHT
                 }
             }
         } else if (Math.abs(diffY) > 0.toFloat()) {
@@ -393,7 +393,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
         if (edge === UIRectEdge.LEFT && x > mEdgeLimit) {
             return false
-        } else if (edge === UIRectEdge.RIGTH) {
+        } else if (edge === UIRectEdge.RIGHT) {
             val w = context.resources.displayMetrics.widthPixels
             return x >= w - mEdgeLimit
         } else if (edge === UIRectEdge.TOP && y > mEdgeLimit) {
