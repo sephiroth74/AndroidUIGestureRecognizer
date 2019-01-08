@@ -1,5 +1,6 @@
 package it.sephiroth.android.library.uigestures.demo
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -8,16 +9,15 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import timber.log.Timber
 
 class MotionView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var pointersMap = hashMapOf<Int, PointerDrawable>()
+    private val pointersMap = hashMapOf<Int, PointerDrawable>()
 
-    init {
-    }
+    init { }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
         val action = event.actionMasked
@@ -84,7 +84,7 @@ class MotionView @JvmOverloads constructor(
 
 }
 
-class PointerDrawable(val pointerIndex: Int) {
+class PointerDrawable(val pointerId: Int) {
     var enabled = false
         private set
 
@@ -97,7 +97,7 @@ class PointerDrawable(val pointerIndex: Int) {
     private var alpha = 1f
 
     override fun toString(): String {
-        return "PointerDrawable($pointerIndex)"
+        return "PointerDrawable($pointerId)"
     }
 
     fun reset() {
@@ -110,9 +110,8 @@ class PointerDrawable(val pointerIndex: Int) {
     fun moveTo(x: Float, y: Float) {
         this.x = x
         this.y = y
-        path.moveTo(x, y)
         enabled = true
-
+        path.moveTo(x, y)
         drawCallback?.invoke(this)
     }
 

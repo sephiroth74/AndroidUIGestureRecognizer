@@ -6,21 +6,20 @@ import android.os.Bundle
 import androidx.annotation.ColorRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import it.sephiroth.android.library.uigestures.UIGestureRecognizer
+import it.sephiroth.android.library.uigestures.*
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer.State
-import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate
-import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_tap.*
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 
-class TapActivity : AppCompatActivity() {
+open class TapActivity : AppCompatActivity() {
 
-    val delegate = UIGestureRecognizerDelegate()
-
+    private val delegate = UIGestureRecognizerDelegate()
 
     private lateinit var recognizer: UITapGestureRecognizer
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tap)
@@ -39,10 +38,9 @@ class TapActivity : AppCompatActivity() {
         }
     }
 
+    private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    @SuppressLint("RestrictedApi")
-    protected fun setupRecognizer() {
+    private fun setupRecognizer() {
         recognizer = UITapGestureRecognizer(this)
         recognizer.tapsRequired = 1
         recognizer.touchesRequired = 1
@@ -54,7 +52,11 @@ class TapActivity : AppCompatActivity() {
             testView.isPressed = true
             testView.performClick()
             testView.isPressed = false
-            Unit
+
+            val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
+
+            textState.append("[$dateTime] ${it.javaClass.simpleName}: ${it.state} \n")
+            textState.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
         }
 
         recognizer.stateListener =

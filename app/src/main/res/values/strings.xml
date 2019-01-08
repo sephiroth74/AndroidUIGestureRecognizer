@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Android UIGestureRecognizer</string>
-    <string name="title_activity_tap">Tap Activity</string>
+    <string name="title_activity_tap">UITapGestureRecognizer</string>
 </resources>
