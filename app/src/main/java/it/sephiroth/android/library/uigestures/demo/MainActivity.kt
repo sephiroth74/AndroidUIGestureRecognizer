@@ -2,90 +2,145 @@ package it.sephiroth.android.library.uigestures.demo
 
 import android.os.Bundle
 import android.os.Handler
-import android.view.ViewGroup
+import android.view.View
+import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import it.sephiroth.android.library.uigestures.*
-import kotlinx.android.synthetic.main.activity_main.*
+import it.sephiroth.android.library.uigestures.demo.fragments.*
+import kotlinx.android.synthetic.main.activity_tap.*
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.reflect.full.primaryConstructor
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
 
-    private lateinit var mRoot: ViewGroup
-    private lateinit var mDelegate: UIGestureRecognizerDelegate
+    private var currentRecognizerClassName: String = ""
+    private val handler = Handler()
+    private val delegate = UIGestureRecognizerDelegate()
     private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
-    val handler = Handler()
+    private lateinit var recognizer: UIGestureRecognizer
+
+    private val clearTextRunnable: Runnable = Runnable {
+        textState.text = "Test me!"
+    }
+
+    init {
+        UIGestureRecognizer.logEnabled = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_tap)
+        setSupportActionBar(toolbar)
 
-        UIGestureRecognizer.logEnabled = BuildConfig.DEBUG
+        setupTouchListener()
+        setupSpinner()
+    }
 
-        mDelegate = UIGestureRecognizerDelegate()
-
-        val recognizer1 = UITapGestureRecognizer(this)
-        recognizer1.tapsRequired = 1
-        recognizer1.touchesRequired = 1
-        recognizer1.actionListener = actionListener
-        recognizer1.stateListener = stateListener
-
-        val recognizer2 = UIPanGestureRecognizer(this)
-        recognizer2.tag = "pan"
-        recognizer2.requireFailureOf = recognizer1
-
-        recognizer2.actionListener = actionListener
-        recognizer2.stateListener = stateListener
-
-        mDelegate.addGestureRecognizer(recognizer1)
-        mDelegate.addGestureRecognizer(recognizer2)
-
-        mRoot.setGestureDelegate(mDelegate)
-
-        mDelegate.shouldReceiveTouch = { true }
-        mDelegate.shouldBegin = { true }
-
-        mDelegate.shouldRecognizeSimultaneouslyWithGestureRecognizer = { recognizer, other ->
-            Timber.v("shouldRecognizeSimultaneouslyWithGestureRecognizer: ${recognizer.tag}, ${other.tag}")
-            true
+    private fun setupTouchListener() {
+        testView.setOnTouchListener { v, event ->
+            v.onTouchEvent(event)
+            delegate.onTouchEvent(v, event)
         }
     }
 
-    override fun onContentChanged() {
-        super.onContentChanged()
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    private fun setupContent(simpleClassName: String) {
+        Timber.i("setupContent: $simpleClassName")
 
-        mRoot = findViewById(R.id.activity_main)
-    }
+        val packageName = UIGestureRecognizer::class.java.`package`.name
+        Timber.v("package: $packageName")
 
-    private val runner = Runnable {
-        text2.text = ""
-        text.text = ""
-        text3.text = ""
-    }
+        val kClass = Class.forName("${packageName}.$simpleClassName").kotlin
+        Timber.v("kClass: ${kClass.simpleName}")
 
-    private val stateListener =
-            { recognizer: UIGestureRecognizer, oldState: UIGestureRecognizer.State?, newState: UIGestureRecognizer.State? ->
-                text3.text = "${recognizer.javaClass.simpleName}: $oldState --> $newState"
+        val newRecognizer = kClass.primaryConstructor?.call(this) as UIGestureRecognizer?
+
+        newRecognizer?.let { rec ->
+            var fragment: Fragment? = null
+
+            when (kClass) {
+                UITapGestureRecognizer::class -> fragment = UITapGestureRecognizerFragment.newInstance(rec)
+                UIRotateGestureRecognizer::class -> fragment = UIRotateGestureRecognizerFragment.newInstance(rec)
+                UIPinchGestureRecognizer::class -> fragment = UIPinchGestureRecognizerFragment.newInstance(rec)
+                UIScreenEdgePanGestureRecognizer::class -> fragment = UIScreenEdgePanGestureRecognizerFragment.newInstance(rec)
+                UIPanGestureRecognizer::class -> fragment = UIPanGestureRecognizerFragment.newInstance(rec)
+                UISwipeGestureRecognizer::class -> fragment = UISwipeGestureRecognizerFragment.newInstance(rec)
+                UILongPressGestureRecognizer::class -> fragment = UILongPressGestureRecognizerFragment.newInstance(rec)
             }
 
-    private val actionListener = { recognizer: UIGestureRecognizer ->
-        val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
-        Timber.d("**********************************************")
-        Timber.d("onGestureRecognized($recognizer)")
-        Timber.d("**********************************************")
+            fragment?.let { frag ->
+                title = kClass.simpleName
+                delegate.clear()
+                recognizer = rec
 
-        text.text = "${recognizer.javaClass.simpleName}: ${recognizer.state}"
-        text2.append("[$dateTime] tag: ${recognizer.tag}, state: ${recognizer.state?.name} \n")
-        text2.append("[coords] ${recognizer.currentLocationX.toInt()}, ${recognizer.currentLocationY.toInt()}\n")
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag, simpleClassName)
+                        .commit()
 
-        if (recognizer is UIPanGestureRecognizer) {
-            text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
-        } else if (recognizer is UILongPressGestureRecognizer) {
-            text2.append("[origin] ${recognizer.startLocationX}, ${recognizer.startLocationY}\n")
+                setupRecognizer(recognizer)
+                currentRecognizerClassName = simpleClassName
+
+            } ?: kotlin.run {
+            }
+        } ?: kotlin.run {
+            Toast.makeText(this, "Unable to find ${kClass.simpleName}", Toast.LENGTH_SHORT).show()
         }
 
-        handler.removeCallbacks(runner)
-        handler.postDelayed(runner, 5000)
     }
+
+    private fun setupSpinner() {
+
+        recognizerSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selected = parent.selectedItem.toString()
+                setupContent(selected)
+            }
+        }
+    }
+
+
+    private fun setupRecognizer(recognizer: UIGestureRecognizer) {
+        recognizer.actionListener = { rec ->
+            Timber.d("actionListener: ${rec.currentLocationX}, ${rec.currentLocationY}")
+            testView.drawableHotspotChanged(rec.currentLocationX, rec.currentLocationY)
+            testView.isPressed = true
+            testView.performClick()
+            testView.isPressed = false
+
+            val dateTime = dateFormat.format(recognizer.lastEvent!!.eventTime)
+
+            textState.append("[$dateTime] ${rec.javaClass.simpleName}: ${rec.state} \n")
+            textState.append("[$dateTime] location: ${rec.currentLocationX.toInt()}, ${rec.currentLocationY.toInt()}\n")
+
+            supportFragmentManager.findFragmentByTag(currentRecognizerClassName)?.let { frag ->
+                val status = (frag as IRecognizerFragment<*>).getRecognizerStatus()
+                status?.let {
+                    textState.append("[$dateTime] $it\n")
+                }
+            }
+
+            textState.append("\n")
+
+            handler.removeCallbacks(clearTextRunnable)
+            handler.postDelayed(clearTextRunnable, 4000)
+
+
+        }
+
+        recognizer.stateListener =
+                { it: UIGestureRecognizer, oldState: UIGestureRecognizer.State?, newState: UIGestureRecognizer.State? ->
+                    Timber.v("state changed: $oldState --> $newState")
+                }
+
+        delegate.addGestureRecognizer(recognizer)
+
+    }
+
 }
