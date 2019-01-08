@@ -329,7 +329,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         if (!sDebug) {
             return
         }
-        Log.println(level, LOG_TAG, "[${javaClass.simpleName}] $fmt")
+        Log.println(level, LOG_TAG, "[${javaClass.simpleName}:$tag] $fmt")
     }
 
     @Suppress("unused")

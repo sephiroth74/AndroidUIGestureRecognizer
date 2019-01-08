@@ -194,7 +194,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             mVelocityTracker = VelocityTracker.obtain()
         }
 
-        mVelocityTracker!!.addMovement(event)
+        mVelocityTracker?.addMovement(event)
 
         when (action) {
             MotionEvent.ACTION_POINTER_DOWN -> {
@@ -213,7 +213,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                 mLastFocusLocation.set(mCurrentLocation)
                 mDownFocusLocation.set(mCurrentLocation)
 
-                mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
+                mVelocityTracker?.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
                 val upIndex = event.actionIndex
 
                 val id1 = event.getPointerId(upIndex)
@@ -231,7 +231,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     val dot = x + y
 
                     if (dot < 0) {
-                        mVelocityTracker!!.clear()
+                        mVelocityTracker?.clear()
                         break
                     }
                 }
@@ -252,7 +252,7 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                     mLastFocusLocation.set(mCurrentLocation)
                     mDownFocusLocation.set(mCurrentLocation)
 
-                    mVelocityTracker!!.clear()
+                    mVelocityTracker?.clear()
 
                     setBeginFiringEvents(false)
                     removeMessages(MESSAGE_RESET)
@@ -264,14 +264,15 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                 scrollX = mLastFocusLocation.x - mCurrentLocation.x
                 scrollY = mLastFocusLocation.y - mCurrentLocation.y
 
+                mVelocityTracker?.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
+                yVelocity = mVelocityTracker!!.yVelocity
+                xVelocity = mVelocityTracker!!.xVelocity
+
                 if (state == State.Possible) {
                     val distance = mCurrentLocation.distance(mDownFocusLocation)
                     logMessage(Log.INFO, "started: $mStarted, distance: $distance, slop: $scaledTouchSlop")
                     if (!mStarted) {
                         if (distance > scaledTouchSlop) {
-                            mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
-                            yVelocity = mVelocityTracker!!.yVelocity
-                            xVelocity = mVelocityTracker!!.xVelocity
 
                             translationX -= scrollX
                             translationY -= scrollY
@@ -325,9 +326,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
                         }
                     } else {
                         // touch has been recognized. now let's track the movement
-                        mVelocityTracker!!.computeCurrentVelocity(1000, scaledMaximumFlingVelocity.toFloat())
-                        yVelocity = mVelocityTracker!!.yVelocity
-                        xVelocity = mVelocityTracker!!.xVelocity
                         val time = event.eventTime - event.downTime
 
                         if (time > maximumTouchFlingTime) {
@@ -378,6 +376,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
             }
 
             MotionEvent.ACTION_UP -> {
+                mVelocityTracker?.addMovement(event)
+
                 if (mVelocityTracker != null) {
                     mVelocityTracker!!.recycle()
                     mVelocityTracker = null

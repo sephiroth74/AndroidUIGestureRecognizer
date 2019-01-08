@@ -204,9 +204,8 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.RIGHT
         recognizer.actionListener = actionListener
 
-        val recognizer2 = UISwipeGestureRecognizer(context)
-        recognizer2.tag = "swipe-up"
-        recognizer2.direction = UISwipeGestureRecognizer.UP
+        val recognizer2 = UITapGestureRecognizer(context)
+        recognizer2.tag = "tap"
         recognizer2.actionListener = {
             fail("unexpected")
         }
@@ -216,7 +215,7 @@ class TestSwipeGesture : TestBaseClass() {
         delegate.addGestureRecognizer(recognizer)
         delegate.addGestureRecognizer(recognizer2)
 
-        mainView.swipeRight(5)
+        mainView.swipeRight(10)
 
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)
