@@ -3,18 +3,25 @@ package it.sephiroth.android.library.uigestures.demo
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import it.sephiroth.android.library.uigestures.UIGestureRecognizer
 import it.sephiroth.android.library.uigestures.UIGestureRecognizerDelegate
+import it.sephiroth.android.library.uigestures.UIRotateGestureRecognizer
 import it.sephiroth.android.library.uigestures.UITapGestureRecognizer
+import it.sephiroth.android.library.uigestures.demo.fragments.UIRotateGestureRecognizerFragment
 import it.sephiroth.android.library.uigestures.demo.fragments.UITapGestureRecognizerFragment
 import kotlinx.android.synthetic.main.activity_tap.*
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.internal.impl.load.kotlin.KotlinClassFinder
 
 open class TapActivity : AppCompatActivity() {
 
@@ -42,29 +49,40 @@ open class TapActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupContent(kClass: KClass<UITapGestureRecognizer>) {
-        Timber.i("setupContent: $kClass")
+    private fun setupContent(simpleClassName: String) {
+        Timber.i("setupContent: $simpleClassName")
 
-        title = kClass.simpleName
+        val packageName = UIGestureRecognizer::class.java.`package`.name
+        Timber.v("package: $packageName")
 
-        delegate.clear()
+        val kClass = Class.forName("${packageName}.$simpleClassName").kotlin
+        Timber.v("kClass: ${kClass.simpleName}")
 
-        recognizer = kClass.primaryConstructor?.call(this)!!
+        val newRecognizer = kClass.primaryConstructor?.call(this) as UIGestureRecognizer?
 
-        var fragment: Fragment? = null
+        newRecognizer?.let { rec ->
+            var fragment: Fragment? = null
 
-        when (kClass) {
-            UITapGestureRecognizer::class -> fragment = UITapGestureRecognizerFragment.newInstance(recognizer)
+            when (kClass) {
+                UITapGestureRecognizer::class -> fragment = UITapGestureRecognizerFragment.newInstance(rec)
+                UIRotateGestureRecognizer::class -> fragment = UIRotateGestureRecognizerFragment.newInstance(rec)
+            }
+
+            fragment?.let { frag ->
+                title = kClass.simpleName
+                delegate.clear()
+                recognizer = rec
+
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag)
+                        .commit()
+                setupRecognizer(recognizer)
+            } ?: kotlin.run {
+            }
+        } ?: kotlin.run {
+            Toast.makeText(this, "Unable to find ${kClass.simpleName}", Toast.LENGTH_SHORT).show()
         }
-
-        fragment?.let {
-            supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, it)
-                    .commit()
-        }
-
-        setupRecognizer(recognizer)
 
     }
 
@@ -75,12 +93,8 @@ open class TapActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 val selected = parent.selectedItem.toString()
-                if (selected == UITapGestureRecognizer::class.simpleName) {
-                    setupContent(UITapGestureRecognizer::class)
-                }
-
+                setupContent(selected)
             }
-
         }
     }
 
