@@ -57,7 +57,7 @@ class TestSwipeGesture : TestBaseClass() {
         recognizer.direction = UISwipeGestureRecognizer.UP
         recognizer.actionListener = actionListener
         delegate.addGestureRecognizer(recognizer)
-        mainView.swipeUp(5)
+        mainView.swipeUp(4)
 
         latch.await(2, TimeUnit.SECONDS)
         assertEquals(0L, latch.count)

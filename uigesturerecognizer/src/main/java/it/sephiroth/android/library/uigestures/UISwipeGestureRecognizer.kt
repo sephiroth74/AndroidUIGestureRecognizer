@@ -26,6 +26,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
      */
     var scaledMinimumFlingVelocity: Int
 
+    var scaledMaximumFlingVelocity: Int
+
     /**
      * Direction of the swipe gesture. Can be one of RIGHT, LEFT, UP, DOWN
      * @since 1.0.0
@@ -106,7 +108,6 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
     private var mDown: Boolean = false
     private var mStarted: Boolean = false
-    private val scaledMaximumFlingVelocity: Int
     private val mLastFocusLocation = PointF()
     private val mDownFocusLocation = PointF()
     private var mVelocityTracker: VelocityTracker? = null
@@ -295,14 +296,24 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
 
                                     logMessage(Log.VERBOSE, "(1) direction: $direction")
 
-                                    if (direction == -1 || (this.direction and direction) == 0) {
-                                        logMessage(Log.WARN, "invalid direction: $direction")
-                                        mStarted = false
-                                        setBeginFiringEvents(false)
-                                        state = State.Failed
+                                    // this is necessary because sometimes the velocityTracker
+                                    // return 0, probably it needs more input events before computing
+                                    // correctly the velocities
+
+                                    if (xVelocity != 0f || yVelocity != 0f) {
+                                        if (direction == -1 || (this.direction and direction) == 0) {
+                                            logMessage(Log.WARN, "invalid direction: $direction")
+                                            mStarted = false
+                                            setBeginFiringEvents(false)
+                                            state = State.Failed
+                                        } else {
+                                            logMessage(Log.DEBUG, "direction accepted: ${(this.direction and direction)}")
+                                            mStarted = true
+                                        }
                                     } else {
-                                        logMessage(Log.DEBUG, "direction accepted: ${(this.direction and direction)}")
-                                        mStarted = true
+                                        logMessage(Log.WARN, "velocity is still 0, waiting for the next event...")
+                                        mDownFocusLocation.set(mCurrentLocation)
+                                        mStarted = false
                                     }
                                 }
                             } else {
@@ -404,7 +415,8 @@ open class UISwipeGestureRecognizer(context: Context) : UIGestureRecognizer(cont
         if (logEnabled) {
             logMessage(Log.INFO, "getTouchDirection")
             logMessage(Log.VERBOSE, "diff: $diffX, $diffY, distanceThreshold: $distanceThreshold")
-            logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, scaledMinimumFlingVelocity: $scaledMinimumFlingVelocity")
+            logMessage(Log.VERBOSE, "velocity: $velocityX, $velocityY, scaledMinimumFlingVelocity: $scaledMinimumFlingVelocity, " +
+                    "scaledMaximumFlingVelocity: $scaledMaximumFlingVelocity")
         }
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
