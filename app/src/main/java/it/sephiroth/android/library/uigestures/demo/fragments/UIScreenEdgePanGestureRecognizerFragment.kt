@@ -29,6 +29,10 @@ class UIScreenEdgePanGestureRecognizerFragment(recognizer: WeakReference<UIGestu
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getRecognizer()?.let {
+            numberPicker3.value = it.edgeLimit.toInt()
+        }
+
         numberPicker1.setListener {
             getRecognizer()?.minimumNumberOfTouches = it
             if (it > numberPicker2.value) numberPicker2.value = it
@@ -37,6 +41,10 @@ class UIScreenEdgePanGestureRecognizerFragment(recognizer: WeakReference<UIGestu
         numberPicker2.setListener {
             getRecognizer()?.maximumNumberOfTouches = it
             if (it < numberPicker1.value) numberPicker1.value = it
+        }
+
+        numberPicker3.setListener {
+            getRecognizer()?.edgeLimit = it.toFloat()
         }
 
         spinnerEdge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

@@ -21,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:snp_maxValue="5"
         app:snp_minValue="1"
+        app:snp_scrollEnabled="true"
         app:snp_value="1" />
 
     <TextView
@@ -43,6 +44,7 @@
         app:layout_constraintTop_toBottomOf="@+id/numberPicker1"
         app:snp_maxValue="5"
         app:snp_minValue="1"
+        app:snp_scrollEnabled="true"
         app:snp_value="1" />
 
     <TextView

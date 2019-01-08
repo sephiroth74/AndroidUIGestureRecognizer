@@ -2,7 +2,6 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -19,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:snp_maxValue="5"
         app:snp_minValue="1"
+        app:snp_scrollEnabled="true"
         app:snp_value="1" />
 
     <TextView
@@ -41,6 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/numberPicker1"
         app:snp_maxValue="5"
         app:snp_minValue="1"
+        app:snp_scrollEnabled="true"
         app:snp_value="1" />
 
     <TextView
@@ -52,6 +53,29 @@
         app:layout_constraintBottom_toBottomOf="@+id/numberPicker2"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="@+id/numberPicker2" />
+
+    <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
+        android:id="@+id/numberPicker3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/numberPicker2"
+        app:snp_maxValue="300"
+        app:snp_minValue="20"
+        app:snp_scrollEnabled="true"
+        app:snp_stepSize="5"
+        app:snp_value="10" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Edge Limit"
+        app:layout_constraintBottom_toBottomOf="@+id/numberPicker3"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toTopOf="@+id/numberPicker3" />
 
     <TextView
         android:id="@+id/textView2"
@@ -72,7 +96,7 @@
         android:entries="@array/rect_edges_entries"
         android:spinnerMode="dropdown"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/numberPicker2" />
+        app:layout_constraintTop_toBottomOf="@+id/numberPicker3" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"

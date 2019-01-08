@@ -19,9 +19,11 @@
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent"
+        app:snp_scrollEnabled="true"
         app:snp_maxValue="45"
         app:snp_minValue="1"
-        app:snp_value="5" />
+        app:snp_stepSize="5"
+        app:snp_value="1" />
 
     <TextView
         android:id="@+id/textView"
