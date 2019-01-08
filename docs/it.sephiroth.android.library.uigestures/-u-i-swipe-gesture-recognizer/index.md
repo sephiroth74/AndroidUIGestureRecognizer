@@ -27,6 +27,7 @@ alessandro crugnola
 | [numberOfTouchesRequired](number-of-touches-required.md) | `var numberOfTouchesRequired: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>Number of touches required for the gesture to be accepted |
 | [relativeScrollX](relative-scroll-x.md) | `val relativeScrollX: `[`Float`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html) |
 | [relativeScrollY](relative-scroll-y.md) | `val relativeScrollY: `[`Float`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html) |
+| [scaledMaximumFlingVelocity](scaled-maximum-fling-velocity.md) | `var scaledMaximumFlingVelocity: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
 | [scaledMinimumFlingVelocity](scaled-minimum-fling-velocity.md) | `var scaledMinimumFlingVelocity: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>Minimum fling velocity before the touch can be accepted |
 | [scaledTouchSlop](scaled-touch-slop.md) | `var scaledTouchSlop: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>Minimum distance in pixel before the touch can be considered as a scroll |
 | [scrollX](scroll-x.md) | `var scrollX: `[`Float`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html) |
