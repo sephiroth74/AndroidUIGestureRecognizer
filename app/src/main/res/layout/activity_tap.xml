@@ -27,47 +27,30 @@
         tools:context=".TapActivity"
         tools:showIn="@layout/activity_tap">
 
-        <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
-            android:id="@+id/numberPicker1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toTopOf="parent"
-            app:snp_maxValue="5"
-            app:snp_minValue="1"
-            app:snp_value="1" />
-
-        <TextView
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/recognizerSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Number of Taps"
-            app:layout_constraintBottom_toBottomOf="@+id/numberPicker1"
-            app:layout_constraintEnd_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toTopOf="@+id/numberPicker1" />
-
-        <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
-            android:id="@+id/numberPicker2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/numberPicker1"
-            app:snp_maxValue="5"
-            app:snp_minValue="1"
-            app:snp_value="1" />
+            android:layout_marginTop="8dp"
+            android:entries="@array/recognizer_spinner_entries"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Number of Touches"
-            app:layout_constraintBottom_toBottomOf="@+id/numberPicker2"
-            app:layout_constraintEnd_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toTopOf="@+id/numberPicker2" />
+        </androidx.appcompat.widget.AppCompatSpinner>
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintTop_toBottomOf="@+id/recognizerSpinner">
+
+        </FrameLayout>
 
         <it.sephiroth.android.library.uigestures.demo.MotionView
             android:id="@+id/testView"
@@ -107,14 +90,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.35" />
+            app:layout_constraintGuide_percent="0.45" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
