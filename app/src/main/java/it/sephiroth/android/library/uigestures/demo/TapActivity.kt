@@ -67,6 +67,7 @@ open class TapActivity : AppCompatActivity() {
                 UIRotateGestureRecognizer::class -> fragment = UIRotateGestureRecognizerFragment.newInstance(rec)
                 UIPinchGestureRecognizer::class -> fragment = UIPinchGestureRecognizerFragment.newInstance(rec)
                 UIScreenEdgePanGestureRecognizer::class -> fragment = UIScreenEdgePanGestureRecognizerFragment.newInstance(rec)
+                UIPanGestureRecognizer::class -> fragment = UIPanGestureRecognizerFragment.newInstance(rec)
             }
 
             fragment?.let { frag ->

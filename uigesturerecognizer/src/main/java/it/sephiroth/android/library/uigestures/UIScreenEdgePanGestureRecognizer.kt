@@ -90,6 +90,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
 
     /**
      * Edge limits (in pixels) after which the gesture will fail
+     * @since 1.2.7
      */
     var edgeLimit: Float
 
