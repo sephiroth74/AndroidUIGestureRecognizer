@@ -69,6 +69,7 @@ open class TapActivity : AppCompatActivity() {
                 UIScreenEdgePanGestureRecognizer::class -> fragment = UIScreenEdgePanGestureRecognizerFragment.newInstance(rec)
                 UIPanGestureRecognizer::class -> fragment = UIPanGestureRecognizerFragment.newInstance(rec)
                 UISwipeGestureRecognizer::class -> fragment = UISwipeGestureRecognizerFragment.newInstance(rec)
+                UILongPressGestureRecognizer::class -> fragment = UILongPressGestureRecognizerFragment.newInstance(rec)
             }
 
             fragment?.let { frag ->

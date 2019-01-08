@@ -4,6 +4,7 @@
 
     <string-array name="recognizer_spinner_entries">
         <item>UITapGestureRecognizer</item>
+        <item>UILongPressGestureRecognizer</item>
         <item>UIRotateGestureRecognizer</item>
         <item>UIPinchGestureRecognizer</item>
         <item>UIScreenEdgePanGestureRecognizer</item>
