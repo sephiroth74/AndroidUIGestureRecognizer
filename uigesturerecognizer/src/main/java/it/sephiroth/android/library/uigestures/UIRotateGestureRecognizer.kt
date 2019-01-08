@@ -19,6 +19,8 @@ import kotlin.math.atan2
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 open class UIRotateGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIContinuousRecognizer {
 
+    // TODO: implement rotation with > 2 fingers
+
     /**
      * The minimum rotation threshold (in radians) before the
      * gesture can be accepted

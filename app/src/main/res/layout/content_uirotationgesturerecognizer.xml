@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:snp_maxValue="45"
         app:snp_minValue="1"
-        app:snp_value="1" />
+        app:snp_value="5" />
 
     <TextView
         android:id="@+id/textView"

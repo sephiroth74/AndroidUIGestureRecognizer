@@ -5,8 +5,14 @@
     <string-array name="recognizer_spinner_entries">
         <item>UITapGestureRecognizer</item>
         <item>UIRotateGestureRecognizer</item>
+        <item>UIPinchGestureRecognizer</item>
+        <item>UIScreenEdgePanGestureRecognizer</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="rect_edges_entries">
+        <item>LEFT</item>
+        <item>RIGHT</item>
+        <item>BOTTOM</item>
+    </string-array>
+
 </resources>

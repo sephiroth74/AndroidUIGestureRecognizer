@@ -79,7 +79,7 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="bottom"
-                android:text=""
+                android:text="Test me!"
                 android:textAppearance="?textAppearanceListItemSmall"
                 android:textSize="11sp" />
 
