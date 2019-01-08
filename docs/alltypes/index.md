@@ -4,7 +4,6 @@
 
 | Name | Summary |
 |---|---|
-| [it.sephiroth.android.library.uigestures.Geometry](../it.sephiroth.android.library.uigestures/-geometry.md) | Copyright 2017 Adobe Systems Incorporated.  All rights reserved. $Id$ $DateTime$ $Change$ $File$ $Revision$ $Author$ |
 | [it.sephiroth.android.library.uigestures.OnGestureRecognizerStateChangeListener](../it.sephiroth.android.library.uigestures/-on-gesture-recognizer-state-change-listener/index.md) | Created by alessandro crugnola on 11/20/16. |
 | [android.graphics.Point](../it.sephiroth.android.library.uigestures/android.graphics.-point/index.md) (extensions in package it.sephiroth.android.library.uigestures) |  |
 | [android.graphics.PointF](../it.sephiroth.android.library.uigestures/android.graphics.-point-f/index.md) (extensions in package it.sephiroth.android.library.uigestures) |  |
