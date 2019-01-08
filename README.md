@@ -122,4 +122,5 @@ Add the library dependency:
 
 # JavaDoc
 
-https://sephiroth74.github.io/AndroidUIGestureRecognizer/it.sephiroth.android.library.uigestures/
+https://github.com/sephiroth74/AndroidUIGestureRecognizer/blob/master/docs/it.sephiroth.android.library.uigestures/index.md
+
