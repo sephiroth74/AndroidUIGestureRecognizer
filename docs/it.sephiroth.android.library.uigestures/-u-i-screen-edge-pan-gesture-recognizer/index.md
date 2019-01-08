@@ -22,6 +22,7 @@ alessandro crugnola
 | Name | Summary |
 |---|---|
 | [edge](edge.md) | `var edge: `[`UIRectEdge`](../-u-i-rect-edge/index.md)<br>Screen sdge to be considered for this gesture to be recognized |
+| [edgeLimit](edge-limit.md) | `var edgeLimit: `[`Float`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html)<br>Edge limits (in pixels) after which the gesture will fail |
 | [maximumNumberOfTouches](maximum-number-of-touches.md) | `var maximumNumberOfTouches: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>@ The maximum number of fingers that can be touching the view for this gesture to be recognized. |
 | [minimumNumberOfTouches](minimum-number-of-touches.md) | `var minimumNumberOfTouches: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>The minimum number of fingers that can be touching the view for this gesture to be recognized. The default value is 1 |
 | [relativeScrollX](relative-scroll-x.md) | `val relativeScrollX: `[`Float`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html) |
