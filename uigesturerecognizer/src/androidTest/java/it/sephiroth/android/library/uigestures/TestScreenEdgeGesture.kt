@@ -77,7 +77,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
 
         recognizer.actionListener = actionListener
 
@@ -116,7 +116,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
         recognizer.maximumNumberOfTouches = 2
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
 
         recognizer.actionListener = actionListener
 
@@ -138,7 +138,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         recognizer.maximumNumberOfTouches = 1
         recognizer.minimumNumberOfTouches = 1
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
 
         recognizer.actionListener = actionListener
 
@@ -159,7 +159,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
         val bounds = mainView.visibleBounds
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
 
         recognizer.actionListener = actionListener
 
@@ -182,7 +182,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
 
         val recognizer2 = UIScreenEdgePanGestureRecognizer(context)
         recognizer2.tag = "edge-left"
@@ -211,7 +211,7 @@ class TestScreenEdgeGesture : TestBaseClass() {
 
         val recognizer = UIScreenEdgePanGestureRecognizer(context)
         recognizer.tag = "edge-right"
-        recognizer.edge = UIRectEdge.RIGTH
+        recognizer.edge = UIRectEdge.RIGHT
         recognizer.actionListener = actionListener
 
         val recognizer2 = UITapGestureRecognizer(context)
