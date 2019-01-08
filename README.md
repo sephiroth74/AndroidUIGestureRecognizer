@@ -62,12 +62,34 @@ Internally they will switch between `Possible`, `Ended`, `Failed` or `Cancelled`
 #### UIContinuousRecognizer
 A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state changed events (for instance a pinch gesture, or a rotate gesture).
 
+---
+
 # Installation
 
+### Maven
 Add the library dependency:
 
     implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:**version**'
 
+### JitPack
+**Step 1.** Add the JitPack repository to your build file:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+	
+**Step 2.** Add the dependency to your project's build.gradle file:
+
+	dependencies {
+	        implementation 'com.github.sephiroth74:AndroidUIGestureRecognizer:Tag'
+	}
+
+To See the last release version: https://jitpack.io/private#sephiroth74/AndroidUIGestureRecognizer/
+
+---
 
 # Example
 
@@ -119,6 +141,8 @@ Add the library dependency:
         }
 
 ```
+---
+
 
 # JavaDoc
 
