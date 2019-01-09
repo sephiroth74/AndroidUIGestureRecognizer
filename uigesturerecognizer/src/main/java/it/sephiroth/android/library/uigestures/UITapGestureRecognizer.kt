@@ -18,6 +18,9 @@ import android.view.ViewConfiguration
 @Suppress("MemberVisibilityCanBePrivate")
 open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(context), UIDiscreteGestureRecognizer {
 
+    override val currentLocationX: Float get() = mDownCurrentLocation.x
+    override val currentLocationY: Float get() = mDownCurrentLocation.y
+
     /**
      * Change the number of required touches for this recognizer to succeed.<br></br>
      * Default value is 1
@@ -68,6 +71,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
     private var mStarted: Boolean = false
     private var mNumTaps = 0
     private val mPreviousTapLocation = PointF()
+    private val mDownCurrentLocation = PointF()
 
     init {
         mStarted = false
@@ -117,7 +121,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
             logMessage(Log.VERBOSE, "mStarted: $mStarted")
         }
 
-        if (recognizer.state === State.Failed && state === State.Ended) {
+        if (recognizer.state == State.Failed && state == State.Ended) {
             stopListenForOtherStateChanges()
             fireActionEventIfCanRecognizeSimultaneously()
             postReset()
@@ -175,6 +179,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
                 mNumTaps++
                 mDownFocus.set(mCurrentLocation)
+                mDownCurrentLocation.set(mCurrentLocation)
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> if (state == State.Possible && mStarted) {
@@ -204,6 +209,7 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                 }
 
                 mDownFocus.set(mCurrentLocation)
+                mDownCurrentLocation.set(mCurrentLocation)
             }
 
             MotionEvent.ACTION_POINTER_UP -> if (state == State.Possible && mStarted) {
@@ -223,12 +229,13 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                     val slop = if (touchesRequired > 1 && tapsRequired > 1) scaledDoubleTapSlop else scaledTouchSlop
 
                     if (distance > slop) {
+                        mDownCurrentLocation.set(mCurrentLocation)
                         logMessage(Log.WARN, "distance: $distance, slop: $slop")
-                        logMessage(Log.WARN, "moved too much")
                         mAlwaysInTapRegion = false
                         removeMessages()
                         state = State.Failed
                     }
+
                 }
             }
 

@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">Android UIGestureRecognizer</string>
+    <string name="title_activity_tap">UITapGestureRecognizer</string>
+
+    <string-array name="recognizer_spinner_entries">
+        <item>UITapGestureRecognizer</item>
+        <item>UILongPressGestureRecognizer</item>
+        <item>UIRotateGestureRecognizer</item>
+        <item>UIPinchGestureRecognizer</item>
+        <item>UIScreenEdgePanGestureRecognizer</item>
+        <item>UIPanGestureRecognizer</item>
+        <item>UISwipeGestureRecognizer</item>
+    </string-array>
+
+    <string-array name="rect_edges_entries">
+        <item>LEFT</item>
+        <item>RIGHT</item>
+        <item>BOTTOM</item>
+    </string-array>
+
+    <string-array name="swipe_direction_entries">
+        <item>LEFT</item>
+        <item>RIGHT</item>
+        <item>UP</item>
+        <item>DOWN</item>
+    </string-array>
+
 </resources>

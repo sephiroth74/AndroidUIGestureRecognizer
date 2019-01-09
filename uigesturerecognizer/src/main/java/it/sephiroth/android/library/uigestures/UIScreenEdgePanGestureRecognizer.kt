@@ -88,7 +88,12 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
      */
     var scaledTouchSlop: Int
 
-    private val mEdgeLimit: Float
+    /**
+     * Edge limits (in pixels) after which the gesture will fail
+     * @since 1.2.7
+     */
+    var edgeLimit: Float
+
     private var mStarted: Boolean = false
     private var mDown: Boolean = false
     private var mVelocityTracker: VelocityTracker? = null
@@ -99,7 +104,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     init {
         val configuration = ViewConfiguration.get(context)
         scaledTouchSlop = configuration.scaledTouchSlop
-        mEdgeLimit = context.resources.getDimension(R.dimen.gestures_screen_edge_limit)
+        edgeLimit = context.resources.getDimension(R.dimen.gestures_screen_edge_limit)
     }
 
     override fun handleMessage(msg: Message) {
@@ -219,6 +224,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                     removeMessages(MESSAGE_RESET)
 
                     state = if (!computeState(rawX, rawY)) {
+                        logMessage(Log.WARN, "outside edge limits")
                         State.Failed
                     } else {
                         State.Possible
@@ -242,6 +248,8 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                         mVelocityTracker!!.computeCurrentVelocity(1000, java.lang.Float.MAX_VALUE)
                         yVelocity = mVelocityTracker!!.yVelocity
                         xVelocity = mVelocityTracker!!.xVelocity
+
+                        logMessage(Log.INFO, "velocity: $xVelocity, $yVelocity")
 
                         translationX -= scrollX
                         translationY -= scrollY
@@ -375,7 +383,7 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
                 return if (diffX > 0) {
                     UIRectEdge.LEFT
                 } else {
-                    UIRectEdge.RIGTH
+                    UIRectEdge.RIGHT
                 }
             }
         } else if (Math.abs(diffY) > 0.toFloat()) {
@@ -391,17 +399,17 @@ open class UIScreenEdgePanGestureRecognizer(context: Context) : UIGestureRecogni
     private fun computeState(x: Float, y: Float): Boolean {
         val context = context ?: return false
 
-        if (edge === UIRectEdge.LEFT && x > mEdgeLimit) {
+        if (edge == UIRectEdge.LEFT && x > edgeLimit) {
             return false
-        } else if (edge === UIRectEdge.RIGTH) {
+        } else if (edge == UIRectEdge.RIGHT) {
             val w = context.resources.displayMetrics.widthPixels
-            return x >= w - mEdgeLimit
-        } else if (edge === UIRectEdge.TOP && y > mEdgeLimit) {
+            return x >= w - edgeLimit
+        } else if (edge == UIRectEdge.TOP && y > edgeLimit) {
             return false
-        } else if (edge === UIRectEdge.BOTTOM) {
+        } else if (edge == UIRectEdge.BOTTOM) {
             val h = context.resources.displayMetrics.heightPixels
-            return y >= h - mEdgeLimit
-        } else if (edge === UIRectEdge.NONE) {
+            return y >= h - edgeLimit
+        } else if (edge == UIRectEdge.NONE) {
             return false
         }
         return true

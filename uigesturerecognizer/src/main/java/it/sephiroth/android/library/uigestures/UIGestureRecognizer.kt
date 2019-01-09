@@ -277,11 +277,6 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
 
         // compute current location
         mNumberOfTouches = computeFocusPoint(event, mCurrentLocation)
-
-        if (logEnabled) {
-            logMessage(Log.VERBOSE, "event.action: ${eventActionToString(event.actionMasked)}, focusPoint:$mCurrentLocation, " +
-                    "eventPoint:${PointF(event.x, event.y)}, eventTime:${event.eventTime}")
-        }
         return false
     }
 
@@ -334,7 +329,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
         if (!sDebug) {
             return
         }
-        Log.println(level, LOG_TAG, "[${javaClass.simpleName}] $fmt")
+        Log.println(level, LOG_TAG, "[${javaClass.simpleName}:$tag] $fmt")
     }
 
     @Suppress("unused")

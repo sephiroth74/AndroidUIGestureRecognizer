@@ -6,7 +6,6 @@
 
 | Name | Summary |
 |---|---|
-| [Geometry](-geometry.md) | `object Geometry`<br>Copyright 2017 Adobe Systems Incorporated.  All rights reserved. $Id$ $DateTime$ $Change$ $File$ $Revision$ $Author$ |
 | [OnGestureRecognizerStateChangeListener](-on-gesture-recognizer-state-change-listener/index.md) | `interface OnGestureRecognizerStateChangeListener`<br>Created by alessandro crugnola on 11/20/16. |
 | [ScaleGestureDetector](-scale-gesture-detector/index.md) | `class ScaleGestureDetector`<br>This is a slightly modified version of the Android's ScaleGestureDetector which doesn't trigger onScaleEnd when the scale ratio is back to 0. |
 | [UIContinuousRecognizer](-u-i-continuous-recognizer.md) | `interface UIContinuousRecognizer`<br>Created by Alessandro Crugnola on 11/20/16 |

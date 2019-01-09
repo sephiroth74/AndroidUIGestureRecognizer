@@ -9,7 +9,7 @@
 | Name | Summary |
 |---|---|
 | [LEFT](-l-e-f-t.md) |  |
-| [RIGTH](-r-i-g-t-h.md) |  |
+| [RIGHT](-r-i-g-h-t.md) |  |
 | [TOP](-t-o-p.md) |  |
 | [BOTTOM](-b-o-t-t-o-m.md) |  |
 | [NONE](-n-o-n-e.md) |  |
