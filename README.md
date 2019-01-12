@@ -68,43 +68,43 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
 
 Single Tap| Double Tap | Double Tap 2 Fingers
 :---: | :---: | :--: |
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/single_tap.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/double_tap.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/double_tap_2.gif" width=160 height=160 />
+<img src="./media/single_tap.gif" width=160 height=160 /> | <img src="./media/double_tap.gif" width=160 height=160 /> | <img src="./media/double_tap_2.gif" width=160 height=160 />
 
 <br />
 
 Logn Press| Long Press Double Tap
 :---: | :---: | 
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/long_press_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/long_press_double_tap_1.gif" width=160 height=160 />
+<img src="./media/long_press_1.gif" width=160 height=160 /> | <img src="./media/long_press_double_tap_1.gif" width=160 height=160 />
 
 <br />
 
 Pan 1 Finger| Pan 2 Fingers
 :---: | :---: | 
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/pan_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/pan_2.gif" width=160 height=160 />
+<img src="./media/pan_1.gif" width=160 height=160 /> | <img src="./media/pan_2.gif" width=160 height=160 />
 
 <br />
 
 Pinch|
 :---: |
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/pinch_1.gif" width=160 height=160 /> |
+<img src="./media/pinch_1.gif" width=160 height=160 /> |
 
 <br />
 
 Rotate| Rotate min angle
 :---: | :---: |
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/rotate_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/rotate_2.gif" width=160 height=160 /> |
+<img src="./media/rotate_1.gif" width=160 height=160 /> | <img src="./media/rotate_2.gif" width=160 height=160 /> |
 
 <br />
 
 Screen Edge 1 Finger| Screen Edge 2 Fingers
 :---: | :---: | 
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/screen_edge_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/screen_edge_2.gif" width=160 height=160 />
+<img src="./media/screen_edge_1.gif" width=160 height=160 /> | <img src="./media/screen_edge_2.gif" width=160 height=160 />
 
 <br />
 
 Swipe Left 1 Finger| Swipe Left 2 Fingers
 :---: | :---: | 
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/swipe_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/swipe_2.gif" width=160 height=160 />
+<img src="./media/swipe_1.gif" width=160 height=160 /> | <img src="./media/swipe_2.gif" width=160 height=160 />
 
 ---
 
