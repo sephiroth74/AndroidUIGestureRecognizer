@@ -90,9 +90,9 @@ Pinch|
 
 <br />
 
-Rotate|
-:---: |
-<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/rotate_1.gif" width=160 height=160 /> |
+Rotate| Rotate min angle
+:---: | :---: |
+<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/rotate_1.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/rotate_2.gif" width=160 height=160 /> |
 
 <br />
 
