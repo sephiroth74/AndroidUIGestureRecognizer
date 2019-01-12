@@ -64,6 +64,14 @@ A continuous gesture which will dispatch `Began`, `Changed` and `Ended` state ch
 
 ---
 
+# Demo
+
+Single Tap| Double Tap | Double Tap 2 Fingers
+--- | --- | -- |
+<img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/single_tap.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/double_tap.gif" width=160 height=160 /> | <img src="https://raw.githubusercontent.com/sephiroth74/AndroidUIGestureRecognizer/feature/demo/media/double_tap_2.gif" width=160 height=160 />
+
+---
+
 # Installation
 
 ### Maven
