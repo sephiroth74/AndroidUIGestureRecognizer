@@ -21,6 +21,7 @@ jacoco {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
+    testBuildType "debug"
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -36,7 +37,7 @@ android {
         release {
             minifyEnabled false
             debuggable true
-            testCoverageEnabled true
+            testCoverageEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
