@@ -131,7 +131,7 @@ Add the library dependency:
 	        implementation 'com.github.sephiroth74:AndroidUIGestureRecognizer:Tag'
 	}
 
-To See the last release version: https://jitpack.io/private#sephiroth74/AndroidUIGestureRecognizer/
+To See the last release version: https://jitpack.io/#sephiroth74/AndroidUIGestureRecognizer/
 
 ---
 
