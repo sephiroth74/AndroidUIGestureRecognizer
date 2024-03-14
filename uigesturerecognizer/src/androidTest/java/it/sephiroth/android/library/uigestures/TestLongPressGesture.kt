@@ -216,6 +216,10 @@ class TestLongPressGesture : TestBaseClass() {
                     assertEquals(1L, latch.count)
                     latch.countDown()
                 }
+
+                else -> {
+                    // empty
+                }
             }
 
         }
@@ -262,6 +266,10 @@ class TestLongPressGesture : TestBaseClass() {
                 UIGestureRecognizer.State.Ended -> {
                     assertEquals(1L, latch.count)
                     latch.countDown()
+                }
+
+                else -> {
+                    // empty
                 }
             }
 
@@ -328,6 +336,10 @@ class TestLongPressGesture : TestBaseClass() {
                 UIGestureRecognizer.State.Ended -> {
                     assertEquals(1L, latch.count)
                     latch.countDown()
+                }
+
+                else -> {
+                    // empty
                 }
             }
 

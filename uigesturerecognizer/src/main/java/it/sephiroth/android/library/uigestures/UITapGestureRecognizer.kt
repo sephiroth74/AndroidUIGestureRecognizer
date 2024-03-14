@@ -259,12 +259,15 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
                                     postReset()
                                 } else {
                                     when {
-                                        requireFailureOf!!.state === State.Failed -> {
+                                        requireFailureOf?.state === State.Failed -> {
                                             fireActionEventIfCanRecognizeSimultaneously()
                                             postReset()
                                         }
-                                        requireFailureOf!!.inState(State.Began, State.Ended, State.Changed) -> state =
-                                                State.Failed
+
+                                        requireFailureOf?.inState(State.Began, State.Ended, State.Changed) == true -> {
+                                            state = State.Failed
+                                        }
+                                        
                                         else -> {
                                             listenForOtherStateChanges()
                                         }
@@ -340,12 +343,15 @@ open class UITapGestureRecognizer(context: Context) : UIGestureRecognizer(contex
 
         // request to change the current state to Failed
         private const val MESSAGE_FAILED = 1
+
         // request to change the current state to Possible
         private const val MESSAGE_RESET = 2
+
         // we handle the action_pointer_up received in the onTouchEvent with a delay
         // in order to check how many fingers were actually down when we're checking them
         // in the action_up.
         private const val MESSAGE_POINTER_UP = 3
+
         // a long press will make this gesture to fail
         private const val MESSAGE_LONG_PRESS = 4
     }

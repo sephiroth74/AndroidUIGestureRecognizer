@@ -15,7 +15,6 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.test.core.view.PointerCoordsBuilder
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.Configurator
-import androidx.test.uiautomator.Tracer
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiObjectNotFoundException
 import timber.log.Timber
@@ -77,9 +76,6 @@ class Interaction {
 
         if (fingers < 2)
             throw RuntimeException("at least 2 fingers required")
-
-        Tracer.trace(steps)
-        Tracer.trace(fingers)
 
         val rect = view.visibleBounds
         rect.inset(SWIPE_MARGIN_LIMIT, SWIPE_MARGIN_LIMIT)

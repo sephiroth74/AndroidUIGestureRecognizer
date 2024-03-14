@@ -60,6 +60,8 @@ class TestPanGesture : TestBaseClass() {
                     assertEquals(1L, latch.count)
                     latch.countDown()
                 }
+
+                else -> {}
             }
         }
 
@@ -227,6 +229,8 @@ class TestPanGesture : TestBaseClass() {
                     assertEquals(1L, latch.count)
                     latch.countDown()
                 }
+
+                else -> {}
             }
         }
 

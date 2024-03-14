@@ -45,6 +45,8 @@ class TestPinchGesture : TestBaseClass() {
                     assertTrue(latch.count == 1L)
                     latch.countDown()
                 }
+
+                else -> {}
             }
 
             Timber.v("latch: ${latch.count}")
@@ -91,6 +93,8 @@ class TestPinchGesture : TestBaseClass() {
                     assertTrue(latch.count == 1L)
                     latch.countDown()
                 }
+
+                else -> {}
             }
 
             Timber.v("latch: ${latch.count}")

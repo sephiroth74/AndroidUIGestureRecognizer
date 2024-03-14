@@ -25,6 +25,7 @@ open class TestBaseClass {
     lateinit var wakeLock: PowerManager.WakeLock
     lateinit var interaction: Interaction
     lateinit var delegate: UIGestureRecognizerDelegate
+    lateinit var keyDelegate: UIKeyEventRecognizerDelegate
 
     var screenWidth: Int = 0
     var screenHeight: Int = 0

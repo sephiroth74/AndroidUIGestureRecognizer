@@ -47,6 +47,8 @@ class TestRotateGesture : TestBaseClass() {
                     latch.countDown()
 
                 }
+
+                else -> {}
             }
         }
 
