@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
@@ -16,7 +15,7 @@ tasks.coveralls {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.10"
 }
 
 android {
@@ -26,9 +25,7 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName VERSION_NAME
-
+        namespace "it.sephiroth.android.library.uigestures"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 //        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -36,7 +33,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            debuggable true
             testCoverageEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -60,8 +56,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -120,8 +116,6 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
     description = "Generate Jacoco coverage reports for the ${name.capitalize()} build."
 
     reports {
-        xml.enabled = true
-        html.enabled = true
     }
 
     def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', 'android/**/*.*']
@@ -187,34 +181,36 @@ task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn:
 
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'androidx.annotation:annotation:1.7.1'
 
-    debugImplementation 'com.google.android.material:material:1.0.0-rc01'
-    debugImplementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}"
 
-    testImplementation 'androidx.test:core:1.1.0'
-    testImplementation 'androidx.test:runner:1.1.1'
-    testImplementation 'androidx.test:rules:1.1.1'
-    testImplementation 'androidx.test.ext:junit:1.1.0'
-    testImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    testImplementation 'org.robolectric:robolectric:4.1'
+    debugImplementation 'com.google.android.material:material:1.11.0'
+    debugImplementation 'androidx.appcompat:appcompat:1.6.1'
 
-    androidTestImplementation('com.jakewharton.timber:timber:4.7.1') {
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'androidx.test:runner:1.5.2'
+    testImplementation 'androidx.test:rules:1.5.0'
+    testImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    testImplementation 'org.robolectric:robolectric:4.8'
+
+    androidTestImplementation('com.jakewharton.timber:timber:5.0.1') {
         exclude group: 'org.jetbrains', module: 'annotations'
     }
 
-    androidTestImplementation 'com.google.android.material:material:1.0.0-rc01'
-    androidTestImplementation 'androidx.appcompat:appcompat:1.0.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.1'
-    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    androidTestImplementation 'androidx.test:core:1.1.0'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'com.google.android.material:material:1.11.0'
+    androidTestImplementation 'androidx.appcompat:appcompat:1.6.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.5.1'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+    androidTestImplementation 'androidx.test:core:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 
-    androidTestUtil 'androidx.test:orchestrator:1.1.1'
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
 
 
@@ -225,24 +221,3 @@ tasks.all {
         }
 }
 
-try {
-    apply from: "https://raw.githubusercontent.com/sephiroth74/JavaCheckStyle/2.0.1/checkstyle.gradle"
-    apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'
-} catch (e) {
-
-}
-
-uploadArchives.dependsOn 'check'
-
-task deleteJar(type: Delete) {
-    delete 'libs/jars/uigesturerecognizer.jar'
-}
-
-task createJar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('libs/jars/')
-    include('classes.jar')
-    rename('classes.jar', 'uigesturerecognizer.jar')
-}
-
-createJar.dependsOn(deleteJar, build)

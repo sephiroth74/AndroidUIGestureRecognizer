@@ -1,5 +1,3 @@
-<manifest package="it.sephiroth.android.library.uigestures">
-
+<manifest>
     <application />
-
 </manifest>

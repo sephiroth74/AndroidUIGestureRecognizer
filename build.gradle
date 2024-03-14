@@ -3,34 +3,36 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.3.61'
+        kotlin_version = '1.9.20'
         dokkaVersion = '0.9.17'
     }
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:8.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'org.jacoco:org.jacoco.core:0.8.2'
+        classpath 'org.jacoco:org.jacoco.core:0.8.10'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:$dokkaVersion"
     }
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 34
     minSdkVersion = 15
-    targetSdkVersion = 28
+    targetSdkVersion = 34
 }
 
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
+        mavenLocal()
     }
 }
 

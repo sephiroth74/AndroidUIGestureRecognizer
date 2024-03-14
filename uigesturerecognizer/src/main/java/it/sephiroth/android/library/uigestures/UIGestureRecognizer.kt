@@ -333,11 +333,7 @@ abstract class UIGestureRecognizer(context: Context) : OnGestureRecognizerStateC
     }
 
     @Suppress("unused")
-    @TargetApi(Build.VERSION_CODES.CUPCAKE)
     companion object {
-
-        const val VERSION = BuildConfig.VERSION_NAME
-
         val LOG_TAG: String = UIGestureRecognizer::class.java.simpleName
 
         /**
