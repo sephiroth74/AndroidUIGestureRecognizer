@@ -136,12 +136,6 @@ Screen Edge 1 Finger| Screen Edge 2 Fingers
 
 # Installation
 
-### Maven
-
-Add the library dependency:
-
-    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:**version**'
-
 ### JitPack
 
 **Step 1.** Add the JitPack repository to your build file:
